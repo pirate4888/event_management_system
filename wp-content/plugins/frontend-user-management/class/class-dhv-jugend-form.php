@@ -1,37 +1,35 @@
 <?php
 /**
  * @author Christoph Bessei
- * @version
+ * @version 0.01
  */
-
-class DHV_Jugend_Form {
-
+class Dhv_Jugend_Form {
 
 	public function __construct() {
 		add_filter( 'user_contactmethods', array( $this, 'modify_contact_methods' ) );
 	}
 
-
 	function modify_contact_methods( $profile_fields ) {
 
 		// Add new fields
-		$profile_fields['geburtsdatum']  = 'Geburtsdatum';
-		$profile_fields['strasse']  = 'Straße';
-		$profile_fields['plz']  = 'Postleitzahl';
-		$profile_fields['ort']  = 'Ort';
-		$profile_fields['bundesland']  = 'Bundesland';
-		$profile_fields['telefon']  = 'Telefon';
-		$profile_fields['mobil']  = 'Mobil';
-		$profile_fields['bundesland']  = 'Bundesland';
-		$profile_fields['dhv_mitgliedsnummer'] = 'DHV-MitgliedsNr.';
+		$profile_fields['geburtsdatum']         = 'Geburtsdatum';
+		$profile_fields['strasse']              = 'Straße';
+		$profile_fields['plz']                  = 'Postleitzahl';
+		$profile_fields['ort']                  = 'Ort';
+		$profile_fields['bundesland']           = 'Bundesland';
+		$profile_fields['telefon']              = 'Telefon';
+		$profile_fields['mobil']                = 'Mobil';
+		$profile_fields['bundesland']           = 'Bundesland';
+		$profile_fields['dhv_mitgliedsnummer']  = 'DHV-MitgliedsNr.';
 		$profile_fields['pilotenscheinnummer']  = 'PilotenscheinNr.';
 		$profile_fields['notfall_kontakt_name'] = 'Notfall Kontakt';
-		$profile_fields['notfall_kontakt_tel'] = 'Notfall Kontakt Tel';
-		$profile_fields['sonstiges']  = 'Sonstiges';
+		$profile_fields['notfall_kontakt_tel']  = 'Notfall Kontakt Tel';
+		$profile_fields['sonstiges']            = 'Sonstiges';
 
 
 		return $profile_fields;
 	}
+
 	public function get_form( $user_id ) {
 
 		global $userdata, $wp_http_referer;
@@ -105,7 +103,4 @@ class DHV_Jugend_Form {
 		return $content;
 	}
 }
-
-
-?>
 

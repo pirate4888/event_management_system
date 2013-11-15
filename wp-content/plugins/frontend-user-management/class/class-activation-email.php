@@ -7,13 +7,8 @@
 class Activation_Email {
 	private $activation_key_field = 'fum_user_activation_key';
 	private $active_user_value = 'active';
-	private $plugin_path = NULL;
-	private $plugin_url = NULL;
-
 
 	public function __construct() {
-		$this->plugin_path = plugin_dir_path( __FILE__ );
-		$this->plugin_url  = plugin_dir_url( __FILE__ );
 
 		//since 0.01
 		//Create activation code on user_register and add it to the user meta
@@ -60,10 +55,6 @@ class Activation_Email {
 		foreach ( $user_IDs as $user_ID ) {
 			delete_user_meta( $user_ID, $this->activation_key_field );
 		}
-	}
-
-	public function plugin_uninstall() {
-
 	}
 
 	/**
@@ -122,23 +113,23 @@ class Activation_Email {
 			$user_ids = get_users( $options );
 			foreach ( $user_ids as $user_id ) {
 				if ( update_user_meta( $user_id, $this->activation_key_field, $this->active_user_value, $url_activation_key ) ) {
-					return "SUCCESSFULLY ACTIVATED! " . $content;
+					return '<strong>' . __( 'Activation of user was successful' ) . '</strong>' . $content;
 				}
 			}
-			return "Invalid activation key" . $content;
+			return '<strong>' . __( 'Invalid activation key' ) . '</strong>' . $content;
 		}
 		return $content;
 	}
 
 	public function authenticate( $user ) {
 		//Authentication already failed, just return $user
-		if(is_wp_error($user)) {
+		if ( is_wp_error( $user ) ) {
 			return $user;
 		}
-		if(get_user_meta($user->ID,$this->activation_key_field,true) === $this->active_user_value) {
+		if ( get_user_meta( $user->ID, $this->activation_key_field, true ) === $this->active_user_value ) {
 			return $user;
 		}
-		return new WP_Error('not activated', __('User was not activated, have you check your mails for the activation link?'));
+		return new WP_Error( 'not activated', __( 'User was not activated, have you check your mails for the activation link?' ) );
 	}
 
 	/**

@@ -1,4 +1,4 @@
-frontend_user_management
-========================
+event-management-system
+=======================
 
-Wordpress Plugin for Frontend User Management
+Event management system plugin for wordpress

@@ -34,35 +34,20 @@ class Front_End_Form {
 		add_shortcode( $shortcode, array( $this, 'get_edit_form' ) );
 	}
 
-	public function get_register_form() {
-		if ( isset( $_POST["register_form_sent"] ) ) {
-			$return = wp_insert_user( $_POST );
 
-			if ( is_wp_error( $return ) ) {
-				echo $return->get_error_message();
-			}
-			else {
-				echo __( 'Registration was successful' );
-			}
-
-		}
-		else {
-			/*Field names from http://codex.wordpress.org/Function_Reference/wp_insert_user*/
-			?>
-			<form action="<?php echo get_permalink(); ?>" method="POST">
-				<label>Username:</label> <input type="text" name="user_login" /><br />
-				<label>Passwort:</label> <input type="password" name="user_pass" /><br />
-				<label>E-Mail:</label> <input type="text" name="user_email" /><br />
-				<input type="submit" value="Registrieren" name="register_form_sent" /><br />
-			</form>
-		<?php
-		}
+	/**
+	 * Buffer the content if the post is a front end form
+	 * This is necessary because we may use wp_redirect()
+	 */
+	public function buffer_content_if_front_end_form() {
+		ob_start();
 	}
+
 
 	public function get_login_form() {
 
 		if ( isset( $_GET[Fum_Conf::get_fum_login_arg_name()] ) && Fum_Conf::get_fum_login_failed_arg_value() == $_GET[Fum_Conf::get_fum_login_arg_name()] ) {
-			echo '<p><strong>' . __( 'Benutzername oder Passwort falsch' ) . '</strong></p>';
+			echo '<p><strong>' . __( 'Ist der Benutzer aktiviert(E-Mails checken?) <br/>Benutzername oder Passwort falsch' ) . '</strong></p>';
 		}
 
 		if ( is_user_logged_in() ) {
@@ -81,7 +66,7 @@ class Front_End_Form {
 					$redirect = home_url();
 				}
 			}
-			wp_login_form( array( 'redirect' => $redirect ) );
+
 		}
 	}
 
@@ -128,5 +113,23 @@ class Front_End_Form {
 		}
 		$dhv_jugend_form = new Dhv_Jugend_Form();
 		echo $dhv_jugend_form->get_form( $user_id );
+	}
+
+	private function getCustomFields() {
+
+	}
+
+	public function use_ssl_on_front_end_form( $force_ssl ) {
+		global $post;
+
+		$custom_post_type = Fum_Conf::get_fum_post_type();
+
+		$post_type = get_post_type( $post );
+
+
+		if ( force_ssl_login() && $post_type === $custom_post_type ) {
+			return true;
+		}
+		return $force_ssl;
 	}
 }

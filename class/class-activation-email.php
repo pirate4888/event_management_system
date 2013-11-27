@@ -8,6 +8,7 @@ class Activation_Email {
 	private $activation_key_field = 'fum_user_activation_key';
 	private $active_user_value = 'active';
 
+
 	public function __construct() {
 
 		//since 0.01
@@ -79,9 +80,7 @@ class Activation_Email {
 		$activation_key = $this->create_activation_key();
 		update_user_meta( $user_id, $this->activation_key_field, $activation_key );
 
-		//Send activation key to user, to avoid plugin conflicts we do NOT override wp_new_user_notification
-		$this->send_welcome_mail( $user_id );
-
+		$this->fum_new_user_notification( $user_id, $_POST['user_pass'] );
 	}
 
 	private function create_activation_key() {
@@ -89,26 +88,11 @@ class Activation_Email {
 		return wp_generate_password( 15, false );
 	}
 
-	private function send_welcome_mail( $user_id ) {
-		$user            = new WP_User( $user_id );
-		$activation_code = get_user_meta( $user->ID, $this->activation_key_field, true );
-
-		$user_login = stripslashes( $user->user_login );
-		$user_email = stripslashes( $user->user_email );
-
-		$message = sprintf( __( 'New user registration on your blog %s:', 'frontend-user-management' ), get_option( 'blogname' ) ) . "\r\n\r\n";
-		$message .= sprintf( __( 'Username: %s', 'frontend-user-management' ), $user_login ) . "\r\n\r\n";
-		$message .= sprintf( __( 'E-mail: %s', 'frontend-user-management' ), $user_email ) . "\r\n";
-		$message .= sprintf( __( 'Activation Link: %s', 'frontend-user-management' ), get_home_url() . "?" . $this->activation_key_field . "=" . $activation_code ) . "\r\n\n";
-
-		wp_mail( $user_email, sprintf( __( '[%s] activation link', 'frontend-user-management' ), get_option( 'blogname' ) ), $message );
-	}
-
-
+	//TODO Make activation link more secure with an extra field which contains the username, so we do not check every activation code
 	public function activate_user( $content ) {
 		if ( isset( $_GET[$this->activation_key_field] ) ) {
 			$url_activation_key = $_GET[$this->activation_key_field];
-			//Get all user IDs and do not sort them, we do not need a sorted result and it just costs time
+			//Get all user IDs
 			$options  = array( 'fields' => 'ID' );
 			$user_ids = get_users( $options );
 			foreach ( $user_ids as $user_id ) {
@@ -132,11 +116,61 @@ class Activation_Email {
 		return new WP_Error( 'not activated', __( 'User was not activated, have you check your mails for the activation link?' ) );
 	}
 
+	private function fum_new_user_notification( $user_id, $password = false ) {
+		$user            = new WP_User( $user_id );
+		$activation_code = get_user_meta( $user->ID, $this->get_activation_key_field(), true );
+
+		//Send activation link only if the admin wants to use activation links, otherwise activate user directly
+		if ( get_option( Fum_Conf::get_fum_register_form_use_activation_mail_option() ) ) {
+			$send_activation_link = true;
+		}
+		else {
+			update_user_meta( $user_id, $this->get_activation_key_field(), $this->get_active_user_value() );
+			$send_activation_link = false;
+		}
+
+		//Send password only if it was generated randomly
+		if ( ! get_option( Fum_Conf::get_fum_register_form_generate_password_option() ) ) {
+			$password = false;
+		}
+		//Send the welcome mail only if it contains useful informations (activation link and/or password)
+		if ( false === $password && false === $send_activation_link ) {
+			return;
+		}
+
+		$user_login = stripslashes( $user->user_login );
+		$user_email = stripslashes( $user->user_email );
+
+		$message = sprintf( __( 'New user registration on your blog %s:', 'frontend-user-management' ), get_option( 'blogname' ) ) . "\r\n\r\n";
+		$message .= sprintf( __( 'Username: %s', 'frontend-user-management' ), $user_login ) . "\r\n";
+		$message .= sprintf( __( 'E-mail: %s', 'frontend-user-management' ), $user_email ) . "\r\n";
+		if ( false !== $password ) {
+			$message .= sprintf( __( 'Password: %s', 'frontend-user-management' ), $password ) . "\r\n";
+		}
+		if ( false !== $send_activation_link ) {
+			$message .= sprintf( __( 'Activation Link: %s', 'frontend-user-management' ), get_home_url() . "?" . $this->get_activation_key_field() . "=" . $activation_code ) . "\r\n";
+		}
+
+		wp_mail( $user_email, sprintf( __( 'Welcome to %s', 'frontend-user-management' ), get_option( 'blogname' ) ), $message );
+	}
+
 	/**
 	 * Returns the field name where the activation key is stored in the user meta
 	 * @return string
 	 */
-	public function getActivationKeyField() {
+	public function get_activation_key_field() {
 		return $this->activation_key_field;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function get_active_user_value() {
+		return $this->active_user_value;
+	}
 }
+
+if ( ! function_exists( 'wp_new_user_notification' ) ) :
+//Overwrite wp_new_user_notification from pluggable.php
+//TODO else: throw exception that there is a plugin conflict because two plugins overwrite wp_new_user_notification
+endif;

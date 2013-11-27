@@ -21,6 +21,8 @@ class Change_Wp_Url {
 		add_filter( 'login_url', array( $this, 'change_wp_login_url' ) );
 		add_action( 'wp_login_failed', array( $this, 'login_failed_redirect' ) );
 		add_filter( 'authenticate', array( $this, 'check_if_username_or_password_empty' ), 10, 3 );
+		//TODO Change Link which is show when author is logged in e.g at the comments
+		add_filter( 'author_link', array( $this, 'change_author_url' ) );
 
 		add_filter( 'logout_url', array( $this, 'my_logout_url' ) );
 		add_action( 'pre_get_posts', array( $this, 'search_logout_action' ) );
@@ -28,6 +30,10 @@ class Change_Wp_Url {
 			add_filter( 'lostpassword_url', 'fix_lostpass_url' );
 			//Site URL hack to overwrite register url
 			add_filter( 'site_url', 'fix_urls', 10, 3 );*/
+	}
+
+	public function change_author_url() {
+		return 'HALLLOOO';
 	}
 
 	public function check_if_username_or_password_empty( $user, $username, $password ) {
@@ -68,11 +74,10 @@ class Change_Wp_Url {
 
 
 	public function change_wp_register_url( $link ) {
-		if ( $this->fum_register_url == '' ) {
+		if ( is_user_logged_in() || $this->fum_register_url == '' ) {
 			return $link;
 		}
 		return $this->fum_register_url;
-
 	}
 
 	//Site URL hack to overwrite register url

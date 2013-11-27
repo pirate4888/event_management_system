@@ -1,0 +1,8 @@
+Register/Login failed redirects to wp-login.php
+
+Register->redirect to login screen->login-> redirects to register (in this case the login should redirect to home_url)
+
+Show error if user enters register.php but is already logged in
+
+Edit Profile: Change Password
+

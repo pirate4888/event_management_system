@@ -23,14 +23,32 @@ class Frontend_User_Management {
 		$this->register_hooks();
 		$this->init_plugin();
 		$this->add_actions();
+		$this->add_filter();
 
 	}
 
+	public function register_settings() {
+		register_setting( Fum_Conf::get_fum_register_form_option_group(), Fum_Conf::get_fum_register_form_generate_password_option() );
+		register_setting( Fum_Conf::get_fum_register_form_option_group(), Fum_Conf::get_fum_register_form_use_activation_mail_option() );
+
+	}
 
 	private function add_actions() {
-		//Generate custon admin_bar
-		add_action( 'wp_before_admin_bar_render', array( new Admin_Bar(), 'create_admin_bar' ) );
-		add_action( 'init', array( new Fum_Post(), 'fum_register_post_type' ) );
+		if ( is_admin() ) { // admin actions
+			add_action( 'admin_menu', array( $this, 'fum_admin_menu' ) );
+			add_action( 'admin_init', array( $this, 'register_settings' ) );
+		}
+		else {
+			//Generate custon admin_bar
+			add_action( 'wp_before_admin_bar_render', array( new Admin_Bar(), 'create_admin_bar' ) );
+			add_action( 'init', array( new Fum_Post(), 'fum_register_post_type' ) );
+			add_action( 'init', array( new Front_End_Form(), 'buffer_content_if_front_end_form' ) );
+		}
+
+	}
+
+	private function add_filter() {
+		add_filter( 'force_ssl', array( new Front_End_Form(), 'use_ssl_on_front_end_form' ), 1, 3 );
 	}
 
 	private function init_plugin() {
@@ -77,12 +95,27 @@ class Frontend_User_Management {
 		if ( 'Fum_Conf' === $class_name ) {
 			require_once( $this->plugin_path . 'fum_conf.php' );
 		}
+
+		if ( 'Options' === $class_name ) {
+			require_once( $this->plugin_path . 'options.php' );
+		}
 		//Because of sucking wordpress name conventions class name != file name, convert it manually
 		$class_name = strtolower( str_replace( '_', '-', $class_name ) );
 		$file       = $this->plugin_path . 'class/class-' . $class_name . '.php';
 		if ( file_exists( $file ) ) {
 			require_once( $file );
 		}
+	}
+
+	public function fum_admin_menu() {
+		add_menu_page( 'Frontend User Management', 'Frontend User Management', 'manage_options', 'fum', array( new Options(), 'register_form_options' ) );
+
+		//Show top level link as submenu page
+		add_submenu_page( 'fum', 'Register Form', 'Register Form', 'manage_options', 'fum' );
+
+		//Add submenus
+		add_submenu_page( 'fum', 'Login Form', 'Login Form', 'manage_options', 'fum_login_form', array( new Options(), 'register_form_options' ) );
+
 	}
 }
 

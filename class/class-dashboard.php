@@ -23,16 +23,17 @@ class Dashboard {
 		if ( NULL === $this->hidden_cat_id ) {
 			$this->hidden_cat_id = $cat_id;
 			$this->hide_cat      = $hide_cat;
-			add_action( 'pre_get_posts', array( $this, 'hide_posts_of_category_from_dashboard' ),10,0 );
+			add_action( 'pre_get_posts', array( $this, 'hide_posts_of_category_from_dashboard' ), 10, 0 );
 			if ( true === $this->hide_cat ) {
 				add_filter( 'list_terms_exclusions', array( $this, 'hide_posts_of_category_from_dashboard' ), 10, 1 );
 			}
 		}
 		//Second call, hopefully from do_action now
 		else {
-			if(NULL === $cat_id) {
+			if ( NULL === $cat_id ) {
 				$this->remove_posts_of_category_from_query( $this->hidden_cat_id );
-			} else {
+			}
+			else {
 				$exclusions = $cat_id;
 				//list_terms_exclusions expects exclusions as return value
 				return $this->remove_category_from_dashboard( $exclusions );

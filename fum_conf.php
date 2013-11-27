@@ -21,6 +21,68 @@ class Fum_Conf {
 	private static $fum_login_arg_name = 'fum_login';
 	private static $fum_login_failed_arg_value = 'failed';
 
+	private static $fum_login_form_option_group = 'fum_login_form_options';
+
+	private static $fum_register_form_option_group = 'fum_register_form_options';
+	private static $fum_register_form_generate_password_option = 'fum_register_form_generate_password_option';
+	private static $fum_register_form_use_activation_mail_option = 'fum_register_form_use_activation_mail_option';
+
+	/**
+	 * @param string $fum_register_form_use_activation_mail_option
+	 */
+	public static function set_fum_register_form_use_activation_mail_option( $fum_register_form_use_activation_mail_option ) {
+		self::$fum_register_form_use_activation_mail_option = $fum_register_form_use_activation_mail_option;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function get_fum_register_form_use_activation_mail_option() {
+		return self::$fum_register_form_use_activation_mail_option;
+	}
+
+	/**
+	 * @param string $fum_login_form_option_group
+	 */
+	public static function set_fum_login_form_option_group( $fum_login_form_option_group ) {
+		self::$fum_login_form_option_group = $fum_login_form_option_group;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function get_fum_login_form_option_group() {
+		return self::$fum_login_form_option_group;
+	}
+
+	/**
+	 * @param string $fum_register_form_generate_password
+	 */
+	public static function set_fum_register_form_generate_password_option( $fum_register_form_generate_password ) {
+		self::$fum_register_form_generate_password_option = $fum_register_form_generate_password;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function get_fum_register_form_generate_password_option() {
+		return self::$fum_register_form_generate_password_option;
+	}
+
+	/**
+	 * @param string $fum_register_form_option_group
+	 */
+	public static function set_fum_register_form_option_group( $fum_register_form_option_group ) {
+		self::$fum_register_form_option_group = $fum_register_form_option_group;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function get_fum_register_form_option_group() {
+		return self::$fum_register_form_option_group;
+	}
+
 	/**
 	 * @param string $fum_login_arg_name
 	 */

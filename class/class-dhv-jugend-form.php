@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Christoph Bessei
+ * @author  Christoph Bessei
  * @version 0.01
  */
 class Dhv_Jugend_Form {

@@ -22,30 +22,50 @@ class Frontend_User_Management {
 
 		$this->register_hooks();
 		$this->init_plugin();
-		$this->add_actions();
+		Action_Hooks::add_action_hooks();
 		$this->add_filter();
 
-	}
-
-	public function register_settings() {
-		register_setting( Fum_Conf::get_fum_register_form_option_group(), Fum_Conf::get_fum_register_form_generate_password_option() );
-		register_setting( Fum_Conf::get_fum_register_form_option_group(), Fum_Conf::get_fum_register_form_use_activation_mail_option() );
+		add_action( 'admin_print_footer_scripts', array( $this, 'my_admin_print_footer_scripts' ) );
 
 	}
 
-	private function add_actions() {
-		if ( is_admin() ) { // admin actions
-			add_action( 'admin_menu', array( $this, 'fum_admin_menu' ) );
-			add_action( 'admin_init', array( $this, 'register_settings' ) );
-		}
-		else {
-			//Generate custon admin_bar
-			add_action( 'wp_before_admin_bar_render', array( new Admin_Bar(), 'create_admin_bar' ) );
-			add_action( 'init', array( new Fum_Post(), 'fum_register_post_type' ) );
-			add_action( 'init', array( new Front_End_Form(), 'buffer_content_if_front_end_form' ) );
-		}
 
+	/*	function my_admin_enqueue_scripts() {
+			wp_enqueue_style( 'wp-pointer' );
+			wp_enqueue_script( 'wp-pointer' );
+
+		}*/
+
+	function my_admin_print_footer_scripts() {
+		$pointer_content = '<h3>iShift | Notice</h3>';
+		$pointer_content .= '<p>Added new functions to Edit Post section and few more options for users (authors and subscribers only).</p>';
+		?>
+		<script type="text/javascript">
+			$(document).ready(function () {
+				// Tooltip only Text
+				$('#icon_fum').hover(function () {
+					// Hover over code
+					var title = $(this).attr('title');
+					$(this).data('tipText', title).removeAttr('title');
+					$('<p class="tooltip"></p>')
+							.text(title)
+							.appendTo('body')
+							.fadeIn('slow');
+				},function () {
+					// Hover out code
+					$(this).attr('title', $(this).data('tipText'));
+					$('.tooltip').remove();
+				}).mousemove(function (e) {
+							var mousex = e.pageX + 20; //Get X coordinates
+							var mousey = e.pageY + 10; //Get Y coordinates
+							$('.tooltip')
+									.css({ top: mousey, left: mousex })
+						});
+			});
+		</script>
+	<?php
 	}
+
 
 	private function add_filter() {
 		add_filter( 'force_ssl', array( new Front_End_Form(), 'use_ssl_on_front_end_form' ), 1, 3 );
@@ -58,9 +78,9 @@ class Frontend_User_Management {
 
 		//Add ShortCodes of user forms(register,login,edit)
 		$front_end_form = new Front_End_Form();
-		$front_end_form->add_shortcode_of_register_form( Fum_Conf::get_fum_register_form_shortcode() );
-		$front_end_form->add_shortcode_of_login_form( Fum_Conf::get_fum_login_form_shortcode() );
-		$front_end_form->add_shortcode_of_edit_form( Fum_Conf::get_fum_edit_form_shortcode() );
+		$front_end_form->add_shortcode_of_register_form( Fum_Conf::$fum_register_form_shortcode );
+		$front_end_form->add_shortcode_of_login_form( Fum_Conf::$fum_login_form_shortcode );
+		$front_end_form->add_shortcode_of_edit_form( Fum_Conf::$fum_edit_form_shortcode );
 	}
 
 	private function register_hooks() {
@@ -72,9 +92,9 @@ class Frontend_User_Management {
 	public function plugin_activate() {
 		$front_end_form = new Front_End_Form();
 		$post_ids       = $front_end_form->add_form_posts();
-		add_option( Fum_Conf::get_fum_register_form_name(), $post_ids[Fum_Conf::get_fum_register_form_name()] );
-		add_option( Fum_Conf::get_fum_login_form_name(), $post_ids[Fum_Conf::get_fum_login_form_name()] );
-		add_option( Fum_Conf::get_fum_edit_form_name(), $post_ids[Fum_Conf::get_fum_edit_form_name()] );
+		add_option( Fum_Conf::$fum_register_form_name, $post_ids[Fum_Conf::$fum_register_form_name] );
+		add_option( Fum_Conf::$fum_login_form_name, $post_ids[Fum_Conf::$fum_login_form_name] );
+		add_option( Fum_Conf::$fum_edit_form_name, $post_ids[Fum_Conf::$fum_edit_form_name] );
 
 		$activation_email = new Activation_Email();
 		$activation_email->plugin_activated();
@@ -84,9 +104,9 @@ class Frontend_User_Management {
 		$fum_post = new Fum_Post();
 		$fum_post->remove_all_fum_posts();
 
-		delete_option( Fum_Conf::get_fum_register_form_name() );
-		delete_option( Fum_Conf::get_fum_login_form_name() );
-		delete_option( Fum_Conf::get_fum_edit_form_name() );
+		delete_option( Fum_Conf::$fum_register_form_name );
+		delete_option( Fum_Conf::$fum_login_form_name );
+		delete_option( Fum_Conf::$fum_edit_form_name );
 		$activation_email = new Activation_Email();
 		$activation_email->plugin_deactivated();
 	}
@@ -99,23 +119,27 @@ class Frontend_User_Management {
 		if ( 'Options' === $class_name ) {
 			require_once( $this->plugin_path . 'options.php' );
 		}
-		//Because of sucking wordpress name conventions class name != file name, convert it manually
-		$class_name = strtolower( str_replace( '_', '-', $class_name ) );
-		$file       = $this->plugin_path . 'class/class-' . $class_name . '.php';
-		if ( file_exists( $file ) ) {
-			require_once( $file );
+		if ( 'Option_Page_Controller' === $class_name ) {
+			require_once( $this->plugin_path . 'controller/class-option-page-controller.php' );
 		}
-	}
+		//Because of sucking wordpress name conventions class name != file name, convert it manually
+		$class_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) . '.php' );
 
-	public function fum_admin_menu() {
-		add_menu_page( 'Frontend User Management', 'Frontend User Management', 'manage_options', 'fum', array( new Options(), 'register_form_options' ) );
-
-		//Show top level link as submenu page
-		add_submenu_page( 'fum', 'Register Form', 'Register Form', 'manage_options', 'fum' );
-
-		//Add submenus
-		add_submenu_page( 'fum', 'Login Form', 'Login Form', 'manage_options', 'fum_login_form', array( new Options(), 'register_form_options' ) );
-
+		if ( file_exists( $this->plugin_path . 'class/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'class/' . $class_name );
+		}
+		elseif ( file_exists( $this->plugin_path . 'controller/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'controller/' . $class_name );
+		}
+		elseif ( file_exists( $this->plugin_path . 'model/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'model/' . $class_name );
+		}
+		elseif ( file_exists( $this->plugin_path . 'views/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'views/' . $class_name );
+		}
+		elseif ( file_exists( $this->plugin_path . 'views/fum_option_pages/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'views/fum_option_pages/' . $class_name );
+		}
 	}
 }
 

@@ -121,7 +121,7 @@ class Activation_Email {
 		$activation_code = get_user_meta( $user->ID, $this->get_activation_key_field(), true );
 
 		//Send activation link only if the admin wants to use activation links, otherwise activate user directly
-		if ( get_option( Fum_Conf::get_fum_register_form_use_activation_mail_option() ) ) {
+		if ( get_option( Fum_Conf::$fum_register_form_use_activation_mail_option ) ) {
 			$send_activation_link = true;
 		}
 		else {
@@ -130,7 +130,7 @@ class Activation_Email {
 		}
 
 		//Send password only if it was generated randomly
-		if ( ! get_option( Fum_Conf::get_fum_register_form_generate_password_option() ) ) {
+		if ( ! get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
 			$password = false;
 		}
 		//Send the welcome mail only if it contains useful informations (activation link and/or password)

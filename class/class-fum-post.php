@@ -7,15 +7,15 @@
 class Fum_Post {
 
 	public function fum_register_post_type() {
-		if ( ! post_type_exists( Fum_Conf::get_fum_post_type() ) ) {
+		if ( ! post_type_exists( Fum_Conf::$fum_post_type ) ) {
 			$args = array(
 				'public'              => true,
-				'label'               => Fum_Conf::get_fum_post_type_label(),
+				'label'               => Fum_Conf::$fum_post_type_label,
 				'exclude_from_search' => true,
 				'show_ui'             => false,
 				'show_in_nav_menus'   => false,
 			);
-			register_post_type( Fum_Conf::get_fum_post_type(), $args );
+			register_post_type( Fum_Conf::$fum_post_type, $args );
 		}
 	}
 
@@ -26,7 +26,7 @@ class Fum_Post {
 			'ping_status'    => 'closed',
 			'post_author'    => get_current_user_id(),
 			'post_status'    => 'publish',
-			'post_type'      => Fum_Conf::get_fum_post_type(),
+			'post_type'      => Fum_Conf::$fum_post_type,
 			'post_content'   => $content,
 			'post_name'      => $name,
 			'post_title'     => $title,
@@ -43,7 +43,7 @@ class Fum_Post {
 
 	public
 	function remove_all_fum_posts() {
-		$posts = get_posts( array( 'post_type' => Fum_Conf::get_fum_post_type() ) );
+		$posts = get_posts( array( 'post_type' => Fum_Conf::$fum_post_type ) );
 		foreach ( $posts as $post ) {
 			wp_delete_post( $post->ID );
 		}

@@ -4,13 +4,18 @@
  * @version 0.01
  */
 class Options {
+	public static function init_fum_option_pages() {
+
+	}
+
+
 	function register_form_options() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
-		$generate_password_option_name     = Fum_Conf::get_fum_register_form_generate_password_option();
+		$generate_password_option_name     = Fum_Conf::$fum_register_form_generate_password_option;
 		$generate_password_option_value    = get_option( $generate_password_option_name );
-		$use_activation_email_option_name  = Fum_Conf::get_fum_register_form_use_activation_mail_option();
+		$use_activation_email_option_name  = Fum_Conf::$fum_register_form_use_activation_mail_option;
 		$use_activation_email_option_value = get_option( $use_activation_email_option_name );
 		?>
 
@@ -43,8 +48,8 @@ class Options {
 
 				</table>
 				<?php
-				settings_fields( Fum_Conf::get_fum_register_form_option_group() );
-				do_settings_sections( Fum_Conf::get_fum_register_form_option_group() );
+				settings_fields( Fum_Conf::$fum_register_form_option_group );
+				do_settings_sections( Fum_Conf::$fum_register_form_option_group );
 				submit_button();
 				?>
 			</form>

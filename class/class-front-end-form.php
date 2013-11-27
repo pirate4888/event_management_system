@@ -8,13 +8,13 @@ class Front_End_Form {
 	public function add_form_posts() {
 		$fum_post = new Fum_Post();
 		$fum_post->fum_register_post_type();
-		$register_id = $fum_post->add_post( Fum_Conf::get_fum_register_form_name(), 'Register', '[' . Fum_Conf::get_fum_register_form_name() . ']' );
-		$login_id    = $fum_post->add_post( Fum_Conf::get_fum_login_form_name(), 'Login', '[' . Fum_Conf::get_fum_login_form_name() . ']' );
-		$edit_id     = $fum_post->add_post( Fum_Conf::get_fum_edit_form_name(), 'Edit', '[' . Fum_Conf::get_fum_edit_form_name() . ']' );
+		$register_id = $fum_post->add_post( Fum_Conf::$fum_register_form_name, 'Register', '[' . Fum_Conf::$fum_register_form_name . ']' );
+		$login_id    = $fum_post->add_post( Fum_Conf::$fum_login_form_name, 'Login', '[' . Fum_Conf::$fum_login_form_name . ']' );
+		$edit_id     = $fum_post->add_post( Fum_Conf::$fum_edit_form_name, 'Edit', '[' . Fum_Conf::$fum_edit_form_name . ']' );
 		return array(
-			Fum_Conf::get_fum_register_form_name() => $register_id,
-			Fum_Conf::get_fum_login_form_name()    => $login_id,
-			Fum_Conf::get_fum_edit_form_name()     => $edit_id,
+			Fum_Conf::$fum_register_form_name => $register_id,
+			Fum_Conf::$fum_login_form_name    => $login_id,
+			Fum_Conf::$fum_edit_form_name     => $edit_id,
 		);
 	}
 
@@ -44,9 +44,25 @@ class Front_End_Form {
 	}
 
 
+	public function get_register_form() {
+
+		echo '<pre>';
+		$user = get_userdata( 1 );
+		$user->data;
+		print_r( $user->data );
+		echo '</pre>';
+		echo '<pre>';
+		print_r( wp_get_user_contact_methods( 1 ) );
+		echo '</pre>';
+		echo '<pre>';
+		print_r( get_user_option( 1 ) );
+		echo '</pre>';
+		print_r( Fum_Conf::$test );
+	}
+
 	public function get_login_form() {
 
-		if ( isset( $_GET[Fum_Conf::get_fum_login_arg_name()] ) && Fum_Conf::get_fum_login_failed_arg_value() == $_GET[Fum_Conf::get_fum_login_arg_name()] ) {
+		if ( isset( $_GET[Fum_Conf::$fum_login_arg_name] ) && Fum_Conf::$fum_login_failed_arg_value == $_GET[Fum_Conf::$fum_login_arg_name] ) {
 			echo '<p><strong>' . __( 'Ist der Benutzer aktiviert(E-Mails checken?) <br/>Benutzername oder Passwort falsch' ) . '</strong></p>';
 		}
 
@@ -66,7 +82,7 @@ class Front_End_Form {
 					$redirect = home_url();
 				}
 			}
-
+			wp_login_form();
 		}
 	}
 
@@ -96,6 +112,7 @@ class Front_End_Form {
 			check_admin_referer( 'update-profile_' . $user_id );
 			$errors = edit_user( $user_id );
 			if ( is_wp_error( $errors ) ) {
+				/*@var $errors WP_Error */
 				$message = $errors->get_error_message();
 				$style   = 'error';
 			}
@@ -122,7 +139,7 @@ class Front_End_Form {
 	public function use_ssl_on_front_end_form( $force_ssl ) {
 		global $post;
 
-		$custom_post_type = Fum_Conf::get_fum_post_type();
+		$custom_post_type = Fum_Conf::$fum_post_type;
 
 		$post_type = get_post_type( $post );
 

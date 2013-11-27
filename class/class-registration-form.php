@@ -29,7 +29,7 @@ class Registration_Form {
 
 		if ( isset( $_POST["register_form_sent"] ) ) {
 			//Check if we should generate a password or if the user should enter one
-			if ( get_option( Fum_Conf::get_fum_register_form_generate_password_option() ) ) {
+			if ( get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
 				$_POST['user_pass'] = wp_generate_password();
 			}
 

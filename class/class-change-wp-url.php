@@ -11,7 +11,7 @@ class Change_Wp_Url {
 	private $fum_register_url = '';
 
 	public function __construct() {
-		$this->fum_register_url = get_permalink( get_option( Fum_Conf::get_fum_register_form_name() ) );
+		$this->fum_register_url = get_permalink( get_option( Fum_Conf::$fum_register_form_name ) );
 
 
 		//register url fix
@@ -44,14 +44,14 @@ class Change_Wp_Url {
 	}
 
 	public function login_failed_redirect() {
-		wp_redirect( add_query_arg( array( Fum_Conf::get_fum_login_arg_name() => Fum_Conf::get_fum_login_failed_arg_value() ), wp_login_url() ) );
+		wp_redirect( add_query_arg( array( Fum_Conf::$fum_login_arg_name => Fum_Conf::$fum_login_failed_arg_value ), wp_login_url() ) );
 	}
 
 	/**
 	 * Checks if there is action=logout set in the URL, calls wp_logout() and redirects the user to home_url()
 	 */
 	public function search_logout_action() {
-		if ( isset( $_GET[Fum_Conf::get_fum_logout_arg_name()] ) && $_GET[Fum_Conf::get_fum_logout_arg_name()] == Fum_Conf::get_fum_logout_arg_value() ) {
+		if ( isset( $_GET[Fum_Conf::$fum_logout_arg_name] ) && $_GET[Fum_Conf::$fum_logout_arg_name] == Fum_Conf::$fum_logout_arg_value ) {
 			wp_logout();
 			wp_redirect( home_url() );
 			exit();
@@ -59,11 +59,11 @@ class Change_Wp_Url {
 	}
 
 	public function my_logout_url( $link ) {
-		return add_query_arg( array( Fum_Conf::get_fum_logout_arg_name() => Fum_Conf::get_fum_logout_arg_value() ), home_url() );
+		return add_query_arg( array( Fum_Conf::$fum_logout_arg_name => Fum_Conf::$fum_logout_arg_value ), home_url() );
 	}
 
 	public function change_wp_login_url( $link ) {
-		$permalink = get_permalink( get_option( Fum_Conf::get_fum_login_form_name() ) );
+		$permalink = get_permalink( get_option( Fum_Conf::$fum_login_form_name ) );
 
 		//Do not show our own login page if we are on a admin page
 		if ( is_admin() || $permalink == '' ) {

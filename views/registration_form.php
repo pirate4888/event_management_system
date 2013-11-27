@@ -10,7 +10,7 @@
 	</p>
 	<?php
 	//Check if we should generate a password or if the user should enter one
-	if ( get_option( Fum_Conf::get_fum_register_form_generate_password_option() ) ) {
+	if ( get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
 		?>
 		<p id="reg_passmail"><?php _e( 'A password will be e-mailed to you.' ) ?></p>
 	<?php

@@ -57,17 +57,22 @@ class Front_End_Form {
 		echo '<pre>';
 		print_r( get_user_option( 1 ) );
 		echo '</pre>';
-		print_r( Fum_Conf::$test );
 	}
 
 	public function get_login_form() {
 
+		if ( isset( $_POST['wp-submit'] ) ) {
+			wp_signon();
+		}
 		if ( isset( $_GET[Fum_Conf::$fum_login_arg_name] ) && Fum_Conf::$fum_login_failed_arg_value == $_GET[Fum_Conf::$fum_login_arg_name] ) {
 			echo '<p><strong>' . __( 'Ist der Benutzer aktiviert(E-Mails checken?) <br/>Benutzername oder Passwort falsch' ) . '</strong></p>';
 		}
 
 		if ( is_user_logged_in() ) {
 			echo __( 'Already logged in.' );
+			echo '<pre>';
+			print_r( $_GET );
+			echo '</pre>';
 		}
 		else {
 			//TODO Check if 'previous' is a url from our domain..better for security
@@ -82,7 +87,26 @@ class Front_End_Form {
 					$redirect = home_url();
 				}
 			}
-			wp_login_form();
+			$form = '
+			<form name="' . $args['form_id'] . '" id="' . $args['form_id'] . '" action="' . esc_url( get_permalink() ) . '" method="post">
+					' . apply_filters( 'login_form_top', '', $args ) . '
+			<p class="login-username">
+				<label for="' . esc_attr( $args['id_username'] ) . '">' . esc_html( $args['label_username'] ) . '</label>
+				<input type="text" name="log" id="' . esc_attr( $args['id_username'] ) . '" class="input" value="' . esc_attr( $args['value_username'] ) . '" size="20" />
+			</p>
+			<p class="login-password">
+				<label for="' . esc_attr( $args['id_password'] ) . '">' . esc_html( $args['label_password'] ) . '</label>
+				<input type="password" name="pwd" id="' . esc_attr( $args['id_password'] ) . '" class="input" value="" size="20" />
+			</p>
+			' . apply_filters( 'login_form_middle', '', $args ) . '
+			' . ( $args['remember'] ? '<p class="login-remember"><label><input name="rememberme" type="checkbox" id="' . esc_attr( $args['id_remember'] ) . '" value="forever"' . ( $args['value_remember'] ? ' checked="checked"' : '' ) . ' /> ' . esc_html( $args['label_remember'] ) . '</label></p>' : '' ) . '
+			<p class="login-submit">
+				<input type="submit" name="wp-submit" id="' . esc_attr( $args['id_submit'] ) . '" class="button-primary" value="' . esc_attr( $args['label_log_in'] ) . '" />
+				<input type="hidden" name="redirect_to" value="' . esc_url( $args['redirect'] ) . '" />
+			</p>
+			' . apply_filters( 'login_form_bottom', '', $args ) . '
+			</form>';
+			echo $form;
 		}
 	}
 

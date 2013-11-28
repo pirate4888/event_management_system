@@ -19,74 +19,23 @@ class Frontend_User_Management {
 		//Set path to plugin dir
 		$this->plugin_path = plugin_dir_path( __FILE__ );
 
+		register_activation_hook( __FILE__, array( $this, 'plugin_activate' ) );
+		register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivate' ) );
 
-		$this->register_hooks();
 		$this->init_plugin();
+
 		Action_Hooks::add_action_hooks();
-		$this->add_filter();
-
-		add_action( 'admin_print_footer_scripts', array( $this, 'my_admin_print_footer_scripts' ) );
-
-	}
-
-
-	/*	function my_admin_enqueue_scripts() {
-			wp_enqueue_style( 'wp-pointer' );
-			wp_enqueue_script( 'wp-pointer' );
-
-		}*/
-
-	function my_admin_print_footer_scripts() {
-		$pointer_content = '<h3>iShift | Notice</h3>';
-		$pointer_content .= '<p>Added new functions to Edit Post section and few more options for users (authors and subscribers only).</p>';
-		?>
-		<script type="text/javascript">
-			$(document).ready(function () {
-				// Tooltip only Text
-				$('#icon_fum').hover(function () {
-					// Hover over code
-					var title = $(this).attr('title');
-					$(this).data('tipText', title).removeAttr('title');
-					$('<p class="tooltip"></p>')
-							.text(title)
-							.appendTo('body')
-							.fadeIn('slow');
-				},function () {
-					// Hover out code
-					$(this).attr('title', $(this).data('tipText'));
-					$('.tooltip').remove();
-				}).mousemove(function (e) {
-							var mousex = e.pageX + 20; //Get X coordinates
-							var mousey = e.pageY + 10; //Get Y coordinates
-							$('.tooltip')
-									.css({ top: mousey, left: mousex })
-						});
-			});
-		</script>
-	<?php
-	}
-
-
-	private function add_filter() {
-		add_filter( 'force_ssl', array( new Front_End_Form(), 'use_ssl_on_front_end_form' ), 1, 3 );
+		Filter_Hooks::add_filter_hooks();
 	}
 
 	private function init_plugin() {
-		new Dhv_Jugend_Form();
-		new Change_Wp_Url();
-		new Activation_Email();
+		/*new Change_Wp_Url();*/
 
 		//Add ShortCodes of user forms(register,login,edit)
 		$front_end_form = new Front_End_Form();
 		$front_end_form->add_shortcode_of_register_form( Fum_Conf::$fum_register_form_shortcode );
 		$front_end_form->add_shortcode_of_login_form( Fum_Conf::$fum_login_form_shortcode );
 		$front_end_form->add_shortcode_of_edit_form( Fum_Conf::$fum_edit_form_shortcode );
-	}
-
-	private function register_hooks() {
-		//Add user activation key field to all current users and mark them as activated
-		register_activation_hook( __FILE__, array( $this, 'plugin_activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivate' ) );
 	}
 
 	public function plugin_activate() {
@@ -139,6 +88,9 @@ class Frontend_User_Management {
 		}
 		elseif ( file_exists( $this->plugin_path . 'views/fum_option_pages/' . $class_name ) ) {
 			require_once( $this->plugin_path . 'views/fum_option_pages/' . $class_name );
+		}
+		elseif ( file_exists( $this->plugin_path . 'utility/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'utility/' . $class_name );
 		}
 	}
 }

@@ -29,7 +29,6 @@ class Frontend_User_Management {
 	}
 
 	private function init_plugin() {
-		/*new Change_Wp_Url();*/
 
 		//Add ShortCodes of user forms(register,login,edit)
 		$front_end_form = new Front_End_Form();

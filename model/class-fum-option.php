@@ -4,7 +4,7 @@
  * @version
  */
 
-class Option {
+class Fum_Option {
 	private $name;
 	private $title;
 	private $description;
@@ -15,7 +15,7 @@ class Option {
 	private $multiple_selection;
 
 
-	public function __construct( $name, $title, $description, $value, Option_Group $option_group, $type, $possible_values = NULL, $multiple_selection = false ) {
+	public function __construct( $name, $title, $description, $value, Fum_Option_Group $option_group, $type, $possible_values = NULL, $multiple_selection = false ) {
 		$this->name               = $name;
 		$this->title              = $title;
 		$this->description        = $description;

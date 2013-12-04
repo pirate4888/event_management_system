@@ -3,14 +3,14 @@
  * @author  Christoph Bessei
  * @version 0.01
  */
-class Option_Page_View {
+class Fum_Option_Page_View {
 	public static function print_option_page() {
 
-		if ( $_GET['page'] === Option_Page_Controller::$parent_slug ) {
-			$option_page = Option_Page_Controller::$pages[0];
+		if ( $_GET['page'] === Fum_Option_Page_Controller::$parent_slug ) {
+			$option_page = Fum_Option_Page_Controller::$pages[0];
 		}
 		else {
-			foreach ( Option_Page_Controller::$pages as $page ) {
+			foreach ( Fum_Option_Page_Controller::$pages as $page ) {
 				if ( $_GET['page'] === $page->get_name() ) {
 					$option_page = $page;
 					break;
@@ -24,13 +24,13 @@ class Option_Page_View {
 			<?php screen_icon(); ?>
 			<h2>Frontend User Management - <?php _e( $option_page->get_title(), 'fum_text_domain' ); ?></h2>
 			<?php foreach ( $option_page->get_option_groups() as $option_group ): ?>
-				<?php /*var @$option_group Option_Group*/ ?>
+				<?php /*var @$option_group Fum_Option_Group*/ ?>
 				<form method="post" action="options.php">
 					<table class="form-table">
 						<?php foreach ( $option_group->get_options() as $option ): ?>
-							<?php /*var @option Option*/ ?>
+							<?php /*var @option Fum_Option*/ ?>
 							<tr valign="top">
-								<th scope="row" title="<?php _e( $option->get_description(), 'fum_text_domain' ); ?>"><?php _e( $option->get_title(), 'fum_text_domain' ); ?></th>
+								<th scope="row" title="<?php _e( $option->get_title(), 'fum_text_domain' ); ?>"><?php _e( $option->get_title(), 'fum_text_domain' ); ?></th>
 								<td>
 									<?php
 									switch ( $option->get_type() ) {

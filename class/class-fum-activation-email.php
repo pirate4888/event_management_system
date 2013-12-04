@@ -4,13 +4,13 @@
  * @version 0.01
  */
 
-class Activation_Email {
+class Fum_Activation_Email {
 	private static $activation_key_field = 'fum_user_activation_key';
 	private static $active_user_value = 'active';
 
 
 	public static function plugin_activated() {
-		//Get all user IDs and do not sort them, we do not need a sorted result and it just costs time
+		//Get all user IDs
 		$options  = array( 'fields' => 'ID' );
 		$user_IDs = get_users( $options );
 
@@ -60,7 +60,7 @@ class Activation_Email {
 		$activation_key = self::create_activation_key();
 		update_user_meta( $user_id, self::$activation_key_field, $activation_key );
 
-		self::fum_new_user_notification( $user_id, $_POST['user_pass'] );
+		self::fum_new_user_notification( $user_id, $_REQUEST[Fum_Conf::$fum_register_form_password_field_name] );
 	}
 
 	private static function create_activation_key() {
@@ -93,7 +93,7 @@ class Activation_Email {
 		if ( get_user_meta( $user->ID, self::$activation_key_field, true ) === self::$active_user_value ) {
 			return $user;
 		}
-		return new WP_Error( 'not activated', __( 'User was not activated, have you check your mails for the activation link?' ) );
+		return new WP_Error( 'not activated', __( 'User is not active, have you checked your mails for the activation link?' ) );
 	}
 
 	private static function fum_new_user_notification( $user_id, $password = false ) {

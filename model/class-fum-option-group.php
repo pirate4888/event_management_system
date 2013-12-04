@@ -4,10 +4,11 @@
  * @version
  */
 
-class Option_Group {
+class Fum_Option_Group {
 	private $name;
 	private $title;
 	private $options;
+	private $description;
 
 	/**
 	 * Create new option group
@@ -33,14 +34,14 @@ class Option_Group {
 	}
 
 	/**
-	 * @param Option[] $options
+	 * @param Fum_Option[] $options
 	 */
 	public function set_options( array $options ) {
 		$this->options = $options;
 	}
 
 	/**
-	 * @return Option[]
+	 * @return Fum_Option[]
 	 */
 	public function get_options() {
 		return $this->options;
@@ -59,4 +60,20 @@ class Option_Group {
 	public function get_title() {
 		return $this->title;
 	}
-} 
+
+	/**
+	 * @param mixed $description
+	 */
+	public function set_description( $description ) {
+		$this->description = $description;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_description() {
+		return $this->description;
+	}
+
+
+}

@@ -19,47 +19,24 @@ class Frontend_User_Management {
 		//Set path to plugin dir
 		$this->plugin_path = plugin_dir_path( __FILE__ );
 
-		register_activation_hook( __FILE__, array( $this, 'plugin_activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivate' ) );
+		register_activation_hook( __FILE__, array( 'Fum_Activation', 'activate_plugin' ) );
+		register_deactivation_hook( __FILE__, array( 'Fum_Deactivation', 'deactivate_plugin' ) );
+		register_uninstall_hook( __FILE__, array( 'Fum_Uninstallation', 'uninstall_plugin' ) );
 
-		$this->init_plugin();
-
-		Action_Hooks::add_action_hooks();
-		Filter_Hooks::add_filter_hooks();
+		Fum_Initialisation::initiate_plugin();
+		add_filter( 'tc_post_metas', array( $this, 'remove_meta' ) );
 	}
 
-	private function init_plugin() {
-
-		//Add ShortCodes of user forms(register,login,edit)
-		$front_end_form = new Front_End_Form();
-		$front_end_form->add_shortcode_of_register_form( Fum_Conf::$fum_register_form_shortcode );
-		$front_end_form->add_shortcode_of_login_form( Fum_Conf::$fum_login_form_shortcode );
-		$front_end_form->add_shortcode_of_edit_form( Fum_Conf::$fum_edit_form_shortcode );
+	function remove_meta( $html ) {
+		if ( get_post()->post_type == Fum_Conf::$fum_post_type ) {
+			return '';
+		}
+		return $html;
 	}
 
-	public function plugin_activate() {
-		$front_end_form = new Front_End_Form();
-		$post_ids       = $front_end_form->add_form_posts();
-		add_option( Fum_Conf::$fum_register_form_name, $post_ids[Fum_Conf::$fum_register_form_name] );
-		add_option( Fum_Conf::$fum_login_form_name, $post_ids[Fum_Conf::$fum_login_form_name] );
-		add_option( Fum_Conf::$fum_edit_form_name, $post_ids[Fum_Conf::$fum_edit_form_name] );
+	public
+	function autoload( $class_name ) {
 
-		$activation_email = new Activation_Email();
-		$activation_email->plugin_activated();
-	}
-
-	public function plugin_deactivate() {
-		$fum_post = new Fum_Post();
-		$fum_post->remove_all_fum_posts();
-
-		delete_option( Fum_Conf::$fum_register_form_name );
-		delete_option( Fum_Conf::$fum_login_form_name );
-		delete_option( Fum_Conf::$fum_edit_form_name );
-		$activation_email = new Activation_Email();
-		$activation_email->plugin_deactivated();
-	}
-
-	public function autoload( $class_name ) {
 		if ( 'Fum_Conf' === $class_name ) {
 			require_once( $this->plugin_path . 'fum_conf.php' );
 		}
@@ -67,12 +44,9 @@ class Frontend_User_Management {
 		if ( 'Options' === $class_name ) {
 			require_once( $this->plugin_path . 'options.php' );
 		}
-		if ( 'Option_Page_Controller' === $class_name ) {
-			require_once( $this->plugin_path . 'controller/class-option-page-controller.php' );
-		}
+
 		//Because of sucking wordpress name conventions class name != file name, convert it manually
 		$class_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) . '.php' );
-
 		if ( file_exists( $this->plugin_path . 'class/' . $class_name ) ) {
 			require_once( $this->plugin_path . 'class/' . $class_name );
 		}
@@ -82,18 +56,23 @@ class Frontend_User_Management {
 		elseif ( file_exists( $this->plugin_path . 'model/' . $class_name ) ) {
 			require_once( $this->plugin_path . 'model/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'views/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'views/' . $class_name );
+		elseif ( file_exists( $this->plugin_path . 'view/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'view/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'views/fum_option_pages/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'views/fum_option_pages/' . $class_name );
+		elseif ( file_exists( $this->plugin_path . 'view/fum_option_pages/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'view/fum_option_pages/' . $class_name );
 		}
 		elseif ( file_exists( $this->plugin_path . 'utility/' . $class_name ) ) {
 			require_once( $this->plugin_path . 'utility/' . $class_name );
 		}
+		elseif ( file_exists( $this->plugin_path . 'plugin_management/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'plugin_management/' . $class_name );
+		}
+		elseif ( file_exists( $this->plugin_path . 'interface/' . $class_name ) ) {
+			require_once( $this->plugin_path . 'interface/' . $class_name );
+		}
 	}
 }
-
 
 new Frontend_User_Management(); //start plugin
 

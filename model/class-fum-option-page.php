@@ -4,7 +4,7 @@
  * @version
  */
 
-class Option_Page {
+class Fum_Option_Page {
 	private $name;
 	private $title;
 	private $option_groups;
@@ -21,19 +21,19 @@ class Option_Page {
 		$this->title = $title;
 	}
 
-	public function add_option_group( Option_Group $option_group ) {
+	public function add_option_group( Fum_Option_Group $option_group ) {
 		$this->option_groups[] = $option_group;
 	}
 
 	/**
-	 * @param Option_Group[] $option_groups
+	 * @param Fum_Option_Group[] $option_groups
 	 */
 	public function set_option_groups( array $option_groups ) {
 		$this->option_groups = $option_groups;
 	}
 
 	/**
-	 * @return Option_Group[]
+	 * @return Fum_Option_Group[]
 	 */
 	public function get_option_groups() {
 		return $this->option_groups;

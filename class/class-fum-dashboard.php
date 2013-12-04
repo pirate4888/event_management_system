@@ -4,7 +4,7 @@
  * @version
  */
 
-class Dashboard {
+class Fum_Dashboard {
 
 	private $hidden_cat_id = NULL;
 	private $hide_cat = NULL;

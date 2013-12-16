@@ -39,10 +39,19 @@ class Ems_Event_Registration {
 	public static function add_event_registration( Ems_Event_Registration $registration ) {
 		$registrations = self::get_event_registrations();
 		if ( self::is_already_registered( $registration ) ) {
-			//throw new Exception( "User is alredy registered for this event" );
-			return;
+			throw new Exception( "User is alredy registered for this event" );
 		}
 		$registrations[] = $registration;
+		$title = get_post( $registration->get_event_post_id() )->post_title;
+		$user = get_userdata( $registration->get_user_id() );
+		$subject = 'Erfolgreich für "' . $title . '" registriert';
+		$message =
+				'Liebe/r ' . $user->user_firstname . "\n" .
+				'du hast dich erfolgreich für das Event "' . $title . '" registriert.' . "\n" .
+				'Du bekommst spätestens 14 Tage vor dem Event weitere Informationen vom Eventleiter zugeschickt.' . "\n" .
+				'Viele Grüße,' . "\n" .
+				'Das DHV-Jugendteam';
+		wp_mail( $user->user_email, $subject, $message );
 		update_option( self::$option_name, $registrations );
 	}
 

@@ -94,7 +94,8 @@ class Fum_Activation_Email {
 		if ( get_user_meta( $user->ID, self::$activation_key_field, true ) === self::$active_user_value ) {
 			return $user;
 		}
-		return new WP_Error( 'not activated', __( 'User is not active, have you checked your mails for the activation link?' ) );
+//		return new WP_Error( 'not activated', __( 'User is not active, have you checked your mails for the activation link?' ) );
+		return new WP_Error( 'not_activated', 'Benutzer ist nicht aktiv, hast du den Aktivierungslink in der Willkommen E-Mail benutzt?' );
 	}
 
 	private static function fum_new_user_notification( $user_id, $password = false ) {

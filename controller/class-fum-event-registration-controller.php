@@ -7,9 +7,14 @@
 class Fum_Event_Registration_Controller {
 	public static function create_event_registration_form() {
 
+		//Check if user is logged in and show register/login link if not
 		if ( ! is_user_logged_in() ) {
 			?>
-			Du musst dich registrieren, bevor du dich für ein Event anmelden kannst:<br />
+			Du musst dich einloggen, bevor du dich für ein Event anmelden kannst:<br />
+			<?php
+			wp_loginout();
+			?>
+			<br />Du hast noch keinen Account? Registriere dich:<br />
 			<?php
 			wp_register( '', '' );
 			return;
@@ -34,7 +39,7 @@ class Fum_Event_Registration_Controller {
 			}
 		}
 
-		//Sort Events by date
+		/* Start sort Events by date */
 		$dates = array();
 		foreach ( $events as $key => $event ) {
 			$date_time = get_post_meta( $event['ID'], 'ems_start_date', true );
@@ -56,6 +61,7 @@ class Fum_Event_Registration_Controller {
 		if ( ! empty( $ordered_events ) ) {
 			$events = $ordered_events;
 		}
+		/* End sort events by date */
 
 		foreach ( $form->get_input_fields() as $input_field ) {
 			if ( $input_field->get_unique_name() == Fum_Conf::$fum_input_field_search_ride || $input_field->get_unique_name() == Fum_Conf::$fum_input_field_offer_ride ) {
@@ -64,7 +70,7 @@ class Fum_Event_Registration_Controller {
 			$input_field->set_required( true );
 		}
 		if ( isset( $_REQUEST[Fum_Conf::$fum_input_field_submit] ) ) {
-			//Select event should only contain event titles
+			//Check if event select field contains and valid event
 			$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_validate_callback( array( 'Fum_Event_Registration_Controller', 'validate_event_select_field' ) );
 			$form->set_values_from_array( $_REQUEST );
 			$form->validate( true );

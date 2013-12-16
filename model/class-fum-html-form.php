@@ -407,9 +407,9 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	}
 
 	/**
-	 * @param callable $callback
+	 * @param $callback
 	 */
-	public function set_callback( callable $callback ) {
+	public function set_callback( $callback ) {
 		$this->callback = $callback;
 	}
 

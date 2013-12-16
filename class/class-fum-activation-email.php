@@ -77,10 +77,11 @@ class Fum_Activation_Email {
 			$user_ids = get_users( $options );
 			foreach ( $user_ids as $user_id ) {
 				if ( update_user_meta( $user_id, self::$activation_key_field, self::$active_user_value, $url_activation_key ) ) {
-					return '<strong>' . __( 'Activation of user was successful' ) . '</strong>' . $content;
+//					return '<strong>' . __( 'Activation of user was successful' ) . '</strong>' . $content;
+					return '<p><strong>Die Aktivierung deines Accounts war erfolgreich</strong></p>' . $content;
 				}
 			}
-			return '<strong>' . __( 'Invalid activation key' ) . '</strong>' . $content;
+			return '<p><strong>Die Aktivierung deines Accounts ist fehlgeschlagen, der Aktivierungscode scheint fehlerhaft zu sein</strong></p>' . $content;
 		}
 		return $content;
 	}

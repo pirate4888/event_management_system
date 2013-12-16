@@ -55,7 +55,7 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	/**
 	 * Calls validate() and notifies all observers that they can save the form if validate() returns true
 	 * It also calls save() on each input_field
-	 * @return bool|WP_Error returns true if validate() returned true and successfully notified all observers, else returns false
+	 * @return bool|WP_Error returns true if validate() returned true and successfully notified all observers, else returns WP_Error
 	 */
 	public function save() {
 
@@ -85,7 +85,7 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 			//Run validation on input fields
 			$validation_fields = true;
 			foreach ( $this->get_input_fields() as $input_field ) {
-				if ( true !== $input_field->validate( $force_new_validation ) ) {
+				if ( is_wp_error( $input_field->validate( $force_new_validation ) ) ) {
 					$validation_fields = false;
 				}
 			}
@@ -97,8 +97,11 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 				}
 
 				$callback_param = $this->callback_param;
-				if ( true !== $validation_fields && ! isset( $this->callback_param ) ) {
-					$callback_param = array_merge( $this->callback_param, array( 'error_on_input_field' => true ) );
+				if ( false === $validation_fields && ! isset( $this->callback_param ) ) {
+					$callback_param = array( 'error_on_input_field' => true );
+				}
+				else if ( false === $validation_fields && isset( $this->callback_param ) ) {
+					$callback_param = array_merge( $callback_param, array( 'error_on_input_field' => true ) );
 				}
 
 				$validation_form = call_user_func( $this->callback, $this, $callback_param );

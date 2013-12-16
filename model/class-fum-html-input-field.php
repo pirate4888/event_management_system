@@ -367,6 +367,20 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		return $this->validate_callback;
 	}
 
+	/**
+	 * @param array $validate_params
+	 */
+	public function set_validate_params( $validate_params ) {
+		$this->validate_params = $validate_params;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_validate_params() {
+		return $this->validate_params;
+	}
+
 
 	/**
 	 * @param bool $force_new_validation
@@ -378,7 +392,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $force_new_validation || false === $this->validation_result ) {
 			if ( NULL === $this->validate_callback ) {
 				if ( true === $this->get_required() ) {
-					//If field is required and no special validate callback is set, we check if if's NOT empty
+					//If field is required and no special validate callback is set, we check if it's NOT empty
 					$this->validation_result = Fum_Html_Input_Field::not_empty_callback( $this );
 				}
 				else {
@@ -444,12 +458,16 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	 *
 	 * @return bool|WP_Error
 	 */
-	private static function not_empty_callback( Fum_Html_Input_Field $input_field, $params = array() ) {
+	private static function not_empty_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
 		$value = trim( $input_field->get_value() );
 		if ( ! empty( $value ) ) {
 			return true;
 		}
-		return new WP_Error( $input_field->get_unique_name(), 'Das Feld darf nicht leer sein' );
+		if ( $input_field->get_type() == Html_Input_Type_Enum::CHECKBOX ) {
+			return new WP_Error( $input_field->get_unique_name(), $input_field->get_title() . ' muss ausgewählt sein' );
+
+		}
+		return new WP_Error( $input_field->get_unique_name(), $input_field->get_title() . ' darf nicht leer sein' );
 	}
 
 	/**
@@ -459,7 +477,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	 *
 	 * @return bool|WP_Error
 	 */
-	private static function mail_address_callback( Fum_Html_Input_Field $input_field, $params = array() ) {
+	private static function mail_address_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
 		$regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/';
 // Run the preg_match() function on regex against the email address
 		if ( preg_match( $regex, $input_field->get_value() ) ) {
@@ -468,5 +486,35 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		else {
 			return new WP_Error( $input_field->get_unique_name(), 'Die E-Mailadresse hat ein ungültiges Format' );
 		}
+	}
+
+	private static function integer_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
+//		echo '<pre>';
+//		print_r( $params );
+//		print_r( $input_field->get_validate_params() );
+//		print_r( strlen( $input_field->get_value() ) );
+//		echo '</pre>';
+		if ( ctype_digit( trim( $input_field->get_value() ) ) ) {
+			if ( isset( $params['length'] ) ) {
+
+				if ( strlen( $input_field->get_value() ) != $params['length'] ) {
+					return new WP_Error( $input_field->get_unique_name(), 'Der Wert von ' . $input_field->get_title() . ' sollte aus ' . $params['length'] . ' Ziffern bestehen' );
+				}
+			}
+			return true;
+		}
+
+		return new WP_Error( $input_field->get_unique_name(), $input_field->get_title() . ' darf nur aus Zahlen bestehen' );
+
+	}
+
+	private static function date_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
+		//German date format
+		$regex = '#[\d]{1,2}\.[\d]{1,2}\.[\d]{4}#Uis';
+		//TODO Use params for different date formats
+		if ( preg_match( $regex, trim( $input_field->get_value() ) ) ) {
+			return true;
+		}
+		return new WP_Error( $input_field->get_unique_name(), 'Das Datum hat ein falsches Format. Gültiges Beispiel: 25.5.1985' );
 	}
 }

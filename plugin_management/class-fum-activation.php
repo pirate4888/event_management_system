@@ -25,10 +25,10 @@ class Fum_Activation {
 			'fum_input_field_display_name'               => array( 'Öffentlicher Name', false ),
 
 			//DHV-Jugend input field names
-			'fum_input_field_birthday'                   => array( 'Geburtstag', false ),
+			'fum_input_field_birthday'                   => array( 'Geburtstag', false, array( 'Fum_Html_Input_Field', 'date_callback' ) ),
 			'fum_input_field_street'                     => array( 'Straße', false ),
 			'fum_input_field_city'                       => array( 'Stadt', false ),
-			'fum_input_field_postcode'                   => array( 'Postleitzahl', false ),
+			'fum_input_field_postcode'                   => array( 'Postleitzahl', false, array( 'Fum_Html_Input_Field', 'integer_callback' ), array( 'length' => 5 ) ),
 			'fum_input_field_state'                      => array( 'Bundesland', false ),
 			'fum_input_field_phone_number'               => array( 'Telefonnummer', false ),
 			'fum_input_field_mobile_number'              => array( 'Handynummer', false ),
@@ -45,7 +45,7 @@ class Fum_Activation {
 			'fum_input_field_new_password_check' => array( 'Confirm new password', true ),
 		),
 		Html_Input_Type_Enum::SELECT   => array(
-			'fum_input_field_aircraft' => array( 'Fluggerät', false, NULL,
+			'fum_input_field_aircraft' => array( 'Fluggerät', false, NULL, NULL,
 				//Possible values array
 				array(
 					array( 'title' => 'Drachen', 'value' => 'drachen' ),
@@ -60,13 +60,13 @@ class Fum_Activation {
 		Html_Input_Type_Enum::TEXT     => array(),
 		Html_Input_Type_Enum::PASSWORD => array(),
 		Html_Input_Type_Enum::SELECT   => array(
-			'fum_input_field_select_event' => array( 'Event', true, NULL, array( 'Bassano', 'Ski & Fly' ) ),
+			'fum_input_field_select_event' => array( 'Event', true, NULL, NULL, array( 'Bassano', 'Ski & Fly' ) ),
 
 		),
 		Html_Input_Type_Enum::CHECKBOX => array(
 			'fum_input_field_search_ride' => array( 'Suche Mitfahrgelegenheit', false ),
 			'fum_input_field_offer_ride'  => array( 'Biete Mitfahrgelgenheit', false ),
-			'fum_input_field_accept_agb'  => array( 'Haftungsausschluss akzeptieren', true ),
+			'fum_input_field_accept_agb'  => array( 'Haftungserklärung akzeptieren', true ),
 		),
 		Html_Input_Type_Enum::SUBMIT   => array()
 	);
@@ -124,10 +124,12 @@ class Fum_Activation {
 					$field->set_validate_callback( $input_field[2] );
 				}
 				if ( isset( $input_field[3] ) ) {
-					$field->set_possible_values( $input_field[3] );
+					$field->set_validate_params( $input_field[3] );
+				}
+				if ( isset( $input_field[4] ) ) {
+					$field->set_possible_values( $input_field[4] );
 				}
 				Fum_Html_Input_Field::add_input_field( $field );
-				error_log( "Added: " . $field->get_unique_name() );
 			}
 		}
 	}

@@ -117,7 +117,10 @@ class Fum_Register_Login_Form_Controller {
 		$error = NULL;
 
 		if ( get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
-			$_REQUEST[Fum_Conf::$fum_input_field_password] = wp_generate_password();
+			//Wordpress uses sometimes user_pass (wp_insert_usert) and sometimes user_password, this is a workaround for this problem
+			$_REQUEST['user_pass']                         = wp_generate_password();
+			$_REQUEST[Fum_Conf::$fum_input_field_password] = $_REQUEST['user_pass'];
+
 		}
 
 		$ID   = wp_insert_user( $_REQUEST );

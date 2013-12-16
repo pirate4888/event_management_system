@@ -60,7 +60,7 @@ class Fum_Activation_Email {
 		$activation_key = self::create_activation_key();
 		update_user_meta( $user_id, self::$activation_key_field, $activation_key );
 
-		self::fum_new_user_notification( $user_id, $_REQUEST[Fum_Conf::$fum_register_form_password_field_name] );
+		self::fum_new_user_notification( $user_id, $_REQUEST[Fum_Conf::$fum_input_field_password] );
 	}
 
 	private static function create_activation_key() {
@@ -121,17 +121,36 @@ class Fum_Activation_Email {
 		$user_login = stripslashes( $user->user_login );
 		$user_email = stripslashes( $user->user_email );
 
-		$message = sprintf( __( 'New user registration on your blog %s:', 'frontend-user-management' ), get_option( 'blogname' ) ) . "\r\n\r\n";
-		$message .= sprintf( __( 'Username: %s', 'frontend-user-management' ), $user_login ) . "\r\n";
-		$message .= sprintf( __( 'E-mail: %s', 'frontend-user-management' ), $user_email ) . "\r\n";
+//		$message = sprintf( __( 'New user registration on your blog %s:', 'frontend-user-management' ), get_option( 'blogname' ) ) . "\r\n\r\n";
+//		$message .= sprintf( __( 'Username: %s', 'frontend-user-management' ), $user_login ) . "\r\n";
+//		$message .= sprintf( __( 'E-mail: %s', 'frontend-user-management' ), $user_email ) . "\r\n";
+//		if ( false !== $password ) {
+//			$message .= sprintf( __( 'Password: %s', 'frontend-user-management' ), $password ) . "\r\n";
+//		}
+//		if ( false !== $send_activation_link ) {
+//			$message .= sprintf( __( 'Activation Link: %s', 'frontend-user-management' ), get_home_url() . "?" . self::get_activation_key_field() . "=" . $activation_code ) . "\r\n";
+//		}
+//
+//		$title = sprintf( __( 'Welcome to %s', 'frontend-user-management' ), get_option( 'blogname' ) );
+
+		//DHV-Jugend
+
+		$title   = 'Herzlich willkommen bei der DHV-Jugend';
+		$message = 'Herlich willkommen bei der DHV-Jugend' . "\n";
+		$message .= 'Dein Benutzername: ' . $user_login . "\n";
+		$message .= 'Deine Emailadresse: ' . $user_email . "\n";
 		if ( false !== $password ) {
-			$message .= sprintf( __( 'Password: %s', 'frontend-user-management' ), $password ) . "\r\n";
+			$message .= 'Dein Passwort: ' . $password . "\n";
 		}
 		if ( false !== $send_activation_link ) {
-			$message .= sprintf( __( 'Activation Link: %s', 'frontend-user-management' ), get_home_url() . "?" . self::get_activation_key_field() . "=" . $activation_code ) . "\r\n";
+			$message .= 'Der Aktivierungslink für deinen Account:' . "\n";
+			$message .= get_home_url() . "?" . self::get_activation_key_field() . "=" . $activation_code . "\n";
+			$message .= 'Ohne deinen Account zu aktivieren, kannst du dich nicht einloggen' . "\n";
 		}
 
-		wp_mail( $user_email, sprintf( __( 'Welcome to %s', 'frontend-user-management' ), get_option( 'blogname' ) ), $message );
+		$message .= 'Wir wünschen dir viel Spaß mit der DHV-Jugend!';
+
+		wp_mail( $user_email, $title, $message );
 	}
 
 	/**

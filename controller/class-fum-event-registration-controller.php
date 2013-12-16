@@ -70,6 +70,7 @@ class Fum_Event_Registration_Controller {
 			$input_field->set_required( true );
 		}
 		if ( isset( $_REQUEST[Fum_Conf::$fum_input_field_submit] ) ) {
+			$form->set_callback( array( 'Fum_Event_Registration_Controller', 'validate_event_registration_form' ) );
 			//Check if event select field contains and valid event
 			$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_validate_callback( array( 'Fum_Event_Registration_Controller', 'validate_event_select_field' ) );
 			$form->set_values_from_array( $_REQUEST );
@@ -77,8 +78,10 @@ class Fum_Event_Registration_Controller {
 			Fum_User::observe_object( $form );
 			Ems_Event::observe_object( $form );
 			$form->save();
+			if ( true === $form->get_validation_result() ) {
+				echo '<p><strong>Du hast dich erfolgreich für "' . get_post( preg_replace( "/[^0-9]/", "", $form->get_input_field( Fum_Conf::$fum_input_field_select_event )->get_value() ) )->post_title . '" registriert </strong></p >';
+			}
 		}
-
 
 		$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_possible_values( $events );
 
@@ -87,13 +90,32 @@ class Fum_Event_Registration_Controller {
 
 
 	public static function validate_event_select_field( Fum_Html_Input_Field $input_field ) {
-		$posts = get_posts( array( 'post_type' => 'event' ) );
+		$posts          = get_posts( array( 'post_type' => 'event' ) );
+		$is_valid_event = false;
+		$ID             = NULL;
 		/** @var WP_Post[] $posts */
 		foreach ( $posts as $post ) {
 			if ( 'ID_' . $post->ID == $input_field->get_value() ) {
+				$ID             = $post->ID;
+				$is_valid_event = true;
+				break;
+			}
+		}
+		if ( $is_valid_event ) {
+			if ( Ems_Event_Registration::is_already_registered( new Ems_Event_Registration( $ID, get_current_user_id() ) ) ) {
+				return new WP_Error( $input_field->get_unique_name(), 'Du bist bereits für dieses Event registriert' );
+			}
+			else {
 				return true;
 			}
 		}
 		return new WP_Error( $input_field->get_unique_name(), 'Das ausgewählte Event existiert nicht' );
+	}
+
+	public static function validate_event_registration_form( Fum_Html_Form $form, array $params = NULL ) {
+		if ( isset( $params['error_on_input_field'] ) && true === $params['error_on_input_field'] ) {
+			return new WP_Error( $form->get_unique_name(), 'Das Registrierungsformular ist nicht vollständig' );
+		}
+		return true;
 	}
 } 

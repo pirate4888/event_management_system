@@ -29,6 +29,9 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 
 		?>
 		<ul>
+			<?php if ( is_user_logged_in() ): ?>
+				<li><a href="<?php echo get_permalink( get_option( 'ems_eventmanagement_page' ) ); ?>">Eventverwaltung</a></li>
+			<?php endif; ?>
 			<?php if ( ! is_user_logged_in() || current_user_can( 'manage_options' ) || current_user_can( 'read_event' ) ): ?>
 				<?php wp_register(); ?>
 			<?php endif; ?>

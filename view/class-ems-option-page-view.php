@@ -9,6 +9,9 @@ class Ems_Option_Page_View {
 		if ( $_GET['page'] === Ems_Option_Page_Controller::$parent_slug ) {
 			$option_page = Ems_Option_Page_Controller::$pages[0];
 		}
+		else if ( $_GET['page'] === Ems_Participant_List_Controller::$parent_slug ) {
+			$option_page = Ems_Participant_List_Controller::$pages[0];
+		}
 		else {
 			foreach ( Ems_Option_Page_Controller::$pages as $page ) {
 				if ( $_GET['page'] === $page->get_name() ) {

@@ -81,6 +81,9 @@ class Ems_Menu {
 			if ( ! $filter_added )
 				add_filter( 'wp_nav_menu_objects', array( &$this, 'fix_menu_current_item' ) );
 
+			//Add Eventanmeldung as child
+			$children[] = get_post( get_option( Fum_Conf::$fum_event_registration_page ) );
+
 			// Add each child to the menu
 			foreach ( $children as $child ) {
 				//Check if $child is already an item in the menu

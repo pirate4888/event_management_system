@@ -15,11 +15,18 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	private $classes;
 	private $size;
 	private $value;
+	/**
+	 * @var array $possible_values
+	 * $possible_values contains an array with title and value as index
+	 * title is the printed text and value is the input field value
+	 */
 	private $possible_values;
 	private $do_action;
 	private $required;
 	private $validate_callback = NULL;
-	private $validation_return = false;
+	private $validate_params = array();
+	/** @var bool|WP_Error $validation_result false if validate() wasn't called, WP_Error if error occured, true if validate was fine */
+	private $validation_result = false;
 
 	public function __construct( $unique_name, $name, Html_Input_Type_Enum $type, $title, $id, $required ) {
 		$this->unique_name = $unique_name;
@@ -29,29 +36,6 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		$this->type        = $type;
 		$this->required    = $required;
 
-	}
-
-
-	public static function not_empty_callback( Fum_Html_Input_Field $input_field ) {
-		$value = trim( $input_field->get_value() );
-		if ( ! empty( $value ) ) {
-			return true;
-		}
-		return new WP_Error( $input_field->get_unique_name(), 'Das Feld darf nicht leer sein' );
-	}
-
-	public static function mail_address_callback( Fum_Html_Input_Field $input_field ) {
-		$regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/';
-		error_log( "MAILADRESSE CALLBACK" );
-// Run the preg_match() function on regex against the email address
-		if ( preg_match( $regex, $input_field->get_value() ) ) {
-			error_log( "RETURN TRUE" );
-			return true;
-		}
-		else {
-			error_log( "RETURN ERROR" );
-			return new WP_Error( $input_field->get_unique_name(), 'Die E-Mailadresse hat ein ungültiges Format' );
-		}
 	}
 
 	/**
@@ -133,6 +117,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 				return self::update_input_fields( $input_fields );
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -183,7 +168,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $this->classes !== $classes ) {
 			$this->classes = $classes;
 			$this->setChanged();
-			$this->notifyObservers();
+
 		}
 	}
 
@@ -201,7 +186,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $this->id !== $id ) {
 			$this->id = $id;
 			$this->setChanged();
-			$this->notifyObservers();
+
 		}
 	}
 
@@ -219,7 +204,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $this->name !== $name ) {
 			$this->name = $name;
 			$this->setChanged();
-			$this->notifyObservers();
+
 		}
 	}
 
@@ -237,7 +222,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $this->size !== $size ) {
 			$this->size = $size;
 			$this->setChanged();
-			$this->notifyObservers();
+
 		}
 	}
 
@@ -255,7 +240,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $this->type !== $type ) {
 			$this->type = $type;
 			$this->setChanged();
-			$this->notifyObservers();
+
 		}
 	}
 
@@ -273,7 +258,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $this->title !== $title ) {
 			$this->title = $title;
 			$this->setChanged();
-			$this->notifyObservers();
+
 		}
 	}
 
@@ -291,7 +276,6 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		if ( $this->value !== $value ) {
 			$this->value = $value;
 			$this->setChanged();
-			$this->notifyObservers();
 		}
 	}
 
@@ -299,20 +283,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	 * @return string
 	 */
 	public function get_value() {
-
-		//user_password is also a wordpress field, but it's useless to set the hash as value (we don't have the password)
-		$wordpress_fields = Fum_Conf::$fum_wordpress_fields;
-
-		//If no value is set and the field is a wordpress default fied, get the value from wordpress
-		if ( empty( $this->value ) && is_user_logged_in() && in_array( $this->get_unique_name(), $wordpress_fields ) ) {
-
-			$userdata = get_userdata( get_current_user_id() )->to_array();
-			return isset( $userdata[$this->get_unique_name()] ) ? $userdata[$this->get_unique_name()] : '';
-		}
-		else {
-			return $this->value;
-		}
-
+		return $this->value;
 	}
 
 	/**
@@ -321,8 +292,6 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	public function set_possible_values( $possible_values ) {
 		if ( $this->possible_values !== $possible_values ) {
 			$this->possible_values = $possible_values;
-			$this->setChanged();
-			$this->notifyObservers();
 		}
 	}
 
@@ -339,8 +308,6 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	public function set_unique_name( $unique_name ) {
 		if ( $this->unique_name !== $unique_name ) {
 			$this->unique_name = $unique_name;
-			$this->setChanged();
-			$this->notifyObservers();
 		}
 	}
 
@@ -357,8 +324,6 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	public function set_do_action( $do_action ) {
 		if ( $this->do_action !== $do_action ) {
 			$this->do_action = $do_action;
-			$this->setChanged();
-			$this->notifyObservers();
 		}
 	}
 
@@ -375,13 +340,12 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	public function set_required( $required ) {
 		if ( $this->required !== $required ) {
 			$this->required = $required;
-			$this->setChanged();
-			$this->notifyObservers();
 		}
 	}
 
 	/**
-	 * @return mixed
+	 * Returns true/false if the input field is required
+	 * @return bool
 	 */
 	public function get_required() {
 		return $this->required;
@@ -393,8 +357,6 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	public function set_validate_callback( $validate_callback ) {
 		if ( $this->validate_callback !== $validate_callback ) {
 			$this->validate_callback = $validate_callback;
-			$this->setChanged();
-			$this->notifyObservers();
 		}
 	}
 
@@ -409,27 +371,102 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	/**
 	 * @param bool $force_new_validation
 	 *
-	 * @return bool| WP_Error
+	 * @return bool|WP_Error
 	 * @throws Exception
 	 */
 	public function validate( $force_new_validation = false ) {
-		if ( $this->validate_callback === NULL ) {
-			return true;
-		}
-		else {
-			if ( $force_new_validation || false === $this->validation_return ) {
+		if ( $force_new_validation || false === $this->validation_result ) {
+			if ( NULL === $this->validate_callback ) {
+				if ( true === $this->get_required() ) {
+					//If field is required and no special validate callback is set, we check if if's NOT empty
+					$this->validation_result = Fum_Html_Input_Field::not_empty_callback( $this );
+				}
+				else {
+					$this->validation_result = true;
+				}
+			}
+			else {
 				if ( ! is_callable( $this->validate_callback ) ) {
 					throw new Exception( 'Validation callback is not callable!' );
 				}
-				$this->validation_return = call_user_func( $this->validate_callback, $this );
-				return $this->validation_return;
-			}
-			else {
-				return $this->validation_return;
+				$this->validation_result = call_user_func( $this->validate_callback, $this, $this->validate_params );
 			}
 		}
+		return $this->validation_result;
+
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function is_validated() {
+		if ( false === $this->validation_result ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param bool|WP_Error $validated
+	 */
+	public function set_validation_result( $validated ) {
+		$this->validation_result = $validated;
+	}
+
+	/**
+	 * @return bool|WP_Error
+	 */
+	public function get_validation_result() {
+		return $this->validation_result;
+	}
+
+	public function save() {
+		$validation = $this->validation_result;
+		if ( false === $this->validation_result ) {
+			$validation              = $this->validate();
+			$this->validation_result = $validation;
+		}
+
+		if ( true === $validation ) {
+			$this->notifyObservers();
+		}
+		return $validation;
 	}
 
 	public function update( Fum_Observable $o ) {
+	}
+
+
+	/**
+	 * Example validation callback function, checks if the input field is empty
+	 *
+	 * @param Fum_Html_Input_Field $input_field
+	 *
+	 * @return bool|WP_Error
+	 */
+	private static function not_empty_callback( Fum_Html_Input_Field $input_field, $params = array() ) {
+		$value = trim( $input_field->get_value() );
+		if ( ! empty( $value ) ) {
+			return true;
+		}
+		return new WP_Error( $input_field->get_unique_name(), 'Das Feld darf nicht leer sein' );
+	}
+
+	/**
+	 * Example validation callback function, checks if the input field contains an valid e-mail address (only format of mail address)
+	 *
+	 * @param Fum_Html_Input_Field $input_field
+	 *
+	 * @return bool|WP_Error
+	 */
+	private static function mail_address_callback( Fum_Html_Input_Field $input_field, $params = array() ) {
+		$regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/';
+// Run the preg_match() function on regex against the email address
+		if ( preg_match( $regex, $input_field->get_value() ) ) {
+			return true;
+		}
+		else {
+			return new WP_Error( $input_field->get_unique_name(), 'Die E-Mailadresse hat ein ungültiges Format' );
+		}
 	}
 }

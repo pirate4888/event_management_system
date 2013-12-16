@@ -15,6 +15,13 @@ class Fum_Form_View {
 		if ( $return ) {
 			ob_start();
 		}
+		if ( $form->is_validated() && is_wp_error( $form->get_validation_result() ) ):
+			foreach ( $form->get_validation_result()->get_error_messages() as $message ):
+				?>
+				<p><strong><?php _e( $message ); ?></strong></p>
+			<?php
+			endforeach;
+		endif;
 		?>
 		<form id="<?php echo $form->get_id(); ?>" name="<?php echo $form->get_name(); ?>" class="<?php echo $form->get_classes(); ?>" action="<?php echo $form->get_action(); ?>" method="<?php echo $form->get_method(); ?>">
 			<?php if ($table): //TODO make class="form-table" dynamic ? ?>
@@ -28,7 +35,7 @@ class Fum_Form_View {
 
 				if ($table): ?>
 			</table>
-		<?php endif; ?>
+		<?php endif; //TODO Not sure if this should happen in the view, maybe more a controller thing? ?>
 			<input type="hidden" name="<?php echo Fum_Conf::$fum_unique_name_field_name ?>" value="<?php echo $form->get_unique_name(); ?>">
 		</form>
 		<?php
@@ -46,15 +53,20 @@ class Fum_Form_View {
 		}
 
 		//If type is submit, we don't need a label or description
-		if ( $input_field->get_type() == Html_Input_Type_Enum::SUBMIT ) {
+		if ( $input_field->get_type() == Html_Input_Type_Enum::HIDDEN ) {
+			?>
+			<input type="<?php echo $input_field->get_type(); ?>" value="<?php echo $input_field->get_value(); ?>" size="<?php echo $input_field->get_size(); ?>" id="<?php echo $input_field->get_id(); ?>" class="<?php echo $input_field->get_classes(); ?>" name="<?php echo $input_field->get_name(); ?>" />
+		<?php
+		}
+		else if ( $input_field->get_type() == Html_Input_Type_Enum::SUBMIT ) {
 			if ( $input_field->get_value() != '' ):
 				?>
 				<p>
-					<input type="<?php echo $input_field->get_type(); ?>" value="<?php echo $input_field->get_value(); ?>" size="<?php echo $input_field->get_size(); ?>" id="<?php echo $input_field->get_id(); ?>" name="<?php echo $input_field->get_name(); ?>" />
+					<input type="<?php echo $input_field->get_type(); ?>" value="<?php echo $input_field->get_value(); ?>" size="<?php echo $input_field->get_size(); ?>" id="<?php echo $input_field->get_id(); ?>" class="<?php echo $input_field->get_classes(); ?>" name="<?php echo $input_field->get_name(); ?>" />
 				</p>
 			<?php else: ?>
 				<p>
-					<input type="<?php echo $input_field->get_type(); ?>" value="<?php echo $input_field->get_title(); ?>" size="<?php echo $input_field->get_size(); ?>" id="<?php echo $input_field->get_id(); ?>" name="<?php echo $input_field->get_name(); ?>" />
+					<input type="<?php echo $input_field->get_type(); ?>" value="<?php echo $input_field->get_title(); ?>" size="<?php echo $input_field->get_size(); ?>" id="<?php echo $input_field->get_id(); ?>" class="<?php echo $input_field->get_classes(); ?>" name="<?php echo $input_field->get_name(); ?>" />
 				</p>
 			<?php
 			endif;
@@ -100,8 +112,8 @@ class Fum_Form_View {
 					<?php
 					break;
 				case Html_Input_Type_Enum::RADIO:
-					foreach ( $input_field->get_possible_values() as $value ): ?>
-						<input type="radio" name="<?php echo( $input_field->get_name() ); ?>" value="<?php echo $value; ?>" <?php checked( $input_field->get_value(), $value ); ?>/> <?php echo $value; ?>
+					foreach ( $input_field->get_possible_values() as $possible_value ): ?>
+						<input type="radio" name="<?php echo( $input_field->get_name() ); ?>" value="<?php echo $possible_value['value']; ?>" <?php checked( $input_field->get_value(), $possible_value['value'] ); ?>/> <?php echo $possible_value['title']; ?>
 						<br />
 					<?php
 					endforeach;
@@ -110,14 +122,15 @@ class Fum_Form_View {
 					break;
 				case Html_Input_Type_Enum::CHECKBOX:
 					?>
-					<input type="checkbox" name="<?php echo( $input_field->get_name() ); ?>" value="1" <?php checked( $input_field->get_value(), 1 ); ?>/>
+					<input type="checkbox" name="<?php echo( $input_field->get_name() ); ?>" value="1" id="<?php echo $input_field->get_id(); ?>" class="<?php echo $input_field->get_classes(); ?>" <?php checked( $input_field->get_value(), 1 ); ?>/>
 					<?php
 					break;
 				case Html_Input_Type_Enum::SELECT:
 					?>
+
 					<select name="<?php echo $input_field->get_name(); ?>">
-						<?php foreach ( $input_field->get_possible_values() as $value ): ?>
-							<option value="<?php echo $value ?>" <?php selected( $input_field->get_value(), $value ); ?>><?php echo $value ?></option>
+						<?php foreach ( $input_field->get_possible_values() as $possible_value ): ?>
+							<option value="<?php echo $possible_value['value'] ?>" <?php selected( $input_field->get_value(), $possible_value['value'] ); ?>><?php echo $possible_value['title'] ?></option>
 						<?php endforeach; ?>
 					</select>
 					<?php
@@ -128,12 +141,14 @@ class Fum_Form_View {
 					<?php
 					break;
 			}
-			if ( true !== $input_field->validate() ) {
-				?>
-				<br />
-				<strong><?php _e( $input_field->validate()->get_error_message( $input_field->get_unique_name() ) ); ?></strong>
-			<?php
-			}
+			if ( $input_field->is_validated() && is_wp_error( $input_field->get_validation_result() ) ):
+				foreach ( $input_field->get_validation_result()->get_error_messages() as $message ):
+					?>
+					<br />
+					<strong><?php _e( $message ); ?></strong>
+				<?php
+				endforeach;
+			endif;
 			if ( $table ): ?>
 				</td>
 				</tr>

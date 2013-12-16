@@ -11,6 +11,9 @@ class Fum_Initialisation {
 		self::add_filter_hooks();
 		add_shortcode( Fum_Conf::$fum_register_login_page_name, array( 'Fum_Register_Login_Form_Controller', 'create_register_login_form' ) );
 		add_shortcode( Fum_Conf::$fum_edit_page_name, array( 'Fum_Edit_Form_Controller', 'create_edit_form' ) );
+		add_shortcode( Fum_Conf::$fum_event_registration_page, array( 'Fum_Event_Registration_Controller', 'create_event_registration_form' ) );
+		add_shortcode( 'ems_eventverwaltung', array( 'Fum_Registered_Event_list', 'create_applied_event_form' ) );
+
 	}
 
 	private static function add_action_hooks() {

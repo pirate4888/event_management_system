@@ -16,9 +16,10 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	/** @var  Fum_Html_Input_Field[] $input_fields */
 	private $input_fields;
 	private $callback;
-	private $validation_return = false;
+	private $callback_param;
+	private $validation_result = false;
 
-	function __construct( $unique_name, $name, $action, Html_Method_Type_Enum $method = NULL, $id = '', $classes = '', $input_fields = '', $callback = NULL ) {
+	function __construct( $unique_name, $name, $action, Html_Method_Type_Enum $method = NULL, $id = '', $classes = '', $input_fields = '', $callback = NULL, $callback_param = array() ) {
 		$this->unique_name = $unique_name;
 		$this->name        = $name;
 		$this->action      = $action;
@@ -30,46 +31,99 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 		$this->classes      = $classes;
 		$this->input_fields = $input_fields;
 		if ( is_array( $this->input_fields ) ) {
-
 			foreach ( $this->input_fields as $input_field ) {
 				/** @var  Fum_Html_Input_Field $input_field */
 				$input_field->addObserver( $this );
 			}
 		}
-
 		$this->callback = $callback;
 	}
 
+	/**
+	 * @param Fum_Observable $observable
+	 */
 	public function update( Fum_Observable $observable ) {
-		//Got notification from an input field, notify observers
+		//Got notification from an input field, set changed to true
+		//Notify observer is called on save()
 		if ( in_array( $observable, $this->input_fields ) ) {
+			//Set validation_result to false because we have to revalidate the form now
+			$this->validated = false;
 			$this->setChanged();
-			$this->notifyObservers();
 		}
 	}
 
+	/**
+	 * Calls validate() and notifies all observers that they can save the form if validate() returns true
+	 * It also calls save() on each input_field
+	 * @return bool|WP_Error returns true if validate() returned true and successfully notified all observers, else returns false
+	 */
+	public function save() {
+
+		foreach ( $this->get_input_fields() as $input_field ) {
+			$input_field->save();
+		}
+
+		if ( false === $this->validation_result ) {
+			$this->validation_result = $this->validate();
+		}
+
+		if ( true === $this->validation_result ) {
+			$this->notifyObservers();
+		}
+		return $this->validation_result;
+	}
+
+	/**
+	 * @param bool $force_new_validation
+	 *
+	 * @return bool|WP_Error
+	 * @throws Exception
+	 */
 	public function validate( $force_new_validation = false ) {
-		//Check if validation is forced or if no validation_return value is set, else return the validation_return value
-		if ( $force_new_validation || false === $this->validation_return ) {
-			$errors = new WP_Error();
+		//Check if validation is forced or if no validation_result value is set, else return the validation_result value
+		if ( $force_new_validation || false === $this->validation_result ) {
+			//Run validation on input fields
+			$validation_fields = true;
 			foreach ( $this->get_input_fields() as $input_field ) {
-				error_log( "Validate: " . $input_field->get_unique_name() );
-				$error = $input_field->validate();
-				if ( is_wp_error( $error ) ) {
-					$errors->add( $input_field->get_unique_name(), $error->get_error_message() );
+				if ( true !== $input_field->validate( $force_new_validation ) ) {
+					$validation_fields = false;
 				}
 			}
-			$error_codes = $errors->get_error_codes();
-			if ( empty( $error_codes ) ) {
-				$this->validation_return = true;
-				return $this->validation_return;
-			}
 
-			$this->validation_return = $errors;
-			return $errors;
+			//Run validation of form
+			if ( NULL !== $this->callback ) {
+				if ( ! is_callable( $this->callback ) ) {
+					throw new Exception( 'Validation callback is not callable!' );
+				}
+
+				$callback_param = $this->callback_param;
+				if ( true !== $validation_fields && ! isset( $this->callback_param ) ) {
+					$callback_param = array_merge( $this->callback_param, array( 'error_on_input_field' => true ) );
+				}
+
+				$validation_form = call_user_func( $this->callback, $this, $callback_param );
+				if ( true !== $validation_fields && ! is_wp_error( $validation_form ) ) {
+					throw new Exception( 'If there is an error on validation of an input field, the callback function of the form have to return an WP_Error' );
+				}
+				$this->validation_result = $validation_form;
+			}
+			else {
+				$this->validation_result = $validation_fields;
+				if ( false === $validation_fields ) {
+					$this->validation_result = new WP_Error();
+				}
+			}
 		}
-		else {
-			return $this->validation_return;
+		return $this->validation_result;
+	}
+
+
+	public function set_values_from_array( array $values ) {
+		//Set form values
+		foreach ( $this->get_input_fields() as $input_field ) {
+			if ( isset( $values[$input_field->get_name()] ) ) {
+				$input_field->set_value( $values[$input_field->get_name()] );
+			}
 		}
 	}
 
@@ -81,8 +135,7 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	 * @return bool  return value of update_option(), true if add was successful, otherwise false
 	 * @throws Exception The exception is thrown if $unique_name is already used for another form
 	 */
-	public
-	static function add_form( Fum_Html_Form $form ) {
+	public static function add_form( Fum_Html_Form $form ) {
 		$forms = self::get_forms();
 		foreach ( $forms as $cur_form ) {
 			if ( $cur_form->get_unique_name() === $form->get_unique_name() ) {
@@ -119,6 +172,10 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 		$forms = self::get_forms();
 		foreach ( $forms as $form ) {
 			if ( $form->get_unique_name() === $unique_name ) {
+				//Add observer
+				foreach ( $form->get_input_fields() as $input_field ) {
+					$input_field->addObserver( $form );
+				}
 				return $form;
 			}
 		}
@@ -152,6 +209,7 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 				return self::update_forms( $forms );
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -275,8 +333,7 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	/**
 	 * @param Fum_Html_Input_Field[] $input_fields
 	 */
-	public
-	function set_input_fields( array $input_fields ) {
+	public function set_input_fields( array $input_fields ) {
 		foreach ( $input_fields as $input_field ) {
 			$input_field->addObserver( $this );
 		}
@@ -286,63 +343,70 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	/**
 	 * @return Fum_Html_Input_Field[]
 	 */
-	public
-	function get_input_fields() {
+	public function get_input_fields() {
 		return $this->input_fields;
+	}
+
+	public function get_input_field( $input_field ) {
+		$name = $input_field;
+		if ( $input_field instanceof Fum_Html_Input_Field ) {
+			$name = $input_field->get_unique_name();
+		}
+
+		foreach ( $this->get_input_fields() as $cur_input_field ) {
+			if ( $cur_input_field->get_unique_name() == $name ) {
+				return $cur_input_field;
+			}
+		}
+		return NULL;
 	}
 
 	/**
 	 * @param Html_Method_Type_Enum $method
 	 */
-	public
-	function set_method( Html_Method_Type_Enum $method ) {
+	public function set_method( Html_Method_Type_Enum $method ) {
 		$this->method = $method;
 	}
 
 	/**
 	 * @return Html_Method_Type_Enum
 	 */
-	public
-	function get_method() {
+	public function get_method() {
 		return $this->method;
 	}
 
 	/**
 	 * @param mixed $name
 	 */
-	public
-	function set_name( $name ) {
+	public function set_name( $name ) {
 		$this->name = $name;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public
-	function get_name() {
+	public function get_name() {
 		return $this->name;
 	}
 
 	/**
 	 * @param mixed $unique_name
 	 */
-	public
-	function set_unique_name( $unique_name ) {
+	public function set_unique_name( $unique_name ) {
 		$this->unique_name = $unique_name;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public
-	function get_unique_name() {
+	public function get_unique_name() {
 		return $this->unique_name;
 	}
 
 	/**
-	 * @param null $callback
+	 * @param callable $callback
 	 */
-	public function set_callback( $callback ) {
+	public function set_callback( callable $callback ) {
 		$this->callback = $callback;
 	}
 
@@ -353,4 +417,69 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 		return $this->callback;
 	}
 
+	/**
+	 * @return boolean|WP_Error
+	 */
+	public function get_validation_result() {
+		return $this->validation_result;
+	}
+
+	public function is_validated() {
+		if ( false === $this->validation_result ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param mixed $callback_param
+	 */
+	public function set_callback_param( $callback_param ) {
+		$this->callback_param = $callback_param;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_callback_param() {
+		return $this->callback_param;
+	}
+
+	public static function validate_change_password_form( Fum_Html_Form $form, $params ) {
+		$return         = true;
+		$ID             = $params['ID'];
+		$pass           = $form->get_input_field( $params['password'] )->get_value();
+		$new_pass       = $form->get_input_field( $params['new_password'] )->get_value();
+		$new_pass_check = $form->get_input_field( $params['new_password_check'] )->get_value();
+		$user           = get_userdata( $ID );
+		if ( ! $user instanceof WP_User ) {
+			throw new Exception( 'Could not find user with id' . $ID );
+		}
+
+		/** @var array $user ->data */
+		if ( ! wp_check_password( $pass, $user->data->user_pass, $ID ) ) {
+			$form->get_input_field( $params['password'] )->set_validation_result( new WP_Error( $params['password'], 'Das aktuelle Passwort ist falsch' ) );
+		}
+
+		if ( $new_pass != $new_pass_check ) {
+			$form->get_input_field( $params['new_password_check'] )->set_validation_result( new WP_Error( $params['new_password_check'], 'Die Passwörter stimmen nicht überein' ) );
+			$form->get_input_field( $params['new_password'] )->set_validation_result( new WP_Error( $params['new_password'], 'Die Passwörter stimmen nicht überein' ) );
+			$return = false;
+		}
+
+		if ( empty( $new_pass ) ) {
+			$form->get_input_field( $params['new_password'] )->set_validation_result( new WP_Error( $params['new_password'], 'Leere Passwörter sind nicht erlaubt' ) );
+			$return = false;
+		}
+		else {
+			if ( empty( $new_pass_check ) ) {
+				$form->get_input_field( $params['new_password_check'] )->set_validation_result( new WP_Error( $params['new_password_check'], 'Leere Passwörter sind nicht erlaubt' ) );
+				$return = false;
+			}
+		}
+		if ( false === $return ) {
+			$return = new WP_Error( $form->get_unique_name(), 'Fehler beim Ändern des Passworts' );
+		}
+		return $return;
+	}
 }

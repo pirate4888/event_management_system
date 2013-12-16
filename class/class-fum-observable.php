@@ -40,12 +40,14 @@ class Fum_Observable {
 	}
 
 	public function notifyObservers() {
-		if ( $this->changed ) {
 
+
+		if ( $this->changed ) {
 			foreach ( $this->observers as $ob ) {
 				$ob->update( $this );
 			}
 		}
+
 	}
 
 	public

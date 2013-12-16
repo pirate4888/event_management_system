@@ -16,4 +16,5 @@ class Html_Input_Type_Enum extends Enum {
 	const SUBMIT   = 'submit';
 	const TEXTAREA = 'textarea';
 	const SELECT   = 'select';
+	const HIDDEN   = 'hidden';
 } 

@@ -12,27 +12,28 @@ class Fum_Conf {
 	 * Fields of a user which wordpress defines, does not contain the user_pass/user_password field,
 	 * because there we have only the hash, not the password
 	 */
-	public static $fum_wordpress_fields = [
-		'ID',
-		'user_login',
-		'user_nicename',
-		'user_url',
-		'user_email',
-		'display_name',
-		'nickname',
-		'first_name',
-		'last_name',
-		'nickname',
-		'description',
-		'rich_editing',
-		'comment_shortcuts',
-		'admin_color',
-		'use_ssl',
-		'show_admin_bar_front',
-	];
+	/*	public static $fum_wordpress_fields = [
+			'ID',
+			'user_login',
+			'user_nicename',
+			'user_url',
+			'user_email',
+			'display_name',
+			'nickname',
+			'first_name',
+			'last_name',
+			'nickname',
+			'description',
+			'rich_editing',
+			'comment_shortcuts',
+			'admin_color',
+			'use_ssl',
+			'show_admin_bar_front',
+		];*/
 
 	public static $fum_register_login_page_name = 'fum_register_login';
 	public static $fum_edit_page_name = 'fum_edit';
+	public static $fum_event_registration_page = 'fum_event_registration';
 
 	/*Unique name of the default forms*/
 	public static $fum_login_form_unique_name = 'fum_login_form';
@@ -41,6 +42,10 @@ class Fum_Conf {
 	public static $fum_edit_form_unique_name = 'fum_edit_form';
 	public static $fum_change_password_form_unique_name = 'fum_change_password_form';
 	public static $fum_event_register_form_unique_name = 'fum_event_register_form';
+	public static $fum_user_applied_event_form_unique_name = 'fum_user_applied_event_form';
+
+	/*Name of the hidden input field which is added to a fum form*/
+	public static $fum_hidden_input_field = 'fum_hidden_input_field';
 
 	/*Fields which are used by wordpress*/
 	public static $fum_input_field_username = 'user_login';
@@ -56,6 +61,7 @@ class Fum_Conf {
 	public static $fum_input_field_submit = 'fum_submit';
 
 	/*DHV-Jugend input field names*/
+	public static $fum_input_field_select_event = 'select_event';
 	public static $fum_input_field_birthday = 'fum_birthday';
 	public static $fum_input_field_street = 'fum_street';
 	public static $fum_input_field_city = 'fum_city';
@@ -70,6 +76,10 @@ class Fum_Conf {
 	public static $fum_input_field_emergency_contact_surname = 'fum_emergency_contact_surname';
 	public static $fum_input_field_emergency_contact_forename = 'fum__emergency_contact_forename';
 	public static $fum_input_field_emergency_phone_number = 'fum_emergency_phone_number';
+
+	public static $fum_input_field_search_ride = 'fum_search_ride';
+	public static $fum_input_field_offer_ride = 'fum_offer_ride';
+	public static $fum_input_field_accept_agb = 'fum_accept_agb';
 
 
 	//Name of the hidden unique_name field in the html form

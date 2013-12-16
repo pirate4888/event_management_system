@@ -8,12 +8,15 @@ class Fum_Front_End_Form {
 	public function add_form_posts() {
 
 		Fum_Post::fum_register_post_type();
-		$register_post_id = Fum_Post::add_post( Fum_Conf::$fum_register_login_page_name, 'Login', '[' . Fum_Conf::$fum_register_login_page_name . ']' );
-		$edit_post_id     = Fum_Post::add_post( Fum_Conf::$fum_edit_page_name, 'Profil editieren', '[' . Fum_Conf::$fum_edit_page_name . ']' );
+		$register_post_id       = Fum_Post::add_post( Fum_Conf::$fum_register_login_page_name, 'Login', '[' . Fum_Conf::$fum_register_login_page_name . ']' );
+		$edit_post_id           = Fum_Post::add_post( Fum_Conf::$fum_edit_page_name, 'Profil editieren', '[' . Fum_Conf::$fum_edit_page_name . ']' );
+		$register_event_post_id = Fum_Post::add_post( Fum_Conf::$fum_event_registration_page, 'Eventregistrierung', '[' . Fum_Conf::$fum_event_registration_page . ']' );
+
 
 		return array(
 			Fum_Conf::$fum_register_login_page_name => $register_post_id,
 			Fum_Conf::$fum_edit_page_name           => $edit_post_id,
+			Fum_Conf::$fum_event_registration_page  => $register_event_post_id,
 		);
 	}
 

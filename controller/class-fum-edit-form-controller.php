@@ -6,9 +6,11 @@
 
 class Fum_Edit_Form_Controller {
 	public static function  create_edit_form() {
-		$error = NULL;
+		$validated = false;
 
+		$form = NULL;
 		if ( isset( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] ) ) {
+			$form              = Fum_Html_Form::get_form( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] );
 			$request_form_name = $_REQUEST[Fum_Conf::$fum_unique_name_field_name];
 		}
 		else {
@@ -16,63 +18,55 @@ class Fum_Edit_Form_Controller {
 		}
 
 		if ( $request_form_name !== false ) {
-			switch ( $request_form_name ) {
-				case Fum_Conf::$fum_edit_form_unique_name:
-					$error = self::validate_edit_form();
-					break;
-				case Fum_Conf::$fum_change_password_form_unique_name:
-					$error = self::validate_new_password_form();
-					break;
-			}
+			$validated = self::validate_form( $form );
 		}
 
 
 		if ( is_user_logged_in() ) {
-			if ( $request_form_name !== false && $request_form_name == Fum_Conf::$fum_edit_form_unique_name && ! is_wp_error( $error ) ) {
+			if ( $request_form_name == Fum_Conf::$fum_edit_form_unique_name && true === $validated ) {
 				echo '<p><strong>Profil wurde erfolgreich aktualisiert!</strong></p>';
 			}
-			else if ( $request_form_name !== false && $request_form_name == Fum_Conf::$fum_change_password_form_unique_name && ! is_wp_error( $error ) ) {
+			else if ( $request_form_name == Fum_Conf::$fum_change_password_form_unique_name && true === $validated ) {
 
 				echo '<p><strong>Passwort erfolgreich geändert!</strong></p>';
 
 
 				/** @var WP_User $error */
-				$credentials[Fum_Conf::$fum_input_field_username] = $error->data->user_login;
+				$credentials[Fum_Conf::$fum_input_field_username] = get_userdata( get_current_user_id() )->data->user_login;
 				//Set new password as password for the relog
 				$credentials[Fum_Conf::$fum_input_field_password] = $_REQUEST[Fum_Conf::$fum_input_field_new_password];
 				//User gets automatically logged out after password change, log him in again
 				$user = wp_signon( $credentials, true );
 
 				if ( is_wp_error( $user ) ) {
-					$error = $user;
+					$validated = $user;
 				}
 				else {
 					wp_set_auth_cookie( $user->ID );
 				}
 			}
 
-			if ( is_wp_error( $error ) ) {
-				echo '<p><strong>' . $error->get_error_message() . '</strong></p>';
-			}
+			$edit_form = Fum_Html_Form::get_form( Fum_Conf::$fum_edit_form_unique_name );
+			$edit_form = Fum_User::fill_form( $edit_form );
 
-			if ( $error instanceof Fum_Html_Form ) {
-				$form = $error;
-			}
-			else {
-				$form = Fum_Html_Form::get_form( Fum_Conf::$fum_edit_form_unique_name );
+			$change_password_form = Fum_Html_Form::get_form( Fum_Conf::$fum_change_password_form_unique_name );
 
-				foreach ( $form->get_input_fields() as $input_field ) {
-					if ( $input_field->get_type() == Html_Input_Type_Enum::SUBMIT ) {
-						continue;
-					}
-					$input_field->set_value( get_user_meta( get_current_user_id(), $input_field->get_name(), true ) );
+			if ( false === $validated && $form instanceof Fum_Html_Form ) {
+				switch ( $form->get_unique_name() ) {
+					case Fum_Conf::$fum_edit_form_unique_name:
+						$edit_form = $form;
+						break;
+					case Fum_Conf::$fum_change_password_form_unique_name:
+						$change_password_form = $form;
+						break;
+
 				}
 			}
 			//Change password form
-			Fum_Form_View::output( Fum_Html_Form::get_form( Fum_Conf::$fum_change_password_form_unique_name ) );
+			Fum_Form_View::output( $change_password_form );
 
 			//Edit profile form
-			Fum_Form_View::output( $form );
+			Fum_Form_View::output( $edit_form );
 		}
 		else {
 			echo '<p></p><strong>Du musst dich einloggen, bevor du dein Profil bearbeiten kannst</strong></p>';
@@ -80,58 +74,24 @@ class Fum_Edit_Form_Controller {
 		}
 	}
 
-	private static function validate_edit_form() {
-		$form = Fum_Html_Form::get_form( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] );
-		//Set form values
-		foreach ( $form->get_input_fields() as $input_field ) {
-			if ( isset( $_REQUEST[$input_field->get_name()] ) ) {
-				$input_field->set_value( $_REQUEST[$input_field->get_name()] );
-			}
+	private static function validate_form( Fum_Html_Form $form ) {
+		$form->set_values_from_array( $_REQUEST );
+		if ( $form->get_unique_name() == Fum_Conf::$fum_change_password_form_unique_name ) {
+			$form->set_callback( array( 'Fum_Html_Form', 'validate_change_password_form' ) );
+			$params = array(
+				'ID'                 => get_current_user_id(),
+				'password'           => Fum_Conf::$fum_input_field_password,
+				'new_password'       => Fum_Conf::$fum_input_field_new_password,
+				'new_password_check' => Fum_Conf::$fum_input_field_new_password_check,
+			);
+			$form->set_callback_param( $params );
 		}
 		$error = $form->validate( true );
 		if ( is_wp_error( $error ) ) {
-			return $form;
+			return false;
 		}
-		$user      = new WP_User( get_current_user_id() );
-		$user_data = array();
-		foreach ( $form->get_input_fields() as $input_field ) {
-			if ( isset( $_REQUEST[$input_field->get_name()] ) ) {
-				//Check if input_field contains the data of a default wordpress user field
-				if ( in_array( $input_field->get_name(), Fum_Conf::$fum_wordpress_fields ) ) {
-					$user_data[$input_field->get_name()] = $_REQUEST[$input_field->get_name()];
-				}
-				else {
-					update_user_meta( get_current_user_id(), $input_field->get_name(), $_REQUEST[$input_field->get_name()] );
-				}
-			}
-		}
-		if ( ! empty( $user_data ) ) {
-			wp_update_user( $user_data );
-		}
-		return NULL;
-	}
-
-	private static function validate_new_password_form() {
-		$user = get_user_by( 'id', get_current_user_id() );
-		$pass = $_REQUEST[Fum_Conf::$fum_input_field_password];
-
-		if ( $user && wp_check_password( $pass, $user->data->user_pass, $user->ID ) ) {
-			$new_pass       = $_REQUEST[Fum_Conf::$fum_input_field_new_password];
-			$new_pass_check = $_REQUEST[Fum_Conf::$fum_input_field_new_password_check];
-			if ( $new_pass == $new_pass_check ) {
-				if ( empty( $new_pass ) ) {
-					return new WP_Error( 'Das Passwortfeld war leer - leere Passwörter sind leider nicht möglich.', 'Das Passwortfeld war leer - leere Passwörter sind leider nicht möglich.' );
-				}
-				reset_password( $user, $new_pass );
-				return $user;
-			}
-			else {
-				return new WP_Error( 'Die Passwörter stimmen nicht überein', 'Die Passwörter stimmen nicht überein' );
-			}
-		}
-		else {
-
-			return new WP_Error( 'Das aktuelle Passwort stimmt nicht', 'Das aktuelle Passwort stimmt nicht' );
-		}
+		Fum_User::observe_object( $form );
+		$form->save();
+		return true;
 	}
 }

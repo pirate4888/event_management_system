@@ -42,7 +42,7 @@ class Ems_Event_Registration {
 			throw new Exception( "User is alredy registered for this event" );
 		}
 		$registrations[] = $registration;
-		$title = get_post( $registration->get_event_post_id() )->post_title;
+		$title = htmlspecialchars_decode( get_post( $registration->get_event_post_id() )->post_title );
 		$user = get_userdata( $registration->get_user_id() );
 		$subject = 'Erfolgreich für "' . $title . '" registriert';
 		$message =

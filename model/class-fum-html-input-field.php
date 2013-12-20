@@ -15,14 +15,18 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	private $classes;
 	private $size;
 	private $value;
+	//TODO Use Readonly in view
+	private $readonly;
 	/**
 	 * @var array $possible_values
 	 * $possible_values contains an array with title and value as index
 	 * title is the printed text and value is the input field value
 	 */
 	private $possible_values;
-	private $do_action;
 	private $required;
+	//TODO Add extra params in view
+	private $extra_params;
+	private $do_action;
 	private $validate_callback = NULL;
 	private $validate_params = array();
 	/** @var bool|WP_Error $validation_result false if validate() wasn't called, WP_Error if error occured, true if validate was fine */
@@ -381,12 +385,56 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		return $this->validate_params;
 	}
 
+	/**
+	 * @param bool|WP_Error $validated
+	 */
+	public function set_validation_result( $validated ) {
+		$this->validation_result = $validated;
+	}
 
 	/**
+	 * @return bool|WP_Error
+	 */
+	public function get_validation_result() {
+		return $this->validation_result;
+	}
+
+	/**
+	 * @param mixed $extra_params
+	 */
+	public function set_extra_params( $extra_params ) {
+		$this->extra_params = $extra_params;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_extra_params() {
+		return $this->extra_params;
+	}
+
+	/**
+	 * @param mixed $readonly
+	 */
+	public function set_readonly( $readonly ) {
+		$this->readonly = $readonly;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_readonly() {
+		return $this->readonly;
+	}
+
+	/**
+	 * Checks if the value of an input field is valid
+	 * If validate_callback is not set the function checks if the value is empty and if possible_values are set it checks if the value is inside of the possible values
+	 *
 	 * @param bool $force_new_validation
 	 *
-	 * @return bool|WP_Error
-	 * @throws Exception
+	 * @return bool|WP_Error returns true if everything is fine, returns WP_Error if something went wrong
+	 * @throws Exception throws Exception if validate_callback is set but not callable
 	 */
 	public function validate( $force_new_validation = false ) {
 		if ( $force_new_validation || false === $this->validation_result ) {
@@ -397,6 +445,21 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 				}
 				else {
 					$this->validation_result = true;
+				}
+				//If not empty callback was successfull or field is not required, check if value is in possible values (if they are set)
+				if ( true === $this->validation_result && ! empty( $this->possible_values ) ) {
+
+					$found = false;
+					//If there are possible values set, check if the current value is inside
+					foreach ( $this->get_possible_values() as $possible_value ) {
+						if ( in_array( $this->get_value(), $possible_value ) ) {
+							$found = true;
+							break;
+						}
+					}
+					if ( ! $found ) {
+						$this->validation_result = new WP_Error( $this->get_unique_name(), 'Der eingegebene Wert ist ungültig' );
+					}
 				}
 			}
 			else {
@@ -413,28 +476,16 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	/**
 	 * @return bool
 	 */
-	public function is_validated() {
+	public
+	function is_validated() {
 		if ( false === $this->validation_result ) {
 			return false;
 		}
 		return true;
 	}
 
-	/**
-	 * @param bool|WP_Error $validated
-	 */
-	public function set_validation_result( $validated ) {
-		$this->validation_result = $validated;
-	}
-
-	/**
-	 * @return bool|WP_Error
-	 */
-	public function get_validation_result() {
-		return $this->validation_result;
-	}
-
-	public function save() {
+	public
+	function save() {
 		$validation = $this->validation_result;
 		if ( false === $this->validation_result ) {
 			$validation              = $this->validate();
@@ -447,7 +498,8 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 		return $validation;
 	}
 
-	public function update( Fum_Observable $o ) {
+	public
+	function update( Fum_Observable $o ) {
 	}
 
 
@@ -458,7 +510,8 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	 *
 	 * @return bool|WP_Error
 	 */
-	private static function not_empty_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
+	private
+	static function not_empty_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
 		$value = trim( $input_field->get_value() );
 		if ( ! empty( $value ) ) {
 			return true;

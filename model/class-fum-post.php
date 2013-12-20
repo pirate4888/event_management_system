@@ -4,7 +4,6 @@
  * @version 0.01
  */
 
-//TODO Make Fum_Post a real model class - split into controller and model
 class Fum_Post {
 
 	public static function fum_register_post_type() {

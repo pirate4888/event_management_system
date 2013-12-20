@@ -7,6 +7,9 @@
 class Fum_Initialisation {
 
 	public static function initiate_plugin() {
+		//Removes 'next' link in head because this could cause SEO problems and firefox is fetching the link in backround which makes more traffic
+		remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );
+
 		self::add_action_hooks();
 		self::add_filter_hooks();
 		add_shortcode( Fum_Conf::$fum_register_login_page_name, array( 'Fum_Register_Login_Form_Controller', 'create_register_login_form' ) );
@@ -18,8 +21,8 @@ class Fum_Initialisation {
 
 	private static function add_action_hooks() {
 
-		/*class-fum-option-page-controller.php*/
-
+		//Action hook for changing
+		add_action( 'get_header', array( 'Fum_Initialisation', 'check_shortcode' ) );
 //Register plugin settings
 		add_action( 'admin_init', array( 'Fum_Option_Page_Controller', 'register_settings' ) );
 //Create plugin admin menu page
@@ -56,8 +59,6 @@ class Fum_Initialisation {
 		if ( get_option( Fum_Conf::$fum_general_option_group_hide_wp_login_php ) ) {
 			//Redirect wp-login.php
 			add_action( 'login_init', array( 'Fum_Redirect', 'redirect_wp_login_php' ) );
-			//Redirect to home url after logout
-			add_action( 'wp_logout', create_function( '', 'wp_redirect(home_url());exit();' ) );
 		}
 
 		if ( get_option( Fum_Conf::$fum_general_option_group_hide_dashboard_from_non_admin ) ) {
@@ -69,5 +70,49 @@ class Fum_Initialisation {
 
 	private static function add_filter_hooks() {
 		add_filter( 'force_ssl', array( new Fum_Front_End_Form(), 'use_ssl_on_front_end_form' ), 1, 3 );
+
+		add_filter( 'logout_url', array( 'Fum_Redirect', 'redirect_wp_logout' ), 10, 2 );
+
+	}
+
+
+	/**
+	 * Calls shortcode callback_header function in wp_head, useful for  add styles,scripts, change title, etc.
+	 *
+	 *
+	 * <p>Checks if the current post (it checks the complete WP_Post object) contains a shortcode with the FUM_NAME_PREFIX
+	 * If a shortcode is found it takes the callback functionname adds _header and calls it (if it's callable)</p>
+	 *
+	 * <p><b>Example:</b></p>
+	 * <code>add_shortcode('FUM_NAME_PREFIX_test',array('Classname','functionname'));</code>
+	 * then the following is called:<br>
+	 * <code>call_user_func(array('Classname','functionname_header'));</code>
+	 *
+	 * <code>add_shortcode('FUM_NAME_PREFIX_test','functionname');</code>
+	 * then the following is called:
+	 * <code>call_user_func('functionname_header');</code>
+	 */
+	public static function check_shortcode() {
+		global $shortcode_tags;
+		foreach ( $shortcode_tags as $shortcode_tag => $callback ) {
+			if ( 0 === stripos( $shortcode_tag, Fum_Conf::FUM_NAME_PREFIX ) && has_shortcode( implode( ' ', get_object_vars( get_post() ) ), $shortcode_tag ) ) {
+				switch ( count( $callback ) ) {
+					case 1:
+						$function = (string) $callback;
+						$function = $function . '_header';
+						if ( is_callable( $function ) ) {
+							call_user_func( $function );
+						}
+						break;
+					case 2:
+						$class    = $callback[0];
+						$function = $callback[1] . '_header';
+						$callback = array( $class, $function );
+						if ( is_callable( $callback ) ) {
+							call_user_func( $callback );
+						}
+				}
+			}
+		}
 	}
 }

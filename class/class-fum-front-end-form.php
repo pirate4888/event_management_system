@@ -25,6 +25,8 @@ class Fum_Front_End_Form {
 	 * This is necessary because we may use wp_redirect()
 	 */
 	public function buffer_content_if_front_end_form() {
+
+
 		ob_start();
 	}
 

@@ -13,6 +13,7 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	private $method;
 	private $id;
 	private $classes;
+	private $extra_params;
 	/** @var  Fum_Html_Input_Field[] $input_fields */
 	private $input_fields;
 	private $callback;
@@ -350,6 +351,14 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 		return $this->input_fields;
 	}
 
+	public function get_unique_names_of_input_fields() {
+		$names = array();
+		foreach ( $this->get_input_fields() as $input_field ) {
+			$names[$input_field->get_unique_name()] = $input_field->get_unique_name();
+		}
+		return $names;
+	}
+
 	public function get_input_field( $input_field ) {
 		$name = $input_field;
 		if ( $input_field instanceof Fum_Html_Input_Field ) {
@@ -447,6 +456,24 @@ class Fum_Html_Form extends Fum_Observable implements Fum_Observer {
 	public function get_callback_param() {
 		return $this->callback_param;
 	}
+
+	/**
+	 * Set extra parameters in the <form> tag, could be useful to add js onload or something similar
+	 *
+	 * @param string $extra_params the string which should be added to the <form> tag
+	 */
+	public function set_extra_params( $extra_params ) {
+		$this->extra_params = $extra_params;
+	}
+
+	/**
+	 * Get extra parameters in the <form> tag, could be useful to add js onload or something similar
+	 * @return string the string which should be added to the <form> tag
+	 */
+	public function get_extra_params() {
+		return $this->extra_params;
+	}
+
 
 	public static function validate_change_password_form( Fum_Html_Form $form, $params ) {
 		$return         = true;

@@ -8,29 +8,6 @@ class Fum_Conf {
 
 	const FUM_NAME_PREFIX = 'fum_';
 
-	/** @var array $fum_wordpress_fields
-	 * Fields of a user which wordpress defines, does not contain the user_pass/user_password field,
-	 * because there we have only the hash, not the password
-	 */
-	/*	public static $fum_wordpress_fields = [
-			'ID',
-			'user_login',
-			'user_nicename',
-			'user_url',
-			'user_email',
-			'display_name',
-			'nickname',
-			'first_name',
-			'last_name',
-			'nickname',
-			'description',
-			'rich_editing',
-			'comment_shortcuts',
-			'admin_color',
-			'use_ssl',
-			'show_admin_bar_front',
-		];*/
-
 	public static $fum_register_login_page_name = 'fum_register_login';
 	public static $fum_edit_page_name = 'fum_edit';
 	public static $fum_event_registration_page = 'fum_event_registration';
@@ -81,6 +58,8 @@ class Fum_Conf {
 	public static $fum_input_field_offer_ride = 'fum_offer_ride';
 	public static $fum_input_field_accept_agb = 'fum_accept_agb';
 
+	public static $fum_input_field_premium_participant = 'fum_premium_participant';
+
 
 	//Name of the hidden unique_name field in the html form
 	public static $fum_unique_name_field_name = 'fum_unique_name';
@@ -90,8 +69,9 @@ class Fum_Conf {
 	public static $fum_post_type_label = 'fum_posts';
 
 	public static $fum_general_option_group = 'general_settings_group';
-	public static $fum_general_option_group_hide_wp_login_php = 'hide_wp_login_php';
-	public static $fum_general_option_group_hide_dashboard_from_non_admin = 'hide_dashboard_from_non_admin';
+	public static $fum_general_option_group_hide_wp_login_php = 'fum_hide_wp_login_php';
+	public static $fum_general_option_group_hide_dashboard_from_non_admin = 'fum_hide_dashboard_from_non_admin';
+	public static $fum_general_option_group_redirect_to_home_after_logout = 'fum_redirect_to_home_after_logout';
 
 	public static $fum_login_form_option_group = 'fum_login_form_options';
 

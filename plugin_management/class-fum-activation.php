@@ -44,16 +44,10 @@ class Fum_Activation {
 			'fum_input_field_new_password'       => array( 'New password', true ),
 			'fum_input_field_new_password_check' => array( 'Confirm new password', true ),
 		),
-		Html_Input_Type_Enum::SELECT   => array(
-			'fum_input_field_aircraft' => array( 'Fluggerät', false, NULL, NULL,
-				//Possible values array
-				array(
-					array( 'title' => 'Drachen', 'value' => 'drachen' ),
-					array( 'title' => 'Gleitschirm', 'value' => 'gleitschirm' ),
-					array( 'title' => 'Fußgänger', 'value' => 'fussgaenger' ),
-				) ),
+		Html_Input_Type_Enum::SELECT   => array(),
+		Html_Input_Type_Enum::CHECKBOX => array(
+			'fum_input_field_premium_participant' => array( 'Schüler, Azubi, Student', false, ),
 		),
-		Html_Input_Type_Enum::CHECKBOX => array(),
 		Html_Input_Type_Enum::SUBMIT   => array()
 	);
 	private static $event_input_fields = array(
@@ -61,7 +55,13 @@ class Fum_Activation {
 		Html_Input_Type_Enum::PASSWORD => array(),
 		Html_Input_Type_Enum::SELECT   => array(
 			'fum_input_field_select_event' => array( 'Event', true, NULL, NULL, array( 'Bassano', 'Ski & Fly' ) ),
-
+			'fum_input_field_aircraft'     => array( 'Fluggerät', false, NULL, NULL,
+				//Possible values array
+				array(
+					array( 'title' => 'Drachen', 'value' => 'drachen' ),
+					array( 'title' => 'Gleitschirm', 'value' => 'gleitschirm' ),
+					array( 'title' => 'Fußgänger', 'value' => 'fussgaenger' ),
+				) ),
 		),
 		Html_Input_Type_Enum::CHECKBOX => array(
 			'fum_input_field_search_ride' => array( 'Suche Mitfahrgelegenheit', false ),
@@ -157,6 +157,7 @@ class Fum_Activation {
 		//Required fields
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_username ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_email ) );
+
 		//DHV-Jugend input field names
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_birthday ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_street ) );
@@ -167,7 +168,6 @@ class Fum_Activation {
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_mobile_number ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_dhv_member_number ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_license_number ) );
-		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_aircraft ) );
 
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_emergency_contact_surname ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_emergency_contact_forename ) );
@@ -203,7 +203,6 @@ class Fum_Activation {
 
 
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_email ) );
-
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_last_name ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_first_name ) );
 
@@ -218,7 +217,8 @@ class Fum_Activation {
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_mobile_number ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_dhv_member_number ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_license_number ) );
-		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_aircraft ) );
+		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_premium_participant ) );
+
 
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_emergency_contact_surname ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_emergency_contact_forename ) );
@@ -285,6 +285,11 @@ class Fum_Activation {
 	}
 
 	/**
+	 * Returns array with unique names of event input fields with the following format:
+	 * [0] => select_event
+	 * [1] => fum_search_ride
+	 * [2] => fum_offer_ride
+	 * [3] => fum_accept_agb
 	 * @return array
 	 */
 	public static function get_event_input_fields() {

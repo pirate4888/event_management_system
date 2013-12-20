@@ -40,11 +40,8 @@ class Fum_User extends Fum_Observable implements Fum_Observer {
 			case Fum_Conf::$fum_register_form_unique_name:
 				break;
 			case Fum_Conf::$fum_login_form_unique_name:
-				error_log( "CALLED LOGIN FORM OBSERVER" );
 				break;
 			case Fum_Conf::$fum_lost_password_form_unique_name:
-				error_log( "CALLED LOST PASSWORD FORM OBSERVER" );
-
 				break;
 			case Fum_Conf::$fum_change_password_form_unique_name:
 				$params         = $form->get_callback_param();
@@ -65,7 +62,6 @@ class Fum_User extends Fum_Observable implements Fum_Observer {
 					}
 					else {
 						if ( in_array( $input_field->get_name(), self::$user_fields ) ) {
-							error_log( "Update_user_meta" );
 							update_user_meta( get_current_user_id(), $input_field->get_name(), $input_field->get_value() );
 						}
 					}
@@ -77,6 +73,20 @@ class Fum_User extends Fum_Observable implements Fum_Observer {
 
 		}
 
+	}
+
+	public static function get_user_data( $id ) {
+		$user_data = get_userdata( $id )->to_array();
+		$user_meta = get_user_meta( $id );
+
+		$callback = create_function( '$value', 'return implode( "", $value );' );
+		//get_user_meta returns an array for each field, remove this additional array
+		$user_meta = array_map( $callback, $user_meta );
+
+		//From the array_merge php manual: If the input arrays have the same string keys, then the later value for that key will overwrite the previous one.
+		//So the order is important and we prefer the values from user_data than from user_meta!
+		$user_data = array_merge( $user_meta, $user_data );
+		return $user_data;
 	}
 
 	public static function fill_form( Fum_Html_Form $form ) {

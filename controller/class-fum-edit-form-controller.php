@@ -5,6 +5,10 @@
  */
 
 class Fum_Edit_Form_Controller {
+
+	public static function create_edit_form_header() {
+	}
+
 	public static function  create_edit_form() {
 		$validated = false;
 

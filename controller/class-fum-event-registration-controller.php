@@ -12,7 +12,7 @@ class Fum_Event_Registration_Controller {
 			?>
 			Du musst dich einloggen, bevor du dich für ein Event anmelden kannst:<br />
 			<?php
-			wp_loginout();
+			wp_loginout( get_permalink() );
 			?>
 			<br />Du hast noch keinen Account? Registriere dich:<br />
 			<?php
@@ -21,55 +21,64 @@ class Fum_Event_Registration_Controller {
 		}
 
 		$form = Fum_Html_Form::get_form( Fum_Conf::$fum_event_register_form_unique_name );
-		$form = Fum_User::fill_form( $form );
 
-		if ( isset( $_GET['event'] ) ) {
-			$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_value( $_GET['event'] );
+		$event_field = $form->get_input_field( Fum_Conf::$fum_input_field_select_event );
+
+		if ( isset( $_REQUEST['event'] ) ) {
+			$event_field->set_value( $_REQUEST['event'] );
+			$event_field->set_readonly( true );
+			//Check if event is an valid event
+			$return_value = self::validate_event_select_field( $event_field );
+			if ( is_wp_error( $return_value ) ) {
+				/** @var WP_Error $return_value */
+				echo '<p><strong>' . $return_value->get_error_message() . '</strong></p>';
+				echo '<p><a href="' . get_permalink() . '">Für ein anderes Event anmelden</a></p>';
+				return;
+			}
 		}
-		$posts  = get_posts( array( 'post_type' => 'event' ) );
+		else {
+			//if no event is specified, just show the select event field
+			$event_field->set_name( 'event' );
+			$event_field->set_id( 'event' );
+			$form->set_input_fields( array( $event_field ) );
+			$form->set_unique_name( 'select_event' );
+			$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_submit ) );
+		}
+
+
+		if ( get_post_meta( preg_replace( "/[^0-9]/", "", $form->get_input_field( Fum_Conf::$fum_input_field_select_event )->get_value() ), 'ems_premium_field', true ) ) {
+			$form->insert_input_field_after_unique_name( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_premium_participant ), Fum_Conf::$fum_input_field_emergency_phone_number );
+		}
+
+		$form = Fum_User::fill_form( $form );
+		$url  = $form->get_action();
+		$form->set_action( add_query_arg( array( 'event' => $event_field->get_value() ), $url ) );
+		if ( $url == '#' ) {
+			$form->set_action( add_query_arg( array( 'event' => $event_field->get_value() ) ) );
+		}
+
+
+		$posts = Ems_Event::get_events();
+
 		$events = array();
 		/** @var WP_Post[] $posts */
 		foreach ( $posts as $post ) {
-			/** @var DateTime $date_time */
-			$date_time = get_post_meta( $post->ID, 'ems_start_date', true );
-			$timestamp = $date_time->getTimestamp();
-			$year      = date( 'Y', $timestamp );
-			if ( $year == 2014 ) {
-				$events[] = array( 'title' => $post->post_title, 'value' => 'ID_' . $post->ID, 'ID' => $post->ID );
+			$event_field = $form->get_input_field( Fum_Conf::$fum_input_field_select_event );
+			if ( $event_field->get_readonly() && $event_field->get_value() != 'ID_' . $post->ID ) {
+				continue;
 			}
-		}
-
-		/* Start sort Events by date */
-		$dates = array();
-		foreach ( $events as $key => $event ) {
-			$date_time = get_post_meta( $event['ID'], 'ems_start_date', true );
-			if ( $date_time instanceof DateTime ) {
-				$dates[$key] = $date_time->getTimestamp();
-			}
-			else {
-				$dates = array();
-				break;
-			}
+			$events[] = array( 'title' => $post->post_title, 'value' => 'ID_' . $post->ID, 'ID' => $post->ID );
 
 		}
-		asort( $dates );
-		$ordered_events = array();
-		foreach ( $dates as $key => $timestamp ) {
-			$ordered_events[] = $events[$key];
-		}
-
-		if ( ! empty( $ordered_events ) ) {
-			$events = $ordered_events;
-		}
-		/* End sort events by date */
 
 		foreach ( $form->get_input_fields() as $input_field ) {
-			if ( $input_field->get_unique_name() == Fum_Conf::$fum_input_field_search_ride || $input_field->get_unique_name() == Fum_Conf::$fum_input_field_offer_ride ) {
+			if ( $input_field->get_type() == Html_Input_Type_Enum::CHECKBOX && $input_field->get_unique_name() != Fum_Conf::$fum_input_field_accept_agb ) {
 				continue;
 			}
 			$input_field->set_required( true );
 		}
-		if ( isset( $_REQUEST[Fum_Conf::$fum_input_field_submit] ) ) {
+
+		if ( isset( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] ) && $_REQUEST[Fum_Conf::$fum_unique_name_field_name] == Fum_Conf::$fum_event_register_form_unique_name ) {
 			$form->set_callback( array( 'Fum_Event_Registration_Controller', 'validate_event_registration_form' ) );
 			//Check if event select field contains and valid event
 			$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_validate_callback( array( 'Fum_Event_Registration_Controller', 'validate_event_select_field' ) );
@@ -79,18 +88,38 @@ class Fum_Event_Registration_Controller {
 			Ems_Event::observe_object( $form );
 			$form->save();
 			if ( true === $form->get_validation_result() ) {
-				echo '<p><strong>Du hast dich erfolgreich für "' . get_post( preg_replace( "/[^0-9]/", "", $form->get_input_field( Fum_Conf::$fum_input_field_select_event )->get_value() ) )->post_title . '" registriert </strong></p >';
+				echo '<p><strong > Du hast dich erfolgreich für "' . get_post( preg_replace( "/[^0-9]/", "", $form->get_input_field( Fum_Conf::$fum_input_field_select_event )->get_value() ) )->post_title . '" registriert </strong ></p > ';
+				echo '<p><a href="' . get_permalink() . '">Für ein weiteres Event anmelden</a></p>';
+				return;
 			}
 		}
 
 		$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_possible_values( $events );
 
+		if ( $form->get_input_field( Fum_Conf::$fum_input_field_select_event )->get_readonly() ) {
+			echo '<p><a href="' . get_permalink() . '">Für ein anderes Event anmelden</a></p>';
+		}
 		Fum_Form_View::output( $form );
+
+		if ( ! $form->get_input_field( Fum_Conf::$fum_input_field_select_event )->get_readonly() ) {
+			?>
+			<script type="text/javascript">
+				var test = document.getElementsByName('<?php echo (isset($event_field) ? $event_field->get_name() : ''); ?>')[0];
+				test.onchange = function () {
+					var url = "<?php echo get_permalink().'?event='; ?>" + this.options[this.selectedIndex].value;
+					document.location.href = url;
+				}
+			</script>
+		<?php
+		}
 	}
 
 
 	public static function validate_event_select_field( Fum_Html_Input_Field $input_field ) {
-		$posts          = get_posts( array( 'post_type' => 'event' ) );
+		$posts          = get_posts( array(
+			'posts_per_page' => - 1,
+			'post_type'      => Ems_Conf::$ems_custom_event_post_type,
+		) );
 		$is_valid_event = false;
 		$ID             = NULL;
 		/** @var WP_Post[] $posts */

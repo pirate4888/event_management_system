@@ -5,6 +5,11 @@
  */
 
 class Fum_Redirect {
+
+	public static function redirect_wp_logout( $url ) {
+		return add_query_arg( array( 'redirect_to' => home_url() ), $url );
+	}
+
 	public static function redirect_wp_login_php() {
 
 		if ( isset( $_GET['action'] ) ) {
@@ -13,17 +18,9 @@ class Fum_Redirect {
 		else {
 			$action = '';
 		}
-		switch ( $action ) {
-			case '':
-			case 'register':
-				$link = add_query_arg( array_merge( array( 'action' => $action ), $_GET ), get_permalink( get_option( Fum_Conf::$fum_register_login_page_name ) ) );
-				wp_safe_redirect( $link );
-				exit();
-				break;
-			case 'lostpassword':
-				//TODO Implement it
-				break;
-		}
+		$link = add_query_arg( array_merge( $_GET, array( 'action' => $action ) ), get_permalink( get_option( Fum_Conf::$fum_register_login_page_name ) ) );
+		wp_safe_redirect( $link );
+		exit();
 	}
 
 	public static function redirect_own_profile_edit() {

@@ -24,7 +24,6 @@ class Ems_Option_Page_View {
 
 		?>
 		<div class="wrap">
-			<?php screen_icon(); ?>
 			<h2>Frontend User Management - <?php _e( $option_page->get_title(), 'ems_text_domain' ); ?></h2>
 			<?php foreach ( $option_page->get_option_groups() as $option_group ): ?>
 				<?php /*var @$option_group Ems_Option_Group*/ ?>

@@ -32,13 +32,23 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 			<?php if ( is_user_logged_in() ): ?>
 				<li><a href="<?php echo get_permalink( get_option( 'ems_eventmanagement_page' ) ); ?>">Eventverwaltung</a></li>
 			<?php endif; ?>
+			<?php if ( is_user_logged_in() && current_user_can( 'read_event' ) ): ?>
+				<li><a href="<?php echo get_permalink( get_option( 'ems_partcipant_list_page' ) ); ?>">Teilnehmerlisten</a></li>
+			<?php endif; ?>
+			<?php if ( is_user_logged_in() && current_user_can( 'read_event' ) ): ?>
+				<li><a href="https://forum.schwarzwald-falke.de">Internes Forum</a></li>
+			<?php endif; ?>
 			<?php if ( ! is_user_logged_in() || current_user_can( 'manage_options' ) || current_user_can( 'read_event' ) ): ?>
 				<?php wp_register(); ?>
 			<?php endif; ?>
 			<?php if ( is_user_logged_in() ): ?>
 				<li><a href="<?php echo admin_url( 'profile.php' ); ?>">Profil editieren</a></li>
-			<?php endif; ?>
-			<li><?php wp_loginout(); ?></li>
+			<?php endif;
+			$redirect = home_url();
+			if ( ! is_user_logged_in() ):
+				$redirect = get_permalink();
+			endif; ?>
+			<li><?php wp_loginout( $redirect ); ?></li>
 			<?php wp_meta(); ?>
 		</ul>
 	<?php

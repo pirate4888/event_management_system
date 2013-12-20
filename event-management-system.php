@@ -21,11 +21,11 @@ class Event_Management_System {
 		Event_Management_System::$plugin_path = plugin_dir_path( __FILE__ );
 		Event_Management_System::$plugin_url  = plugin_dir_url( __FILE__ );
 
+		Ems_Initialisation::initiate_plugin();
 
-		Ems_Dhv_Jugend::init_plugin();
-		register_activation_hook( __FILE__, array( 'Ems_Dhv_Jugend', 'activate_plugin' ) );
-		register_deactivation_hook( __FILE__, array( 'Ems_Dhv_Jugend', 'deactivate_plugin' ) );
-		register_uninstall_hook( __FILE__, array( 'Ems_Dhv_Jugend', 'uninstall_plugin' ) );
+		register_activation_hook( __FILE__, array( 'Ems_Activation', 'activate_plugin' ) );
+		register_deactivation_hook( __FILE__, array( 'Ems_Deactivation', 'deactivate_plugin' ) );
+		register_uninstall_hook( __FILE__, array( 'Ems_Uninstallation', 'uninstall_plugin' ) );
 
 	}
 
@@ -53,6 +53,10 @@ class Event_Management_System {
 		elseif ( file_exists( Event_Management_System::$plugin_path . 'plugin_management/' . $class_name ) ) {
 			require_once( Event_Management_System::$plugin_path . 'plugin_management/' . $class_name );
 		}
+		elseif ( file_exists( Event_Management_System::$plugin_path . 'class/' . $class_name ) ) {
+			require_once( Event_Management_System::$plugin_path . 'class/' . $class_name );
+		}
+
 	}
 
 	public static function get_plugin_path() {

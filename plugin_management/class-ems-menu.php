@@ -6,11 +6,7 @@
 
 class Ems_Menu {
 
-	public function __construct() {
-		if ( ! is_admin() ) {
-			add_filter( 'wp_get_nav_menu_items', array( &$this, 'add_children_to_menu' ) );
-		}
-	}
+	private static $added = array();
 
 	/**
 	 * Loop through all nav menu items checking whether the functionality has been enabled or not for them.
@@ -22,7 +18,7 @@ class Ems_Menu {
 	 *
 	 * @return array Potentially modified array of nav menu items.
 	 */
-	public function add_children_to_menu( $items ) {
+	public static function add_children_to_menu( $items ) {
 
 
 		$menu_order   = count( $items ) + 1000;
@@ -35,14 +31,23 @@ class Ems_Menu {
 
 				// Using get_pages() instead of get_posts() because we want ALL descendants
 				/** @var WP_Post[] $children */
-				$children = get_posts( array( 'post_type' => Ems_Conf::$ems_custom_event_post_type ) );
+				$children = get_posts( array(
+						'posts_per_page' => - 1,
+						'post_type'      => Ems_Conf::$ems_custom_event_post_type,
+					)
+				);
 
 				//Sort children by start_date
 				$dates = array();
 				foreach ( $children as $key => $child ) {
 					$date_time = get_post_meta( $child->ID, 'ems_start_date', true );
 					if ( $date_time instanceof DateTime ) {
-						$dates[$key] = $date_time->getTimestamp();
+						$timestamp = $date_time->getTimestamp();
+						while ( isset( $dates[$timestamp] ) ) {
+							$timestamp ++;
+						}
+
+						$dates[$key] = $timestamp;
 					}
 					else {
 						$dates = array();
@@ -79,7 +84,7 @@ class Ems_Menu {
 			/** @var WP_Post[] $children */
 			// Menu items are being added, so later fix the "current" values for highlighting
 			if ( ! $filter_added )
-				add_filter( 'wp_nav_menu_objects', array( &$this, 'fix_menu_current_item' ) );
+				add_filter( 'wp_nav_menu_objects', array( 'Ems_Menu', 'fix_menu_current_item' ) );
 
 			//Add Eventanmeldung as child
 			$children[] = get_post( get_option( Fum_Conf::$fum_event_registration_page ) );
@@ -87,7 +92,7 @@ class Ems_Menu {
 			// Add each child to the menu
 			foreach ( $children as $child ) {
 				//Check if $child is already an item in the menu
-				if ( $this->is_child_already_in_menu( $items, $child ) ) {
+				if ( self::is_child_already_in_menu( $items, $child ) ) {
 					continue;
 				}
 				$child->post_parent = $parent_ID;
@@ -95,7 +100,7 @@ class Ems_Menu {
 				$child        = wp_setup_nav_menu_item( $child );
 				$child->db_id = $child->ID;
 
-				$this->added[$child->ID] = true; // We'll need this later
+				self::$added[$child->ID] = true; // We'll need this later
 
 				// Set the parent menu item.
 				// When adding items as children of existing menu items, their IDs won't match up
@@ -119,19 +124,16 @@ class Ems_Menu {
 		return $items;
 	}
 
-	private function compare_event_date( WP_Post $a, WP_Post $b ) {
-		return - 1;
-
-	}
-
 	/**
 	 * Avoids duplicates posts in the nav_menu
 	 * object_id of the nav_menu_item is the ID of the post to which it points
 	 *
 	 * @param WP_Post[] $items all menu items
 	 * @param WP_Post   $child post which should be added to the menu
+	 *
+	 * @return bool
 	 */
-	private function is_child_already_in_menu( $items, $child ) {
+	private static function is_child_already_in_menu( $items, $child ) {
 
 		foreach ( $items as $item ) {
 			if ( $item->object_id == $child->ID ) {
@@ -156,13 +158,12 @@ class Ems_Menu {
 	 *
 	 * @return array Potentially modified array of nav menu items.
 	 */
-	public
-	function fix_menu_current_item( $items ) {
+	public static function fix_menu_current_item( $items ) {
 		$queried_object    = get_queried_object();
 		$queried_object_id = (int) get_queried_object_id();
 
 		// Only need to fix items added by this plugin
-		if ( empty( $queried_object_id ) || empty( $this->added[$queried_object_id] ) )
+		if ( empty( $queried_object_id ) || empty( self::$added[$queried_object_id] ) )
 			return $items;
 
 		// Get ancestors of currently displayed item

@@ -9,10 +9,16 @@ class Ems_Event_Registration {
 
 	private $event_post_id;
 	private $user_id;
+	/**
+	 * @var $data
+	 * Array of fields which belongs to the registration. Could be used for event specific information for the participants list
+	 */
+	private $data;
 
-	public function __construct( $event_post_id, $user_id ) {
+	public function __construct( $event_post_id, $user_id, $data = array() ) {
 		$this->event_post_id = $event_post_id;
 		$this->user_id       = $user_id;
+		$this->data          = $data;
 	}
 
 	/**
@@ -29,6 +35,20 @@ class Ems_Event_Registration {
 		return $this->user_id;
 	}
 
+	/**
+	 * @param array $data
+	 */
+	public function set_data( $data ) {
+		$this->data = $data;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_data() {
+		return $this->data;
+	}
+
 	public function equals( self $otherObject ) {
 		if ( $otherObject->get_event_post_id() == $this->get_event_post_id() && $otherObject->get_user_id() == $this->get_user_id() ) {
 			return true;
@@ -42,16 +62,29 @@ class Ems_Event_Registration {
 			throw new Exception( "User is alredy registered for this event" );
 		}
 		$registrations[] = $registration;
-		$title = htmlspecialchars_decode( get_post( $registration->get_event_post_id() )->post_title );
-		$user = get_userdata( $registration->get_user_id() );
-		$subject = 'Erfolgreich für "' . $title . '" registriert';
-		$message =
+		$title           = htmlspecialchars_decode( get_post( $registration->get_event_post_id() )->post_title );
+		$user            = get_userdata( $registration->get_user_id() );
+		$subject         = 'Erfolgreich für "' . $title . '" registriert';
+		$message         =
 				'Liebe/r ' . $user->user_firstname . "\n" .
 				'du hast dich erfolgreich für das Event "' . $title . '" registriert.' . "\n" .
 				'Du bekommst spätestens 14 Tage vor dem Event weitere Informationen vom Eventleiter zugeschickt.' . "\n" .
 				'Viele Grüße,' . "\n" .
 				'Das DHV-Jugendteam';
 		wp_mail( $user->user_email, $subject, $message );
+		if ( 1 == get_post_meta( $registration->get_event_post_id(), 'ems_inform_via_mail', true ) ) {
+			$leader_id = get_post_meta( $registration->get_event_post_id(), 'ems_event_leader', true );
+			$leader    = get_userdata( $leader_id );
+
+			if ( false !== $leader ) {
+				$email   = $leader->user_email;
+				$subject = 'Es gibt eine neue Anmeldung für das "' . $title . '" Event';
+				$message = $user->user_firstname . ' ' . $user->lastname . ' hat sich für dein Event "' . $title . '" angemeldet.' . "\n";
+				$message .= 'Du kannst die Details zur Anmeldung auf ' . get_permalink( get_option( 'ems_partcipant_list_page' ) ) . '?select_event=ID_' . $registration->get_event_post_id() . ' einsehen';
+				wp_mail( $email, $subject, $message );
+			}
+
+		}
 		update_option( self::$option_name, $registrations );
 	}
 
@@ -77,6 +110,11 @@ class Ems_Event_Registration {
 		return array();
 	}
 
+	/**
+	 * @param $event_post_id
+	 *
+	 * @return Ems_Event_Registration[]
+	 */
 	public static function get_registrations_of_event( $event_post_id ) {
 		$registrations       = self::get_event_registrations();
 		$event_registrations = array();

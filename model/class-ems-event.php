@@ -28,8 +28,20 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 		if ( NULL !== $post ) {
 			$this->post            = $post;
 			$this->start_date_time = get_post_meta( $post->ID, 'ems_start_date', true );
-			$this->end_date_time   = get_post_meta( $post->ID, 'ems_end_date', true );
-			$this->leader          = get_userdata( get_post_meta( $post->ID, 'ems_event_leader', true ) );
+			if ( empty( $this->start_date_time ) ) {
+				$this->start_date_time = new DateTime();
+				$this->start_date_time->setTimestamp( 0 );
+			}
+			$this->end_date_time = get_post_meta( $post->ID, 'ems_end_date', true );
+			if ( empty( $this->end_date_time ) ) {
+				$this->end_date_time = new DateTime();
+				$this->end_date_time->setTimestamp( 0 );
+			}
+
+			$this->leader = get_userdata( get_post_meta( $post->ID, 'ems_event_leader', true ) );
+			if ( false === $this->leader ) {
+				$this->leader = get_post_meta( $post->ID, 'ems_event_leader', true );
+			}
 		}
 	}
 

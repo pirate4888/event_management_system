@@ -71,17 +71,36 @@ class Ems_Event_Registration {
 				'Du bekommst spätestens 14 Tage vor dem Event weitere Informationen vom Eventleiter zugeschickt.' . "\n" .
 				'Viele Grüße,' . "\n" .
 				'Das DHV-Jugendteam';
-		wp_mail( $user->user_email, $subject, $message );
+
+		$leader_id = get_post_meta( $registration->get_event_post_id(), 'ems_event_leader', true );
+		$leader    = get_userdata( $leader_id );
+
+		if ( false === $leader ) {
+			$leader_email = get_post_meta( $registration->get_event_post_id(), 'ems_event_leader_mail', true );
+		}
+		else {
+			$leader_email = $leader->user_email;
+		}
+
+		self::send_mail_via_smtp( $user->user_email, $subject, $message, $leader_email );
+
 		if ( 1 == get_post_meta( $registration->get_event_post_id(), 'ems_inform_via_mail', true ) ) {
+			//TODO Use Ems_Event object
 			$leader_id = get_post_meta( $registration->get_event_post_id(), 'ems_event_leader', true );
 			$leader    = get_userdata( $leader_id );
 
-			if ( false !== $leader ) {
-				$email   = $leader->user_email;
+			if ( false === $leader ) {
+				$leader_email = get_post_meta( $registration->get_event_post_id(), 'ems_event_leader_mail', true );
+			}
+			else {
+				$leader_email = $leader->user_email;
+			}
+
+			if ( false !== $leader_email ) {
 				$subject = 'Es gibt eine neue Anmeldung für das "' . $title . '" Event';
 				$message = $user->user_firstname . ' ' . $user->lastname . ' hat sich für dein Event "' . $title . '" angemeldet.' . "\n";
 				$message .= 'Du kannst die Details zur Anmeldung auf ' . get_permalink( get_option( 'ems_partcipant_list_page' ) ) . '?select_event=ID_' . $registration->get_event_post_id() . ' einsehen';
-				wp_mail( $email, $subject, $message );
+				self::send_mail_via_smtp( $leader_email, $subject, $message );
 			}
 
 		}
@@ -159,6 +178,36 @@ class Ems_Event_Registration {
 	 */
 	public static function get_option_name() {
 		return self::$option_name;
+	}
+
+	public static function send_mail_via_smtp( $email, $subject, $message, $reply_to = 'info@dhv-jugend.de' ) {
+		require_once( __DIR__ . '/../../../../wp-includes/class-phpmailer.php' );
+		$mail = new PHPMailer();
+		$mail->IsSendmail(); //1 und 1 doesn't support isSMTP from webshosting packages
+		$mail->CharSet    = 'utf-8';
+		$mail->Host       = 'smtp.1und1.de'; // Specify main and backup server
+		$mail->SMTPAuth   = true; // Enable SMTP authentication
+		$mail->Username   = 'homepage@dhv-jugend.de'; // SMTP username
+		$mail->Password   = 'jugend1245'; // SMTP password
+		$mail->SMTPSecure = 'tls'; // Enable encryption, 'ssl' also accepted
+		$mail->Port       = 587;
+
+		$mail->AddReplyTo( $reply_to );
+		$mail->From     = 'homepage@dhv-jugend.de';
+		$mail->FromName = 'DHV-Jugend';
+		$mail->addAddress( $email ); // Add a recipient
+		$mail->Sender = $reply_to;
+		$mail->addCC( 'anmeldungen@dhv-jugend.de' );
+
+		$mail->WordWrap = 50; // Set word wrap to 50 characters
+		$mail->isHTML( false ); // Set email format to HTML
+
+		$mail->Subject = $subject;
+		$mail->Body    = $message;
+
+		if ( ! $mail->send() ) {
+			throw new Exception( "Could not sent Mail, maybe your server has a problem? " . $mail->ErrorInfo );
+		}
 	}
 
 

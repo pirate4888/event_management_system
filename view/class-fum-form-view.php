@@ -24,7 +24,7 @@ class Fum_Form_View {
 		endif;
 		?>
 		<form <?php echo $form->get_extra_params(); ?> id="<?php echo $form->get_id(); ?>" name="<?php echo $form->get_name(); ?>" class="<?php echo $form->get_classes(); ?>" action="<?php echo $form->get_action(); ?>" method="<?php echo $form->get_method(); ?>">
-			<?php if ($table): //TODO make class="form-table" dynamic ? ?>
+			<?php if ($table): ?>
 			<table class="form-table">
 				<?php endif;
 
@@ -136,7 +136,7 @@ class Fum_Form_View {
 					break;
 				case Html_Input_Type_Enum::TEXTAREA:
 					?>
-					<textarea name="<?php echo( $input_field->get_name() ); ?>"><?php echo( $input_field->get_value() ); ?></textarea>
+					<textarea id="<?php echo( $input_field->get_id() ); ?>" name="<?php echo( $input_field->get_name() ); ?>"><?php echo( $input_field->get_value() ); ?></textarea>
 					<?php
 					break;
 			}

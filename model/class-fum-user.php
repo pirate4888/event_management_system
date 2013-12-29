@@ -37,8 +37,6 @@ class Fum_User extends Fum_Observable implements Fum_Observer {
 		self::$user_fields = Fum_Activation::get_user_input_fields();
 
 		switch ( $form->get_unique_name() ) {
-			case Fum_Conf::$fum_register_form_unique_name:
-				break;
 			case Fum_Conf::$fum_login_form_unique_name:
 				break;
 			case Fum_Conf::$fum_lost_password_form_unique_name:
@@ -52,8 +50,14 @@ class Fum_User extends Fum_Observable implements Fum_Observer {
 				break;
 			case Fum_Conf::$fum_edit_form_unique_name:
 			case Fum_Conf::$fum_event_register_form_unique_name:
-
-				$user_data_fields = get_userdata( get_current_user_id() )->to_array();
+			case Fum_Conf::$fum_register_form_unique_name:
+				if ( is_user_logged_in() ) {
+					$ID = get_current_user_id();
+				}
+				else {
+					$ID = $form->get_input_field( 'fum_ID' )->get_value();
+				}
+				$user_data_fields = get_userdata( $ID )->to_array();
 				$user_data        = array();
 				foreach ( $form->get_input_fields() as $input_field ) {
 					//Check if input_field contains the data of a default wordpress user field

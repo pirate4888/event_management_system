@@ -28,7 +28,7 @@ class Fum_Activation {
 			'fum_input_field_birthday'                   => array( 'Geburtstag', false, array( 'Fum_Html_Input_Field', 'date_callback' ) ),
 			'fum_input_field_street'                     => array( 'Straße', false ),
 			'fum_input_field_city'                       => array( 'Stadt', false ),
-			'fum_input_field_postcode'                   => array( 'Postleitzahl', false, array( 'Fum_Html_Input_Field', 'integer_callback' ), array( 'length' => 5 ) ),
+			'fum_input_field_postcode'                   => array( 'Postleitzahl', false, array( 'Fum_Html_Input_Field', 'integer_callback' ), array( 'length' => array( 4, 5 ) ) ),
 			'fum_input_field_state'                      => array( 'Bundesland', false ),
 			'fum_input_field_phone_number'               => array( 'Telefonnummer', false ),
 			'fum_input_field_mobile_number'              => array( 'Handynummer', false ),
@@ -58,15 +58,15 @@ class Fum_Activation {
 			'fum_input_field_aircraft'     => array( 'Fluggerät', false, NULL, NULL,
 				//Possible values array
 				array(
-					array( 'title' => 'Drachen', 'value' => 'drachen' ),
 					array( 'title' => 'Gleitschirm', 'value' => 'gleitschirm' ),
+					array( 'title' => 'Drachen', 'value' => 'drachen' ),
 					array( 'title' => 'Fußgänger', 'value' => 'fussgaenger' ),
 				) ),
 		),
 		Html_Input_Type_Enum::CHECKBOX => array(
 			'fum_input_field_search_ride' => array( 'Suche Mitfahrgelegenheit', false ),
 			'fum_input_field_offer_ride'  => array( 'Biete Mitfahrgelgenheit', false ),
-			'fum_input_field_accept_agb'  => array( 'Haftungserklärung akzeptieren', true ),
+			'fum_input_field_accept_agb'  => array( 'Ich habe die <a href="https://www.dhv-jugend.de/teilnahmebedingungen-haftungserklaerung/">Haftungserklärung</a> für DHV-Jugend Events gelesen und akzeptiere diese', true ),
 		),
 		Html_Input_Type_Enum::SUBMIT   => array()
 	);
@@ -157,6 +157,8 @@ class Fum_Activation {
 		//Required fields
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_username ) );
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_email ) );
+		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_first_name ) );
+		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_last_name ) );
 
 		//DHV-Jugend input field names
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_birthday ) );

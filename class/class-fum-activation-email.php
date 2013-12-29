@@ -151,8 +151,13 @@ class Fum_Activation_Email {
 		}
 
 		$message .= 'Wir wünschen dir viel Spaß mit der DHV-Jugend!';
-
-		wp_mail( $user_email, $title, $message );
+		try {
+			Ems_Event_Registration::send_mail_via_smtp( $user_email, $title, $message );
+		} catch ( Exception $e ) {
+			echo "FAIIIILLL.<br/>";
+			echo $user_email . ' ' . $title . ' ' . $message . "<br/><br/>";
+			echo $e->getMessage();
+		}
 	}
 
 	/**

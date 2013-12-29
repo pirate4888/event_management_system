@@ -11,13 +11,13 @@
 
 class Frontend_User_Management {
 	private $option_fum_category_id = 'fum_category';
-	private $plugin_path = NULL;
+	private static $plugin_path = NULL;
 
 	public function __construct() {
 
 		spl_autoload_register( array( $this, 'autoload' ) );
 		//Set path to plugin dir
-		$this->plugin_path = plugin_dir_path( __FILE__ );
+		Frontend_User_Management::$plugin_path = plugin_dir_path( __FILE__ );
 
 		register_activation_hook( __FILE__, array( 'Fum_Activation', 'activate_plugin' ) );
 		register_deactivation_hook( __FILE__, array( 'Fum_Deactivation', 'deactivate_plugin' ) );
@@ -34,44 +34,52 @@ class Frontend_User_Management {
 		return $html;
 	}
 
-	public
-	function autoload( $class_name ) {
+	public function autoload( $class_name ) {
 
 		if ( 'Fum_Conf' === $class_name ) {
-			require_once( $this->plugin_path . 'fum_conf.php' );
+			require_once( Frontend_User_Management::$plugin_path . 'fum_conf.php' );
 		}
 
 		if ( 'Options' === $class_name ) {
-			require_once( $this->plugin_path . 'options.php' );
+			require_once( Frontend_User_Management::$plugin_path . 'options.php' );
 		}
 
 		//Because of sucking wordpress name conventions class name != file name, convert it manually
 		$class_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) . '.php' );
-		if ( file_exists( $this->plugin_path . 'class/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'class/' . $class_name );
+		if ( file_exists( Frontend_User_Management::$plugin_path . 'class/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'class/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'controller/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'controller/' . $class_name );
+		elseif ( file_exists( Frontend_User_Management::$plugin_path . 'controller/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'controller/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'model/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'model/' . $class_name );
+		elseif ( file_exists( Frontend_User_Management::$plugin_path . 'model/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'model/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'view/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'view/' . $class_name );
+		elseif ( file_exists( Frontend_User_Management::$plugin_path . 'view/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'view/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'view/fum_option_pages/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'view/fum_option_pages/' . $class_name );
+		elseif ( file_exists( Frontend_User_Management::$plugin_path . 'view/fum_option_pages/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'view/fum_option_pages/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'utility/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'utility/' . $class_name );
+		elseif ( file_exists( Frontend_User_Management::$plugin_path . 'utility/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'utility/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'plugin_management/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'plugin_management/' . $class_name );
+		elseif ( file_exists( Frontend_User_Management::$plugin_path . 'plugin_management/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'plugin_management/' . $class_name );
 		}
-		elseif ( file_exists( $this->plugin_path . 'interface/' . $class_name ) ) {
-			require_once( $this->plugin_path . 'interface/' . $class_name );
+		elseif ( file_exists( Frontend_User_Management::$plugin_path . 'interface/' . $class_name ) ) {
+			require_once( Frontend_User_Management::$plugin_path . 'interface/' . $class_name );
 		}
 	}
+
+	/**
+	 * @return null|string
+	 */
+	public static function get_plugin_path() {
+		return self::$plugin_path;
+	}
+
+
 }
 
 new Frontend_User_Management(); //start plugin

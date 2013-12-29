@@ -58,17 +58,23 @@ class Fum_Event_Registration_Controller {
 		}
 
 
+		/** @var Ems_Event[] $posts */
 		$posts = Ems_Event::get_events();
 
 		$events = array();
-		/** @var WP_Post[] $posts */
 		foreach ( $posts as $post ) {
 			$event_field = $form->get_input_field( Fum_Conf::$fum_input_field_select_event );
 			if ( $event_field->get_readonly() && $event_field->get_value() != 'ID_' . $post->ID ) {
 				continue;
 			}
-			$events[] = array( 'title' => $post->post_title, 'value' => 'ID_' . $post->ID, 'ID' => $post->ID );
-
+			$start_date = $post->get_start_date_time();
+			$end_date   = $post->get_end_date_time();
+			$title      = $post->post_title;
+			//TODO Niki has set (Location) in the name so this looks bad then
+//			if ( $start_date->getTimestamp() && $end_date->getTimestamp() ) {
+//				$title .= ' (' . date( 'd.m.Y', $start_date->getTimestamp() ) . ' - ' . date( 'd.m.Y', $end_date->getTimestamp() ) . ')';
+//			}
+			$events[] = array( 'title' => $title, 'value' => 'ID_' . $post->ID, 'ID' => $post->ID );
 		}
 
 		foreach ( $form->get_input_fields() as $input_field ) {
@@ -110,6 +116,20 @@ class Fum_Event_Registration_Controller {
 					document.location.href = url;
 				}
 			</script>
+		<?php
+		}
+		else {
+			?>
+			<ul>
+				<li>Mit dem Absenden der Anmeldung erkläre ich mich damit einverstanden,
+					dass die Daten für die Eventplanung der DHV-Jugend gespeichert und elektronisch verarbeitet werden.
+					Die Daten werden nicht an Dritte weitergegeben.
+				</li>
+				<li>Ich bin damit einverstanden, dass meine Kontaktdaten an andere Teilnehmer zur Bildung von Fahrgemeinschaften weitergegeben werden.</li>
+				<li>Teilnehmer/Innen unter 18 Jahren! bitte unbedingt folgende Teilnehmererklärung/Haftungserklärung ausdrucken (beide Seiten!), von deinen Erziehungsberechtigten lesen, ausfüllen und unterschreiben lassen! UND mitbringen!!!
+					<a href="https://www.dhv-jugend.de/wp-content/uploads/2013/12/Haftungserklaerung_DHV-Jugend.pdf">Download</a> Haftungserklärung für DHV-Jugend Event als .pdf
+				</li>
+			</ul>
 		<?php
 		}
 	}

@@ -20,6 +20,7 @@ class Fum_Conf {
 	public static $fum_change_password_form_unique_name = 'fum_change_password_form';
 	public static $fum_event_register_form_unique_name = 'fum_event_register_form';
 	public static $fum_user_applied_event_form_unique_name = 'fum_user_applied_event_form';
+	public static $fum_contact_form_unique_name = 'fum_contact_form';
 
 	/*Name of the hidden input field which is added to a fum form*/
 	public static $fum_hidden_input_field = 'fum_hidden_input_field';

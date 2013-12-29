@@ -15,8 +15,7 @@ class Fum_Register_Login_Form_Controller {
 
 	}
 
-	public static
-	function filter_title( $title, $post_id ) {
+	public static function filter_title( $title, $post_id ) {
 		global $wp;
 		$current_url     = trim( site_url( $wp->request ), '/' );
 		$current_post_id = url_to_postid( $current_url );
@@ -60,10 +59,12 @@ class Fum_Register_Login_Form_Controller {
 		$error = NULL;
 		if ( isset( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] ) ) {
 			if ( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] === Fum_Conf::$fum_login_form_unique_name ) {
+				$form  = Fum_Html_Form::get_form( Fum_Conf::$fum_login_form_unique_name );
 				$error = self::validate_login_form();
 			}
 			else if ( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] === Fum_Conf::$fum_register_form_unique_name ) {
-				$error = self::validate_register_form();
+				$form  = Fum_Html_Form::get_form( Fum_Conf::$fum_register_form_unique_name );
+				$error = self::validate_register_form( $form );
 			}
 		}
 
@@ -80,7 +81,7 @@ class Fum_Register_Login_Form_Controller {
 		}
 
 //Print if unique_name_Field was not found OR $error != NULL
-		if ( ! isset( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] ) || $error != NULL ) {
+		if ( ! isset( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] ) || true !== $error ) {
 			if ( is_wp_error( $error ) ) {
 				echo $error->get_error_message();
 			}
@@ -97,16 +98,19 @@ class Fum_Register_Login_Form_Controller {
 						echo '<strong>Da du eingeloggt bist, kannst du dich nicht registrieren</strong>';
 					}
 					else {
-						$form = Fum_Html_Form::get_form( Fum_Conf::$fum_register_form_unique_name );
-						if ( get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
-							Fum_Form_View::output( $form );
+						if ( NULL === $error ) {
+							$form = Fum_Html_Form::get_form( Fum_Conf::$fum_register_form_unique_name );
 						}
-						else {
+						if ( ! get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
 							$password_field = Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_password );
 							$form->insert_input_field_after_unique_name( $password_field, Fum_Conf::$fum_input_field_username );
-							Fum_Form_View::output( $form );
-
 						}
+						if ( isset( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] ) ) {
+							foreach ( $form->get_input_fields() as $input_field ) {
+								$input_field->set_value( $_REQUEST[$input_field->get_name()] );
+							}
+						}
+						Fum_Form_View::output( $form );
 					}
 					break;
 				case 'lostpassword':
@@ -121,6 +125,7 @@ class Fum_Register_Login_Form_Controller {
 							exit();
 						}
 					}
+
 
 					if ( isset( $_GET['error'] ) ) {
 						if ( 'invalidkey' == $_GET['error'] )
@@ -147,7 +152,11 @@ class Fum_Register_Login_Form_Controller {
 					do_action( 'lost_password' );
 
 					$user_login = isset( $_POST['user_login'] ) ? wp_unslash( $_POST['user_login'] ) : '';
-
+					if ( is_wp_error( $errors ) ) {
+						foreach ( $errors->get_error_messages() as $message ) {
+							echo $message . "<br/>";
+						}
+					}
 					?>
 
 					<form name="lostpasswordform" id="lostpasswordform" action="<?php echo esc_url( get_permalink() . '?action=lostpassword', 'login_post' ); ?>" method="post">
@@ -308,38 +317,20 @@ class Fum_Register_Login_Form_Controller {
 	}
 
 
-	private static
-	function validate_login_form() {
-		$error = NULL;
-		$user  = wp_signon( $_REQUEST, true );
+	/**
+	 * Validate login form (calls wp_singnon), redirects if singon was successfull, returns WP_Error if not
+	 * @return WP_Error
+	 */
+	private static function validate_login_form() {
+		$user = wp_signon( $_REQUEST, true );
 		if ( is_wp_error( $user ) ) {
-			$error = $user;
+			return $user;
 		}
 		else {
 			wp_set_auth_cookie( $user->ID );
 			if ( isset( $_REQUEST['interim-login'] ) && 1 == $_REQUEST['interim-login'] ) {
 				ob_end_clean();
-				?>
-				<!DOCTYPE html>
-				<!--[if IE 8]>
-				<html xmlns="http://www.w3.org/1999/xhtml" class="ie8" <?php language_attributes(); ?>>
-				<![endif]-->
-				<!--[if !(IE 8) ]><!-->
-				<html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
-				<!--<![endif]-->
-				<head>
-					<meta http-equiv="Content-Type" content="<?php bloginfo( 'html_type' ); ?>; charset=<?php bloginfo( 'charset' ); ?>" />
-					<title><?php bloginfo( 'name' ); ?> &rsaquo; Login</title>
-					<?php
-					do_action( 'login_enqueue_scripts' );
-					do_action( 'login_head' );
-					?>
-				</head>
-				<body class="interim-login-success">
-				Erfolgreich eingeloggt
-				</body>
-				</html>
-				<?php
+				self::get_interim_login_html();
 				exit();
 			}
 			if ( isset( $_REQUEST['redirect_to'] ) ) {
@@ -349,40 +340,60 @@ class Fum_Register_Login_Form_Controller {
 			wp_safe_redirect( admin_url( 'profile.php' ) );
 			exit();
 		}
-		return $error;
 	}
 
-	private
-	static function validate_register_form() {
-		$error = NULL;
-
-		if ( get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
-//Wordpress uses sometimes user_pass (wp_insert_usert) and sometimes user_password, this is a workaround for this problem
-			$_REQUEST['user_pass']                         = wp_generate_password();
-			$_REQUEST[Fum_Conf::$fum_input_field_password] = $_REQUEST['user_pass'];
-
-		}
-
-		$ID   = wp_insert_user( $_REQUEST );
-		$form = Fum_Html_Form::get_form( $_REQUEST[Fum_Conf::$fum_unique_name_field_name] );
-		if ( is_wp_error( $ID ) ) {
-			$error = $ID;
-//Set values so the formular is filled
-
-			foreach ( $form->get_input_fields() as $input_field ) {
-				$input_field->set_value( $_REQUEST[$input_field->get_name()] );
-			}
-		}
-		else {
-//Registration was successful, write special user fields to database
-			foreach ( $form->get_input_fields() as $input_field ) {
-				if ( isset( $_REQUEST[$input_field->get_name()] ) ) {
-					update_user_meta( $ID, $input_field->get_name(), $_REQUEST[$input_field->get_name()] );
-				}
-			}
-		}
-		return $error;
+	private static function get_interim_login_html() {
+		?>
+		<!DOCTYPE html>
+		<!--[if IE 8]>
+		<html xmlns="http://www.w3.org/1999/xhtml" class="ie8" <?php language_attributes(); ?>>
+		<![endif]-->
+		<!--[if !(IE 8) ]><!-->
+		<html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
+		<!--<![endif]-->
+		<head>
+			<meta http-equiv="Content-Type" content="<?php bloginfo( 'html_type' ); ?>; charset=<?php bloginfo( 'charset' ); ?>" />
+			<title><?php bloginfo( 'name' ); ?> &rsaquo; Login</title>
+			<?php
+			do_action( 'login_enqueue_scripts' );
+			do_action( 'login_head' );
+			?>
+		</head>
+		<body class="interim-login-success">
+		Erfolgreich eingeloggt
+		</body>
+		</html>
+	<?php
 	}
+
+	private static function validate_register_form( Fum_Html_Form $form ) {
+
+		$form->set_values_from_array( $_REQUEST );
+		$errors = $form->validate();
+		if ( true === $errors ) {
+			if ( get_option( Fum_Conf::$fum_register_form_generate_password_option ) ) {
+				//Wordpress uses sometimes user_pass (wp_insert_usert) and sometimes user_password, this is a workaround for this problem
+				$_REQUEST['user_pass']                         = wp_generate_password();
+				$_REQUEST[Fum_Conf::$fum_input_field_password] = $_REQUEST['user_pass'];
+
+			}
+			$ID = wp_insert_user( $_REQUEST );
+			if ( is_wp_error( $ID ) ) {
+				$errors = $ID;
+			}
+			else {
+				$id_field = new Fum_Html_Input_Field( 'fum_ID', 'fum_ID', new Html_Input_Type_Enum( Html_Input_Type_Enum::HIDDEN ), '', '', '' );
+				$id_field->set_value( $ID );
+				$form->add_input_field( $id_field );
+				Fum_User::observe_object( $form );
+				$form->save();
+			}
+
+
+		}
+		return $errors;
+	}
+
 
 	/**
 	 * Handles sending password retrieval email to user.
@@ -515,9 +526,9 @@ class Fum_Register_Login_Form_Controller {
 		 * @param string $key     The activation key.
 		 */
 		$message = apply_filters( 'retrieve_password_message', $message, $key );
-
-		if ( $message && ! wp_mail( $user_email, $title, $message ) )
-			wp_die( __( 'The e-mail could not be sent.' ) . "<br />\n" . __( 'Possible reason: your host may have disabled the mail() function.' ) );
+		Ems_Event_Registration::send_mail_via_smtp( $user_email, $title, $message );
+//		if ( $message && ! wp_mail( $user_email, $title, $message ) )
+//			wp_die( __( 'The e-mail could not be sent.' ) . "<br />\n" . __( 'Possible reason: your host may have disabled the mail() function.' ) );
 
 		return true;
 	}

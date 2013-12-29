@@ -16,8 +16,30 @@ class Fum_Initialisation {
 		add_shortcode( Fum_Conf::$fum_edit_page_name, array( 'Fum_Edit_Form_Controller', 'create_edit_form' ) );
 		add_shortcode( Fum_Conf::$fum_event_registration_page, array( 'Fum_Event_Registration_Controller', 'create_event_registration_form' ) );
 		add_shortcode( 'ems_eventverwaltung', array( 'Fum_Registered_Event_list', 'create_applied_event_form' ) );
+		add_shortcode( 'recent_posts', array( 'Fum_Initialisation', 'my_recent_posts_shortcode' ) );
+		add_shortcode( 'contact_form', array( 'Fum_Contact_Form_Controller', 'create_contact_form' ) );
+
 
 	}
+
+	public static function my_recent_posts_shortcode( $atts ) {
+		$q = new WP_Query(
+			array( 'orderby' => 'date', 'posts_per_page' => '4' )
+		);
+
+		$list = '<ul class="recent-posts">';
+
+		while ( $q->have_posts() ) : $q->the_post();
+
+			$list .= '<li><h3>' . get_the_title() . '</h3><i>' . get_the_date() . '</i>' . '<br/><p>' . get_the_excerpt() . '</p><a href="' . get_permalink() . '">Weiterlesen</a></li>';
+
+		endwhile;
+
+		wp_reset_query();
+
+		return $list . '</ul>';
+	}
+
 
 	private static function add_action_hooks() {
 
@@ -95,7 +117,17 @@ class Fum_Initialisation {
 	public static function check_shortcode() {
 		global $shortcode_tags;
 		foreach ( $shortcode_tags as $shortcode_tag => $callback ) {
-			if ( 0 === stripos( $shortcode_tag, Fum_Conf::FUM_NAME_PREFIX ) && has_shortcode( implode( ' ', get_object_vars( get_post() ) ), $shortcode_tag ) ) {
+			if ( 0 === stripos( $shortcode_tag, Fum_Conf::FUM_NAME_PREFIX ) ) {
+				$post = get_post();
+				//Maybe the current site is not a post, not sure when this happens
+				if ( NULL === $post ) {
+					continue;
+				}
+				//If there are no object vars, then it's not possible that there is a shortcode tag
+				if ( ! has_shortcode( implode( ' ', get_object_vars( $post ) ), $shortcode_tag ) ) {
+					continue;
+				}
+
 				switch ( count( $callback ) ) {
 					case 1:
 						$function = (string) $callback;
@@ -111,6 +143,7 @@ class Fum_Initialisation {
 						if ( is_callable( $callback ) ) {
 							call_user_func( $callback );
 						}
+						break;
 				}
 			}
 		}

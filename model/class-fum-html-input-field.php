@@ -429,7 +429,15 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 
 	/**
 	 * Checks if the value of an input field is valid
-	 * If validate_callback is not set the function checks if the value is empty and if possible_values are set it checks if the value is inside of the possible values
+	 *
+	 * Required = false:
+	 * If the field is empty, nothing gets checked
+	 * If a value is set and there is no validate_callback function, nothing gets checked
+	 * If a value is set and there is a validate_callback function, the callback function is called
+	 *
+	 * Required = true:
+	 * If no validate_callback function is set, it's only checked if the field is empty
+	 * If a validate_callback function is set, the callback function is called
 	 *
 	 * @param bool $force_new_validation
 	 *
@@ -466,7 +474,15 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 				if ( ! is_callable( $this->validate_callback ) ) {
 					throw new Exception( 'Validation callback is not callable!' );
 				}
-				$this->validation_result = call_user_func( $this->validate_callback, $this, $this->validate_params );
+				//If the field is not required, empty is also valid and the callback function is not called
+				$value = $this->get_value();
+				if ( false === $this->get_required() && empty( $value ) ) {
+					$this->validation_result = true;
+				}
+				else {
+					$this->validation_result = call_user_func( $this->validate_callback, $this, $this->validate_params );
+
+				}
 			}
 		}
 		return $this->validation_result;
@@ -542,16 +558,24 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	}
 
 	private static function integer_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
-//		echo '<pre>';
-//		print_r( $params );
-//		print_r( $input_field->get_validate_params() );
-//		print_r( strlen( $input_field->get_value() ) );
-//		echo '</pre>';
+
 		if ( ctype_digit( trim( $input_field->get_value() ) ) ) {
 			if ( isset( $params['length'] ) ) {
-
-				if ( strlen( $input_field->get_value() ) != $params['length'] ) {
-					return new WP_Error( $input_field->get_unique_name(), 'Der Wert von ' . $input_field->get_title() . ' sollte aus ' . $params['length'] . ' Ziffern bestehen' );
+				if ( is_array( $params['length'] ) ) {
+					$found = false;
+					foreach ( $params['length'] as $length ) {
+						if ( strlen( $input_field->get_value() ) == $length ) {
+							$found = true;
+						}
+					}
+					if ( ! $found ) {
+						return new WP_Error( $input_field->get_unique_name(), 'Der Wert von ' . $input_field->get_title() . ' sollte aus ' . implode( ' oder ', $params['length'] ) . ' Ziffern bestehen' );
+					}
+				}
+				else {
+					if ( strlen( $input_field->get_value() ) != $params['length'] ) {
+						return new WP_Error( $input_field->get_unique_name(), 'Der Wert von ' . $input_field->get_title() . ' sollte aus ' . $params['length'] . ' Ziffern bestehen' );
+					}
 				}
 			}
 			return true;

@@ -77,6 +77,10 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 		}
 	}
 
+	public function __call( $func, $param ) {
+
+	}
+
 	/**
 	 * @param DateTime $end_date_time
 	 */

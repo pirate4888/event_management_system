@@ -7,7 +7,6 @@
 /**
  * Class Ems_Event quasi(!) extends WP_Post, because WP_Post is final it fake the extends via __get and __set method
  * e.g you can access the WP_Post variable $post_title via $event->post_title
- * TODO: Make WP_Post cunctions callable
  */
 class Ems_Event extends Fum_Observable implements Fum_Observer {
 
@@ -15,7 +14,6 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	private static $post_type = 'event';
 
 	private static $object = NULL;
-	private static $event_fields = NULL;
 
 	private $start_date_time;
 	private $end_date_time;
@@ -59,22 +57,11 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 		if ( property_exists( $this, $var ) ) {
 			return $this->$var;
 		}
-		else {
-			if ( property_exists( $this->post, $var ) ) {
-				return $this->post->$var;
-			}
-		}
-	}
 
-	public function __set( $var, $value ) {
-		if ( property_exists( $this, $var ) ) {
-			$this->$var = $value;
+		if ( NULL !== $this->post ) {
+			return $this->post->$var;
 		}
-		else {
-			if ( property_exists( $this->post, $var ) ) {
-				$this->post->$var = $value;
-			}
-		}
+		throw new Exception( "Property " . $var . " does not exist in Ems_Event and WP_Post property is NULL" );
 	}
 
 	/**
@@ -84,7 +71,11 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	 * @param $args
 	 */
 	public function __call( $method, $args ) {
-
+		//__call is not called if the function exists in Ems_Event, so we just have to check if the function exists in WP_Post
+		if ( is_callable( array( $this->post, $method ) ) ) {
+			return call_user_func_array( array( $this->post, $method ), $args );
+		}
+		throw new Exception( "Tried to call function: " . print_r( $method, true ) . " which does not exist in WP_Post and Ems_Event" );
 	}
 
 	/**
@@ -141,6 +132,20 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	 */
 	public function get_post() {
 		return $this->post;
+	}
+
+	/**
+	 * @param mixed $location
+	 */
+	public function set_location( $location ) {
+		$this->location = $location;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_location() {
+		return $this->location;
 	}
 
 

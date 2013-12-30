@@ -77,6 +77,12 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 		}
 	}
 
+	/**
+	 * Calls the underlying WP_Post functions
+	 *
+	 * @param $func
+	 * @param $param
+	 */
 	public function __call( $func, $param ) {
 
 	}

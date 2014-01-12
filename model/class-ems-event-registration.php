@@ -185,16 +185,17 @@ class Ems_Event_Registration {
 		$mail = new PHPMailer();
 		$mail->IsSendmail(); //1 und 1 doesn't support isSMTP from webshosting packages
 		$mail->CharSet    = 'utf-8';
-		$mail->Host       = 'smtp.1und1.de'; // Specify main and backup server
+		$mail->Host = get_option( 'fum_smtp_host' ); // Specify main and backup server
 		$mail->SMTPAuth   = true; // Enable SMTP authentication
-		$mail->Username   = 'homepage@dhv-jugend.de'; // SMTP username
-		$mail->Password   = 'jugend1245'; // SMTP password
+		$mail->Username = get_option( 'fum_smtp_username' ); // SMTP username
+		$mail->Password = get_option( 'fum_smtp_password' ); // SMTP password
 		$mail->SMTPSecure = 'tls'; // Enable encryption, 'ssl' also accepted
 		$mail->Port       = 587;
 
 		$mail->AddReplyTo( $reply_to );
-		$mail->From     = 'homepage@dhv-jugend.de';
-		$mail->FromName = 'DHV-Jugend';
+
+		$mail->From     = get_option( 'fum_smtp_sender' );
+		$mail->FromName = get_option( 'fum_smtp_sender_name' );
 		$mail->addAddress( $email ); // Add a recipient
 		$mail->Sender = $reply_to;
 		$mail->addCC( 'anmeldungen@dhv-jugend.de' );

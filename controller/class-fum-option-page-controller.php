@@ -56,6 +56,54 @@ class Fum_Option_Page_Controller {
 		//Add option to option_group
 		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'checkbox' );
 
+		//Create "use SMTP to send mails" checkbox
+		$name        = 'fum_use_smtp';
+		$title       = 'Versende Mails per SMTP statt wp_mail';
+		$description = 'Der Benutzer bekommt ein automatisch generiertes Passwort per Mail zugeschickt.';
+
+		//Add option to option_group
+		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'checkbox' );
+
+		//Create "use SMTP to send mails" checkbox
+		$name        = 'fum_smtp_host';
+		$title       = 'SMTP Server / Host';
+		$description = '';
+
+		//Add option to option_group
+		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
+
+		//Create SMTP username text field
+		$name        = 'fum_smtp_username';
+		$title       = 'SMTP Username';
+		$description = '';
+
+		//Add option to option_group
+		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
+
+		//Create SMTP password text field
+		$name        = 'fum_smtp_password';
+		$title       = 'SMTP Password';
+		$description = '';
+
+		//Add option to option_group
+		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'password' );
+
+		//Create "from" text field
+		$name        = 'fum_smtp_sender';
+		$title       = 'E-Mailadresse des Absenders (Mailadresse die zum SMTP Konto gehört)';
+		$description = '';
+
+		//Add option to option_group
+		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
+
+		//Create "from name" text field
+		$name        = 'fum_smtp_sender_name';
+		$title       = 'Name des Absenders';
+		$description = '';
+
+		//Add option to option_group
+		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
+
 
 		//Add created options to $option_group and register $option_group
 		$option_group->set_options( $options );

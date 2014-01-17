@@ -44,7 +44,7 @@ class Frontend_User_Management {
 			require_once( Frontend_User_Management::$plugin_path . 'options.php' );
 		}
 
-		if ( 'WPGitHubUpdater' === $class_name ) {
+		if ( 'WP_GitHub_Updater' === $class_name ) {
 			require_once( Frontend_User_Management::$plugin_path . 'updater.php' );
 		}
 

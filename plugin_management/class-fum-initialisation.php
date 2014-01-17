@@ -34,7 +34,7 @@ class Fum_Initialisation {
 				'tested'             => '3.8', // which version of WordPress is your plugin tested up to?
 				'readme'             => 'README.MD' // which file to use as the readme for the version number
 			);
-			new WPGitHubUpdater( $config );
+			new WP_GitHub_Updater( $config );
 
 		}
 

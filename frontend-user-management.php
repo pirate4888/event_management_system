@@ -44,6 +44,10 @@ class Frontend_User_Management {
 			require_once( Frontend_User_Management::$plugin_path . 'options.php' );
 		}
 
+		if ( 'WPGitHubUpdater' === $class_name ) {
+			require_once( Frontend_User_Management::$plugin_path . 'updater.php' );
+		}
+
 		//Because of sucking wordpress name conventions class name != file name, convert it manually
 		$class_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) . '.php' );
 		if ( file_exists( Frontend_User_Management::$plugin_path . 'class/' . $class_name ) ) {

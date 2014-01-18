@@ -224,10 +224,9 @@ class WP_GitHub_Updater {
 
 			if ( is_array( $raw_response ) ) {
 				if ( ! empty( $raw_response['body'] ) )
-					//TODO Changed from ^\s*Version\:\s*(.*)$ to \s*Version\:\s*(.*)   <---tell author of plugin
+					//TODO Changed from ^\s*Version\:\s*(.*)$ to \s*Version\:\s*(.*)   <---tell author of plugin (
 					preg_match( '#\s*Version\:\s*(.*)#im', $raw_response['body'], $matches );
 			}
-			echo "MATCHES: " . print_r( $matches, true );
 
 			if ( empty( $matches[1] ) )
 				$version = false;
@@ -252,8 +251,7 @@ class WP_GitHub_Updater {
 			if ( false !== $version )
 				set_site_transient( $this->config['slug'] . '_new_version', $version, 60 * 60 * 6 );
 		}
-		echo "Slug: " . $this->config['slug'] . "<br/>";
-		echo "VERSION NUMBER: " . $version . "<br/>";
+
 		return $version;
 	}
 
@@ -358,15 +356,9 @@ class WP_GitHub_Updater {
 	 * @return object $transient updated plugin data transient
 	 */
 	public function api_check( $transient ) {
-		echo "FOLDER NAME: " . $this->config['proper_folder_name'] . '<br/>';
-		echo "NEW_VERSION: " . $this->config['new_version'] . '<br/>';
-		echo "OLD_VERSION: " . $this->config['version'] . '<br/>';
-		// Check if the transient contains the 'checked' information
 		// If not, just return its value without hacking it
 		if ( empty( $transient->checked ) )
 			return $transient;
-
-		echo "NOT RETUNRED TRANSIENT";
 
 		// check the version and decide if it's new
 		$update = version_compare( $this->config['new_version'], $this->config['version'] );
@@ -404,8 +396,6 @@ class WP_GitHub_Updater {
 		if ( ! isset( $response->slug ) || $response->slug != $this->config['slug'] )
 			return false;
 
-		echo "SLUG:" . $response->slug . '<br/>';
-		echo "NAME: " . $response->plugin_name . '<br/>';
 		$response->slug          = $this->config['slug'];
 		$response->plugin_name   = $this->config['plugin_name'];
 		$response->version       = $this->config['new_version'];

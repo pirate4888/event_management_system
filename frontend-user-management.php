@@ -20,9 +20,6 @@ class Frontend_User_Management {
 		//Set path to plugin dir
 		Frontend_User_Management::$plugin_path = plugin_dir_path( __FILE__ );
 
-		//Small change to introduce the experimental branch
-		//TODO Add Option if user wants experimental branch or stable branch
-
 		//Add Github Updater
 		if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
 			$config = array(

@@ -227,8 +227,8 @@ class WP_GitHub_Updater {
 					//TODO Changed from ^\s*Version\:\s*(.*)$ to \s*Version\:\s*(.*)   <---tell author of plugin (
 					preg_match( '#\s*Version\:\s*(.*)#im', $raw_response['body'], $matches );
 			}
-			echo "VERSION: " . $version;
-			echo $raw_response['body'];
+			//echo "VERSION: " . $version;
+			//echo $raw_response['body'];
 
 			if ( empty( $matches[1] ) )
 				$version = false;

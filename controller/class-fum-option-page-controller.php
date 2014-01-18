@@ -104,6 +104,18 @@ class Fum_Option_Page_Controller {
 		//Add option to option_group
 		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
 
+		$name  = 'fum_git_branch';
+		$title = 'Welche Version soll verwendet werden (Experimental beinhaltet nicht geteste Versionen!)';
+
+		$description = 'Welche Version soll verwendet werden (Experimental beinhaltet nicht geteste Versionen!), im Zweifelsfall immer stable benutzen';
+		$description = esc_attr( $description );
+
+		//Add option to option_group
+		$option = new Fum_Option( $name, $title, $description, get_option( Ems_Conf::$ems_general_option_show_events_in_menu ), $option_group, 'select' );
+		$option->set_possible_values( array( 'stable', 'experimental' ) );
+		$option->set_value( get_option( 'ems_git_branch' ) );
+		$options[] = $option;
+
 
 		//Add created options to $option_group and register $option_group
 		$option_group->set_options( $options );

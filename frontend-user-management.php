@@ -3,7 +3,7 @@
  * Plugin Name: Frontend User Management
  * Plugin URI: https://github.com/SchwarzwaldFalke/frontend-user-management
  * Description: Plugin which allows user to register, login and edit their user profile in frontend. It also adds activation mails during user registration
- * Version: 0.03
+ * Version: 0.04
  * Author: Christoph Bessei
  * Author URI: https://www.schwarzwald-falke.de
  * License: GPL v2
@@ -22,13 +22,17 @@ class Frontend_User_Management {
 
 		//Add Github Updater
 		if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
+			$branch = 'master';
+			if ( false !== get_option( 'fum_git_branch' ) && get_option( 'fum_git_branch' ) == 'experimental' ) {
+				$branch = 'experimental';
+			}
 			$config = array(
 				'slug'               => plugin_basename( __FILE__ ), // this is the slug of your plugin
 				'proper_folder_name' => 'frontend-user-management', // this is the name of the folder your plugin lives in
 				'api_url'            => 'https://api.github.com/repos/SchwarzwaldFalke/frontend_user_management', // the github API url of your github repo
-				'raw_url'            => 'https://raw.github.com/SchwarzwaldFalke/frontend_user_management/master', // the github raw url of your github repo
+				'raw_url' => 'https://raw.github.com/SchwarzwaldFalke/frontend_user_management/' . $branch, // the github raw url of your github repo
 				'github_url'         => 'https://github.com/SchwarzwaldFalke/frontend_user_management', // the github url of your github repo
-				'zip_url'            => 'https://github.com/SchwarzwaldFalke/frontend_user_management/archive/master.zip', // the zip url of the github repo
+				'zip_url' => 'https://github.com/SchwarzwaldFalke/frontend_user_management/archive/' . $branch . '.zip', // the zip url of the github repo
 				'sslverify'          => true, // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
 				'requires'           => '3.7', // which version of WordPress does your plugin require?
 				'tested'             => '3.8', // which version of WordPress is your plugin tested up to?

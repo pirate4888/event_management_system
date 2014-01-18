@@ -21,8 +21,6 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	private $leader;
 	private $post;
 
-	//Experimental Branch test
-
 	public function __construct( WP_Post $post = NULL ) {
 		if ( NULL !== $post ) {
 			$this->post            = $post;

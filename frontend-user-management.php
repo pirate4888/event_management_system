@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Frontend User Management
  * Plugin URI: https://github.com/SchwarzwaldFalke/frontend-user-management
- * Description: Plugin which allows user to register, login and edit their user profile. It also adds activation mails during user registration
+ * Description: Plugin which allows user to register, login and edit their user profile in frontend. It also adds activation mails during user registration
  * Version: 0.02
  * Author: Christoph Bessei
  * Author URI: https://www.schwarzwald-falke.de
@@ -15,9 +15,28 @@ class Frontend_User_Management {
 
 	public function __construct() {
 
+
 		spl_autoload_register( array( $this, 'autoload' ) );
 		//Set path to plugin dir
 		Frontend_User_Management::$plugin_path = plugin_dir_path( __FILE__ );
+
+		//Add Github Updater
+		if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
+			$config = array(
+				'slug'               => plugin_basename( __FILE__ ), // this is the slug of your plugin
+				'proper_folder_name' => 'frontend-user-management', // this is the name of the folder your plugin lives in
+				'api_url'            => 'https://api.github.com/repos/SchwarzwaldFalke/frontend_user_management', // the github API url of your github repo
+				'raw_url'            => 'https://raw.github.com/SchwarzwaldFalke/frontend_user_management/master', // the github raw url of your github repo
+				'github_url'         => 'https://github.com/SchwarzwaldFalke/frontend_user_management', // the github url of your github repo
+				'zip_url'            => 'https://github.com/SchwarzwaldFalke/frontend_user_management/archive/master.zip', // the zip url of the github repo
+				'sslverify'          => true, // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
+				'requires'           => '3.7', // which version of WordPress does your plugin require?
+				'tested'             => '3.8', // which version of WordPress is your plugin tested up to?
+				'readme'             => 'README.MD' // which file to use as the readme for the version number
+			);
+			new WP_GitHub_Updater( $config );
+		}
+
 
 		register_activation_hook( __FILE__, array( 'Fum_Activation', 'activate_plugin' ) );
 		register_deactivation_hook( __FILE__, array( 'Fum_Deactivation', 'deactivate_plugin' ) );

@@ -85,7 +85,6 @@ class WP_GitHub_Updater {
 			_doing_it_wrong( __CLASS__, $message, self::VERSION );
 			return;
 		}
-
 		$this->set_defaults();
 
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'api_check' ) );
@@ -251,7 +250,8 @@ class WP_GitHub_Updater {
 			if ( false !== $version )
 				set_site_transient( $this->config['slug'] . '_new_version', $version, 60 * 60 * 6 );
 		}
-
+		echo "Slug: " . $this->config['slug'] . "<br/>";
+		echo "VERSION NUMBER: " . $version . "<br/>";
 		return $version;
 	}
 
@@ -356,11 +356,15 @@ class WP_GitHub_Updater {
 	 * @return object $transient updated plugin data transient
 	 */
 	public function api_check( $transient ) {
-
+		echo "FOLDER NAME: " . $this->config['proper_folder_name'] . '<br/>';
+		echo "NEW_VERSION: " . $this->config['new_version'] . '<br/>';
+		echo "OLD_VERSION: " . $this->config['version'] . '<br/>';
 		// Check if the transient contains the 'checked' information
 		// If not, just return its value without hacking it
 		if ( empty( $transient->checked ) )
 			return $transient;
+
+		echo "NOT RETUNRED TRANSIENT";
 
 		// check the version and decide if it's new
 		$update = version_compare( $this->config['new_version'], $this->config['version'] );
@@ -398,6 +402,8 @@ class WP_GitHub_Updater {
 		if ( ! isset( $response->slug ) || $response->slug != $this->config['slug'] )
 			return false;
 
+		echo "SLUG:" . $response->slug . '<br/>';
+		echo "NAME: " . $response->plugin_name . '<br/>';
 		$response->slug          = $this->config['slug'];
 		$response->plugin_name   = $this->config['plugin_name'];
 		$response->version       = $this->config['new_version'];

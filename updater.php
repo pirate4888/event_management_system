@@ -224,8 +224,10 @@ class WP_GitHub_Updater {
 
 			if ( is_array( $raw_response ) ) {
 				if ( ! empty( $raw_response['body'] ) )
-					preg_match( '#^\s*Version\:\s*(.*)$#im', $raw_response['body'], $matches );
+					//TODO Changed from ^\s*Version\:\s*(.*)$ to \s*Version\:\s*(.*)   <---tell author of plugin
+					preg_match( '#\s*Version\:\s*(.*)#im', $raw_response['body'], $matches );
 			}
+			echo "MATCHES: " . print_r( $matches, true );
 
 			if ( empty( $matches[1] ) )
 				$version = false;

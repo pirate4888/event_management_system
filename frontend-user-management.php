@@ -3,7 +3,7 @@
  * Plugin Name: Frontend User Management
  * Plugin URI: https://github.com/SchwarzwaldFalke/frontend-user-management
  * Description: Plugin which allows user to register, login and edit their user profile in frontend. It also adds activation mails during user registration
- * Version: 0.02
+ * Version: 0.03
  * Author: Christoph Bessei
  * Author URI: https://www.schwarzwald-falke.de
  * License: GPL v2

@@ -15,6 +15,7 @@ class Frontend_User_Management {
 
 	public function __construct() {
 
+		//This change should only be visible for sites with experimental branch
 
 		spl_autoload_register( array( $this, 'autoload' ) );
 		//Set path to plugin dir

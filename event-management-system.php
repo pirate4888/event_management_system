@@ -16,6 +16,9 @@ class Event_Management_System {
 
 	public function __construct() {
 
+		//Load frontend-user-management
+		require_once( "frontend-user-management/frontend-user-management.php" );
+		new Frontend_User_Management();
 		spl_autoload_register( array( $this, 'autoload' ) );
 		//Set path to plugin dir
 		Event_Management_System::$plugin_path = plugin_dir_path( __FILE__ );

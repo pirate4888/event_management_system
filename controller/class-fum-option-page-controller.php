@@ -113,8 +113,15 @@ class Fum_Option_Page_Controller {
 		//Add option to option_group
 		$option = new Fum_Option( $name, $title, $description, get_option( Ems_Conf::$ems_general_option_show_events_in_menu ), $option_group, 'select' );
 		$option->set_possible_values( array( 'stable', 'experimental' ) );
-		$option->set_value( get_option( 'fum_git_branch' ) );
+		$option->set_value( get_option( $name ) );
 		$options[] = $option;
+
+
+		$options = apply_filters( 'fum_option_page_entries', $options );
+
+		if ( empty( $options ) ) {
+			return;
+		}
 
 
 		//Add created options to $option_group and register $option_group

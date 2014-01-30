@@ -3,8 +3,16 @@
  * @author Christoph Bessei
  * @version
  */
+class Ems_EventTest extends WP_UnitTestCase {
 
-class Ems_EventTest extends PHPUnit_Framework_TestCase {
+	public function setUp() {
 
+		parent::setUp();
+
+	} // end setup
+
+	public function testWTF() {
+		$this->assertTrue( true );
+	}
 }
  

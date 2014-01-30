@@ -19,6 +19,7 @@ class Event_Management_System {
 		//Load frontend-user-management
 		require_once( "frontend-user-management/frontend-user-management.php" );
 		new Frontend_User_Management();
+		add_filter( 'fum_option_page_entries', array( $this, 'remove_fum_option_page' ) );
 		spl_autoload_register( array( $this, 'autoload' ) );
 		//Set path to plugin dir
 		Event_Management_System::$plugin_path = plugin_dir_path( __FILE__ );
@@ -52,6 +53,10 @@ class Event_Management_System {
 		}
 
 
+	}
+
+	public function remove_fum_option_page( $options ) {
+		return array();
 	}
 
 

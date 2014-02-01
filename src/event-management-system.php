@@ -16,9 +16,6 @@ class Event_Management_System {
 
 	public function __construct() {
 
-		//Load frontend-user-management
-		require_once( "frontend-user-management/frontend-user-management.php" );
-		new Frontend_User_Management();
 		add_filter( 'fum_option_page_entries', array( $this, 'remove_fum_option_page' ) );
 
 

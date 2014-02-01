@@ -9,5 +9,10 @@
  * License: GPL v2
  */
 
+
+//Load dependency frontend-user-management
+require_once( "lib/frontend-user-management/frontend-user-management.php" );
+
+//Load plugin
 require_once( "src/event-management-system.php" );
 new Event_Management_System();

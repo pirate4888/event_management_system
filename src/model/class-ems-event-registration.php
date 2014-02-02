@@ -181,7 +181,7 @@ class Ems_Event_Registration {
 	}
 
 	public static function send_mail_via_smtp( $email, $subject, $message, $reply_to = 'info@dhv-jugend.de' ) {
-		require_once( __DIR__ . '/../../../../wp-includes/class-phpmailer.php' );
+
 		$mail = new PHPMailer();
 		$mail->IsSendmail(); //1 und 1 doesn't support isSMTP from webshosting packages
 		$mail->CharSet    = 'utf-8';
@@ -198,7 +198,7 @@ class Ems_Event_Registration {
 		$mail->FromName = get_option( 'fum_smtp_sender_name' );
 		$mail->addAddress( $email ); // Add a recipient
 		$mail->Sender = $reply_to;
-		$mail->addCC( 'anmeldungen@dhv-jugend.de' );
+		$mail->addCC( 'anmeldungen@test.dhv-jugend.de' );
 
 		$mail->WordWrap = 50; // Set word wrap to 50 characters
 		$mail->isHTML( false ); // Set email format to HTML

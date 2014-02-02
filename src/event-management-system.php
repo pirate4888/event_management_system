@@ -14,13 +14,13 @@ class Event_Management_System {
 	private static $plugin_path = NULL;
 	private static $plugin_url = NULL;
 
-	public function __construct() {
+	public function __construct( $plugin_path = NULL, $plugin_url = NULL ) {
 
 		add_filter( 'fum_option_page_entries', array( $this, 'remove_fum_option_page' ) );
 
-
 		spl_autoload_register( array( $this, 'autoload' ) );
-		//Set path to plugin dir
+
+
 		Event_Management_System::$plugin_path = plugin_dir_path( __FILE__ );
 		Event_Management_System::$plugin_url  = plugin_dir_url( __FILE__ );
 
@@ -87,6 +87,9 @@ class Event_Management_System {
 		}
 		elseif ( file_exists( Event_Management_System::$plugin_path . 'plugin_management/' . $class_name ) ) {
 			require_once( Event_Management_System::$plugin_path . 'plugin_management/' . $class_name );
+		}
+		elseif ( file_exists( Event_Management_System::$plugin_path . '../../../../wp-includes/' . $class_name ) ) {
+			require_once( Event_Management_System::$plugin_path . '../../../../wp-includes/' . $class_name );
 		}
 	}
 

@@ -1,9 +1,9 @@
 <?php
+
 /**
  * @author Christoph Bessei
  * @version
  */
-
 class Fum_Event_Registration_Controller {
 	public static function create_event_registration_form() {
 
@@ -25,6 +25,7 @@ class Fum_Event_Registration_Controller {
 		$event_field = $form->get_input_field( Fum_Conf::$fum_input_field_select_event );
 
 		if ( isset( $_REQUEST['event'] ) ) {
+			error_log( "EVENT ID: " . $_REQUEST['event'] );
 			$event_field->set_value( $_REQUEST['event'] );
 			$event_field->set_readonly( true );
 			//Check if event is an valid event
@@ -137,8 +138,8 @@ class Fum_Event_Registration_Controller {
 
 	public static function validate_event_select_field( Fum_Html_Input_Field $input_field ) {
 		$posts          = get_posts( array(
-			'posts_per_page' => - 1,
-			'post_type'      => Ems_Conf::$ems_custom_event_post_type,
+				'posts_per_page' => - 1,
+				'post_type'      => Ems_Conf::$ems_custom_event_post_type,
 		) );
 		$is_valid_event = false;
 		$ID             = NULL;

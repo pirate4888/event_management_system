@@ -15,4 +15,4 @@ require_once( "lib/frontend-user-management/frontend-user-management.php" );
 
 //Load plugin
 require_once( "src/event-management-system.php" );
-new Event_Management_System();
+new Event_Management_System( plugin_dir_path( __FILE__ ), plugin_dir_url( __FILE__ ) );

@@ -1,9 +1,9 @@
 <?php
+
 /**
  * @author Christoph Bessei
  * @version
  */
-
 class Fum_Initialisation {
 
 	public static function initiate_plugin() {
@@ -22,10 +22,9 @@ class Fum_Initialisation {
 
 	}
 
-	public
-	static function my_recent_posts_shortcode( $atts ) {
+	public static function my_recent_posts_shortcode( $atts ) {
 		$q = new WP_Query(
-			array( 'orderby' => 'date', 'posts_per_page' => '4' )
+				array( 'orderby' => 'date', 'posts_per_page' => '4' )
 		);
 
 		$list = '<ul class="recent-posts">';

@@ -23,7 +23,7 @@ class Fum_Event_Registration_Controller {
 		$form = Fum_Html_Form::get_form( Fum_Conf::$fum_event_register_form_unique_name );
 
 		$event_field = $form->get_input_field( Fum_Conf::$fum_input_field_select_event );
-
+		error_log( "OUTSIDE" );
 		if ( isset( $_REQUEST['event'] ) ) {
 			error_log( "EVENT ID: " . $_REQUEST['event'] );
 			error_log( "TEST" );
@@ -39,6 +39,7 @@ class Fum_Event_Registration_Controller {
 			}
 		}
 		else {
+			error_log( "DRIN" );
 			//if no event is specified, just show the select event field
 			$event_field->set_name( 'event' );
 			$event_field->set_id( 'event' );

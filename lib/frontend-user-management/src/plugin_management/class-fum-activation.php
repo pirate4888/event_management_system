@@ -1,77 +1,78 @@
 <?php
+
 /**
  * @author Christoph Bessei
  * @version
  */
-
 class Fum_Activation {
 	private static $general_input_fields = array(
-		Html_Input_Type_Enum::TEXT     => array(),
-		Html_Input_Type_Enum::PASSWORD => array(),
-		Html_Input_Type_Enum::SELECT   => array(),
-		Html_Input_Type_Enum::CHECKBOX => array(),
-		Html_Input_Type_Enum::SUBMIT   => array(
-			'fum_input_field_submit' => array( 'Abschicken', false ),
-		)
+			Html_Input_Type_Enum::TEXT     => array(),
+			Html_Input_Type_Enum::PASSWORD => array(),
+			Html_Input_Type_Enum::SELECT   => array(),
+			Html_Input_Type_Enum::CHECKBOX => array(),
+			Html_Input_Type_Enum::SUBMIT   => array(
+					'fum_input_field_submit' => array( 'Abschicken', false ),
+			)
 	);
 	private static $user_input_fields = array(
-		Html_Input_Type_Enum::TEXT     => array(
-			//Default input field names
-			'fum_input_field_username'                   => array( 'Username', true ),
-			'fum_input_field_email'                      => array( 'E-Mail', true, array( 'Fum_Html_Input_Field', 'mail_address_callback' ) ),
-			'fum_input_field_last_name'                  => array( 'Nachname', false ),
-			'fum_input_field_first_name'                 => array( 'Vorname', false ),
-			'fum_input_field_website'                    => array( 'Website', false ),
-			'fum_input_field_display_name'               => array( 'Öffentlicher Name', false ),
+			Html_Input_Type_Enum::TEXT     => array(
+				//Default input field names
+					'fum_input_field_username'                   => array( 'Username', true ),
+					'fum_input_field_email'                      => array( 'E-Mail', true, array( 'Fum_Html_Input_Field', 'mail_address_callback' ) ),
+					'fum_input_field_last_name'                  => array( 'Nachname', false ),
+					'fum_input_field_first_name'                 => array( 'Vorname', false ),
+					'fum_input_field_website'                    => array( 'Website', false ),
+					'fum_input_field_display_name'               => array( 'Öffentlicher Name', false ),
 
-			//DHV-Jugend input field names
-			'fum_input_field_birthday'                   => array( 'Geburtstag', false, array( 'Fum_Html_Input_Field', 'date_callback' ) ),
-			'fum_input_field_street'                     => array( 'Straße', false ),
-			'fum_input_field_city'                       => array( 'Stadt', false ),
-			'fum_input_field_postcode'                   => array( 'Postleitzahl', false, array( 'Fum_Html_Input_Field', 'integer_callback' ), array( 'length' => array( 4, 5 ) ) ),
-			'fum_input_field_state'                      => array( 'Bundesland', false ),
-			'fum_input_field_phone_number'               => array( 'Telefonnummer', false ),
-			'fum_input_field_mobile_number'              => array( 'Handynummer', false ),
-			'fum_input_field_dhv_member_number'          => array( 'DHV MitgliedsNr.', false ),
-			'fum_input_field_license_number'             => array( 'Lizenznummer', false ),
+				//DHV-Jugend input field names
+					'fum_input_field_birthday'                   => array( 'Geburtstag', false, array( 'Fum_Html_Input_Field', 'date_callback' ) ),
+					'fum_input_field_street'                     => array( 'Straße', false ),
+					'fum_input_field_city'                       => array( 'Stadt', false ),
+					'fum_input_field_postcode'                   => array( 'Postleitzahl', false, array( 'Fum_Html_Input_Field', 'integer_callback' ), array( 'length' => array( 4, 5 ) ) ),
+					'fum_input_field_state'                      => array( 'Bundesland', false ),
+					'fum_input_field_phone_number'               => array( 'Telefonnummer', false ),
+					'fum_input_field_mobile_number'              => array( 'Handynummer', false ),
+					'fum_input_field_dhv_member_number'          => array( 'DHV MitgliedsNr.', false ),
+					'fum_input_field_license_number'             => array( 'Lizenznummer', false ),
 
-			'fum_input_field_emergency_contact_surname'  => array( 'Notfallkontakt Nachname', false ),
-			'fum_input_field_emergency_contact_forename' => array( 'Notfallkontakt Vorname', false ),
-			'fum_input_field_emergency_phone_number'     => array( 'Notfallkontakt Telefonnummer', false ),
-		),
-		Html_Input_Type_Enum::PASSWORD => array(
-			'fum_input_field_password'           => array( 'Password', true ),
-			'fum_input_field_new_password'       => array( 'New password', true ),
-			'fum_input_field_new_password_check' => array( 'Confirm new password', true ),
-		),
-		Html_Input_Type_Enum::SELECT   => array(),
-		Html_Input_Type_Enum::CHECKBOX => array(
-			'fum_input_field_premium_participant' => array( 'Schüler, Azubi, Student', false, ),
-		),
-		Html_Input_Type_Enum::SUBMIT   => array()
+					'fum_input_field_emergency_contact_surname'  => array( 'Notfallkontakt Nachname', false ),
+					'fum_input_field_emergency_contact_forename' => array( 'Notfallkontakt Vorname', false ),
+					'fum_input_field_emergency_phone_number'     => array( 'Notfallkontakt Telefonnummer', false ),
+			),
+			Html_Input_Type_Enum::PASSWORD => array(
+					'fum_input_field_password'           => array( 'Password', true ),
+					'fum_input_field_new_password'       => array( 'New password', true ),
+					'fum_input_field_new_password_check' => array( 'Confirm new password', true ),
+			),
+			Html_Input_Type_Enum::SELECT   => array(),
+			Html_Input_Type_Enum::CHECKBOX => array(
+					'fum_input_field_premium_participant' => array( 'Schüler, Azubi, Student', false, ),
+			),
+			Html_Input_Type_Enum::SUBMIT   => array()
 	);
 	private static $event_input_fields = array(
-		Html_Input_Type_Enum::TEXT     => array(),
-		Html_Input_Type_Enum::PASSWORD => array(),
-		Html_Input_Type_Enum::SELECT   => array(
-			'fum_input_field_select_event' => array( 'Event', true, NULL, NULL, array( 'Bassano', 'Ski & Fly' ) ),
-			'fum_input_field_aircraft'     => array( 'Fluggerät', false, NULL, NULL,
-				//Possible values array
-				array(
-					array( 'title' => 'Gleitschirm', 'value' => 'gleitschirm' ),
-					array( 'title' => 'Drachen', 'value' => 'drachen' ),
-					array( 'title' => 'Fußgänger', 'value' => 'fussgaenger' ),
-				) ),
-		),
-		Html_Input_Type_Enum::CHECKBOX => array(
-			'fum_input_field_search_ride' => array( 'Suche Mitfahrgelegenheit', false ),
-			'fum_input_field_offer_ride'  => array( 'Biete Mitfahrgelgenheit', false ),
-			'fum_input_field_accept_agb'  => array( 'Ich habe die <a href="https://www.dhv-jugend.de/teilnahmebedingungen-haftungserklaerung/">Haftungserklärung</a> für DHV-Jugend Events gelesen und akzeptiere diese', true ),
-		),
-		Html_Input_Type_Enum::SUBMIT   => array()
+			Html_Input_Type_Enum::TEXT     => array(),
+			Html_Input_Type_Enum::PASSWORD => array(),
+			Html_Input_Type_Enum::SELECT   => array(
+					'fum_input_field_select_event' => array( 'Event', true, NULL, NULL, array( 'Bassano', 'Ski & Fly' ) ),
+					'fum_input_field_aircraft'     => array( 'Fluggerät', false, NULL, NULL,
+						//Possible values array
+							array(
+									array( 'title' => 'Gleitschirm', 'value' => 'gleitschirm' ),
+									array( 'title' => 'Drachen', 'value' => 'drachen' ),
+									array( 'title' => 'Fußgänger', 'value' => 'fussgaenger' ),
+							) ),
+			),
+			Html_Input_Type_Enum::CHECKBOX => array(
+					'fum_input_field_search_ride' => array( 'Suche Mitfahrgelegenheit', false ),
+					'fum_input_field_offer_ride'  => array( 'Biete Mitfahrgelgenheit', false ),
+					'fum_input_field_accept_agb'  => array( 'Ich habe die <a href="https://www.dhv-jugend.de/teilnahmebedingungen-haftungserklaerung/">Haftungserklärung</a> für DHV-Jugend Events gelesen und akzeptiere diese', true ),
+			),
+			Html_Input_Type_Enum::SUBMIT   => array()
 	);
 
 	public static function activate_plugin() {
+		error_log( 'fum_activate_plugin' );
 		$front_end_form = new Fum_Front_End_Form();
 		$post_ids       = $front_end_form->add_form_posts();
 		add_option( Fum_Conf::$fum_register_login_page_name, $post_ids[Fum_Conf::$fum_register_login_page_name] );

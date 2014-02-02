@@ -1,14 +1,5 @@
 <?php
 
-/**
- * Plugin Name: Event Management System
- * Plugin URI: https://github.com/SchwarzwaldFalke/event_management_system
- * Description: Plugin which allows management (create, edit, delete, event registration, participant list, Task reminder, automated news, etc.
- * Version: 0.03
- * Author: Christoph Bessei
- * Author URI: https://www.schwarzwald-falke.de
- * License: GPL v2
- */
 class Event_Management_System {
 
 	private static $plugin_path = NULL;
@@ -16,7 +7,7 @@ class Event_Management_System {
 
 	public function __construct( $plugin_path = NULL, $plugin_url = NULL ) {
 
-		add_filter( 'fum_option_page_entries', array( $this, 'remove_fum_option_page' ) );
+		//add_filter( 'fum_option_page_entries', array( $this, 'remove_fum_option_page' ) );
 
 		spl_autoload_register( array( $this, 'autoload' ) );
 
@@ -26,9 +17,6 @@ class Event_Management_System {
 
 		Ems_Initialisation::initiate_plugin();
 
-		register_activation_hook( __FILE__, array( 'Ems_Activation', 'activate_plugin' ) );
-		register_deactivation_hook( __FILE__, array( 'Ems_Deactivation', 'deactivate_plugin' ) );
-		register_uninstall_hook( __FILE__, array( 'Ems_Uninstallation', 'uninstall_plugin' ) );
 
 		//Add Github Updater
 		if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
@@ -62,7 +50,7 @@ class Event_Management_System {
 	public function autoload( $class_name ) {
 
 		if ( 'WP_GitHub_Updater' === $class_name ) {
-			require_once( '../lib/updater.php' );
+			require_once( __DIR__ . '/../lib/updater.php' );
 		}
 
 		//Because of sucking wordpress name conventions class name != file name, convert it manually

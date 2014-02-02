@@ -6,6 +6,8 @@
  */
 class Ems_Uninstallation {
 	public static function uninstall_plugin() {
+		Fum_Uninstallation::uninstall_plugin();
+		error_log( 'ems_uninstall_plugin' );
 		$role = get_role( 'administrator' );
 		$caps = array( 'edit_event'          => true,
 									 'read_event'          => true,

@@ -6,6 +6,10 @@
  */
 class Ems_Activation {
 	public static function activate_plugin() {
+
+		//Setup frontend user management first (must be called here, because a second 'register_activation_hook' didn't work
+		Fum_Activation::activate_plugin();
+		error_log( 'ems_activate_plugin' );
 		$caps = array( 'edit_event'          => true,
 									 'read_event'          => true,
 									 'delete_event'        => true,

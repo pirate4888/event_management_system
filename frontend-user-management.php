@@ -10,6 +10,5 @@
  * License: GPL v2
  */
 
-require_once('src/frontend-user-management.php');
+require_once( 'src/frontend-user-management.php' );
 new Frontend_User_Management(); //start plugin
-

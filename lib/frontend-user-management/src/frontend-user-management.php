@@ -33,10 +33,6 @@ class Frontend_User_Management {
 		}
 
 
-		register_activation_hook( __FILE__, array( 'Fum_Activation', 'activate_plugin' ) );
-		register_deactivation_hook( __FILE__, array( 'Fum_Deactivation', 'deactivate_plugin' ) );
-		register_uninstall_hook( __FILE__, array( 'Fum_Uninstallation', 'uninstall_plugin' ) );
-
 		Fum_Initialisation::initiate_plugin();
 		add_filter( 'tc_post_metas', array( $this, 'remove_meta' ) );
 	}

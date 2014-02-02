@@ -26,6 +26,7 @@ class Fum_Event_Registration_Controller {
 
 		if ( isset( $_REQUEST['event'] ) ) {
 			error_log( "EVENT ID: " . $_REQUEST['event'] );
+			error_log( "TEST" );
 			$event_field->set_value( $_REQUEST['event'] );
 			$event_field->set_readonly( true );
 			//Check if event is an valid event

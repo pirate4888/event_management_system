@@ -11,30 +11,30 @@ class Ems_Event_Test extends WP_UnitTestCase {
 	}
 
 	public function test_get_events_limit_with_sort() {
-		$events = Ems_Event::get_events( true, 5 );
+		$events = Ems_Event::get_events( 5 );
 		$this->assertEquals( 5, count( $events ) );
 	}
 
 	public function test_get_events_limit_without_sort() {
-		$events = Ems_Event::get_events( false, 5 );
+		$events = Ems_Event::get_events( 5, false );
 		$this->assertEquals( 5, count( $events ) );
 	}
 
 	public function test_get_events_limit_zero_with_sort() {
-		$events = Ems_Event::get_events( true, 0 );
-		$this->assertEquals( 5, count( $events ) );
+		$events = Ems_Event::get_events( 0, true );
+		$this->assertEquals( 0, count( $events ) );
 	}
 
 	public function test_get_events_limit_zero_without_sort() {
-		$events = Ems_Event::get_events( false, 0 );
-		$this->assertEquals( 5, count( $events ) );
+		$events = Ems_Event::get_events( 0, false );
+		$this->assertEquals( 0, count( $events ) );
 	}
 
 	/**
-	 * Tests if the returned event array is really sorted ('next' event first)
+	 * Tests if the returned event array is really sorted (used compare fuction is Ems_Event->compare)
 	 */
 	public function test_get_events_sorted() {
-		$events = Ems_Event::get_events( true );
+		$events = Ems_Event::get_events( - 1, true );
 
 		$this->assertGreaterThan( 1, count( $events ), 'At least two elements are needed to check order' );
 
@@ -48,8 +48,8 @@ class Ems_Event_Test extends WP_UnitTestCase {
 			$second_end_date = $events[$i]->get_end_date_time();
 
 			//if start date is equal and end date differs, check if the elements are ordered by end date
-			if ( $first_start_date == $first_start_date && $first_end_date != $second_end_date ) {
-				$this->assertTrue( $first_end_date < $second_end_date, 'start dates are equal and end dates differ but end date of first element is great then end date of second element' );
+			if ( $first_start_date == $second_start_date && $first_end_date != $second_end_date ) {
+				$this->assertTrue( $first_end_date < $second_end_date, 'start dates are equal and end dates differ but end date of first element is great then end date of second element. first_end_date: ' . $first_end_date->getTimestamp() . ' seocond_end_date: ' . $second_end_date->getTimestamp() );
 			}
 		}
 	}

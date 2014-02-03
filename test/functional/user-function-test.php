@@ -243,17 +243,31 @@ class User_Function_Test extends SauceWrapper {
 	}
 
 	public function test_event_registration() {
-		//$this->do_login( parent::$admin_user );
-		$posts = get_posts( array(
-				'post_type'   => Ems_Conf::$ems_custom_event_post_type,
-				'post_status' => 'publish'
-		) );
-		if ( count( $posts ) < 1 ) {
-			throw new PHPUnit_Extensions_Selenium2TestCase_Exception( "Couldn't find an wordpress post from type " . Ems_Conf::$ems_custom_event_post_type );
-		}
-		$this->url( get_permalink( $posts[0]->ID ) );
-		$this->assertContains( $posts[0]->post_title, $this->title() );
-		$this->byLinkText( 'Anmeldung' )->click();
+		$this->do_login( parent::$admin_user );
+
+		$events = Ems_Event::get_events();
+		//Check if there is at least one event
+		$this->assertGreaterThan( 0, count( $events ) );
+		$selected_event = $events[0];
+
+		$event_registration_post_id = get_option( Fum_Conf::$fum_event_registration_page );
+		$this->url( get_permalink( $event_registration_post_id ) );
+		$this->assertContains( get_the_title( $event_registration_post_id ), $this->title() );
+		$select = $this->select( $this->byName( 'ems_event' ) );
+
+		$select->selectOptionByValue( 'ID_' . $selected_event->get_post()->ID );
+		//Selection should force load via javascript, so check if the new page was loaded
+		$driver            = $this;
+		$search_fum_street = function () use ( $driver ) {
+			try {
+				$driver->byId( 'fum_street' );
+				return true;
+			} catch ( Exception $e ) {
+				return false;
+			}
+		};
+		$this->spinAssert( "Couldn't find 'fum_street' on page", $search_fum_street );
+
 	}
 }
 

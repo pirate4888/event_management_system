@@ -60,7 +60,6 @@ class Fum_Event_Registration_Controller {
 		}
 
 
-		/** @var Ems_Event[] $posts */
 		$posts = Ems_Event::get_events();
 
 		$events = array();

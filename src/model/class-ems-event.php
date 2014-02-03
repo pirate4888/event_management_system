@@ -161,30 +161,42 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 		}
 	}
 
+	/**
+	 * Orders event ascending by start date and end date (if start dates are equal)
+	 *
+	 * @param Ems_Event $a
+	 * @param Ems_Event $b
+	 *
+	 * @return int
+	 */
 	public static function compare( Ems_Event $a, Ems_Event $b ) {
-		//If DateTime is not set, it's later ("bigger")
-		if ( ! $a->get_start_date_time() instanceof DateTime || ! $a->get_end_date_time() instanceof DateTime ) {
-			return - 1;
+
+		$a_start = 0;
+		if ( $a->get_start_date_time() instanceof DateTime ) {
+			$a_start = $a->start_date_time->getTimestamp();
 		}
 
-		if ( ! $b->get_start_date_time() instanceof DateTime || ! $b->get_end_date_time() instanceof DateTime ) {
-			return 1;
+		$b_start = 0;
+		if ( $b->get_start_date_time() instanceof DateTime ) {
+			$b_start = $b->get_start_date_time()->getTimestamp();
 		}
 
-		if ( $a->get_start_date_time() > $b->get_start_date_time() ) {
-			return 1;
+		$start_diff = $a_start - $b_start;
+		if ( $start_diff != 0 ) {
+			return $start_diff;
 		}
-		else if ( $a->get_start_date_time() < $b->get_start_date_time() ) {
-			return - 1;
+
+		$a_end = 0;
+		if ( $a->get_end_date_time() instanceof DateTime ) {
+			$a_end = $a->get_end_date_time()->getTimestamp();
 		}
-		else {
-			if ( $a->get_end_date_time() > $b->get_end_date_time() ) {
-				return 1;
-			}
-			else {
-				return - 1;
-			}
+
+		$b_end = 0;
+		if ( $b->get_end_date_time() instanceof DateTime ) {
+			$b_end = $b->get_end_date_time()->getTimestamp();
 		}
+
+		return ( $a_end - $b_end );
 	}
 
 	public static function observe_object( Fum_Observable $observable ) {
@@ -195,39 +207,75 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	}
 
 	/**
-	 * Returns an array of events (post with post_type Ems_Event::$post_type)
+	 * Returns an array of events (posts with post_type Ems_Event::$post_type)
 	 *
-	 * @param bool  $sorted    true(default) = sort array by start date (and if start date is not unique by end date)
-	 * @param int   $limit     number of events which should be returned, if $sorted is true the 'next' $limit events will be returned
-	 *                         is $sorted false $limit random events will be returned
-	 * @param array $user_args additional arguments for get_posts, order_by and post_per_page is ignored if $sorted/$limit is set!
+	 * @param int      $limit              limits the returned events. If $sort the events gets sorted first and then the first $limit events will be returned
+	 *                                     without sort
+	 * @param bool     $sort               sort events (true) or not (false)
+	 * @param bool     $reverse_order      reverse the order after sort, has no affect if $sort=false
+	 * @param callable $user_sort_callback function which compares two Ems_Event objects, used with usort(). Default is Ems_Event->compare
+	 * @param array    $user_args          array of arguments to use in wordpress get_posts. 'post_type','posts_per_page' and 'order_by' are ignored! Use $sort and $limit instead
 	 *
-	 * @return Ems_Event[] Sorted (if $sorted=true)
+	 * @return Ems_Event[]    returns an array of Ems_Event
+	 * @throws Exception      throws exception if there occurs an error during sort
 	 */
-	public static function get_events( $sorted = true, $limit = -1, array $user_args = array() ) {
+	public static function get_events( $limit = -1, $sort = true, $reverse_order = false, callable $user_sort_callback = NULL, array $user_args = array(), Ems_Date_Period $start_period = NULL, Ems_Date_Period $end_period = NULL ) {
 
-		$args = array(
+		//return empty array if limit is 0
+		if ( 0 === $limit ) {
+			return array();
+		}
+		//unset post_type,posts_per_page and order_by from $user_args because we do this on our own
+		unset( $user_args['post_type'] );
+		unset( $user_args['posts_per_page'] );
+		unset( $user_args['order_by'] );
+
+		$posts_per_page = $limit;
+		if ( $sort ) {
+			//Because we have to order the events later in the function, we need all events
+			$posts_per_page = - 1;
+		}
+		$args  = array(
 				'post_type'      => self::get_event_post_type(),
-				'posts_per_page' => $limit,
+				'posts_per_page' => $posts_per_page,
 		);
-		//Order is important because $args should overwrite $user_args if keys are duplicate
-		//We do this because order_by will be overwritten by php sort, so it's more consistent to do this also for $limit
-		array_merge( $user_args, $args );
-		$posts = get_posts( $args );
+		$posts = get_posts( array_merge( $user_args, $args ) );
+
+		//Use all events if $start_period and $end_period are undefined
+		$events = $posts;
+
+		/* @var DatePeriod $start_period */
 		$events = array();
 		/** @var WP_Post[] $posts */
 		foreach ( $posts as $post ) {
-			//TODO Add date_range with option if start or/and end date should be in the range, delete hardcoded 2014
 			$event = new Ems_Event( $post );
 			/** @var DateTime $date_time */
 			$timestamp = $event->get_start_date_time()->getTimestamp();
 			$year      = date( 'Y', $timestamp );
+			//TODO Use $start_period and $end_period
 			if ( $year == 2014 ) {
 				//$events[] = array( 'title' => $post->post_title, 'value' => 'ID_' . $post->ID, 'ID' => $post->ID );
 				$events[] = $event;
 			}
 		}
-		uasort( $events, array( 'Ems_Event', 'compare' ) );
+
+
+		if ( $sort ) {
+			if ( NULL === $user_sort_callback ) {
+				$user_sort_callback = array( __CLASS__, 'compare' );
+			}
+			if ( false === usort( $events, $user_sort_callback ) ) {
+				throw new Exception( "Couldn't sort events with " . print_r( $user_sort_callback, true ) . " as callback function" );
+			}
+			if ( $reverse_order ) {
+				$events = array_reverse( $events );
+			}
+		}
+
+		//Take the first $limit elements if array is sorted, if not we have done this via posts_per_page
+		if ( $sort && $limit > - 1 ) {
+			$events = array_splice( $events, 0, $limit );
+		}
 		return $events;
 	}
 

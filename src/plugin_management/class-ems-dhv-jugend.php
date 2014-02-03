@@ -185,9 +185,6 @@ class Ems_Dhv_Jugend {
 	public static function add_meta_box_to_event() {
 		global $wp_meta_boxes;
 
-
-		unset( $wp_meta_boxes['event']['side']['core']['submitdiv'] );
-		add_meta_box( 'submitdiv', __( 'Publish' ), array( 'Ems_Dhv_Jugend', 'post_submit_meta_box_fum' ), 'event', 'side', 'core' );
 		add_meta_box( 'register_form', 'Optionen', array( 'Ems_Dhv_Jugend', 'add_registration_form_meta_box' ), 'event', 'normal', 'core' );
 		add_meta_box( 'calendar_meta_box', 'Kalender', array( 'Ems_Dhv_Jugend', 'add_calendar_meta_box' ), 'event', 'side', 'core' );
 

@@ -33,6 +33,9 @@ class Ems_Initialisation {
 //		//Create plugin admin menu page
 //		add_action( 'admin_menu', array( 'Ems_Participant_List_Controller', 'create_menu' ) );
 
+		//Redirect 'event' url parameter to 'ems_event' because event seems to be reserved from wordpress
+		add_action( 'parse_request', array( 'Ems_Redirect', 'redirect_event_parameter' ) );
+
 		add_action( 'add_meta_boxes', array( 'Ems_Dhv_Jugend', 'add_meta_box_to_event' ), 10, 2 );
 		add_action( 'init', array( 'Ems_Initialisation', 'add_event_post_type' ) );
 		add_action( 'do_meta_boxes', array( 'Ems_Dhv_Jugend', 'remove_metabox_layout' ) );

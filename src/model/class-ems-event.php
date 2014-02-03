@@ -202,7 +202,7 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	 *                         is $sorted false $limit random events will be returned
 	 * @param array $user_args additional arguments for get_posts, order_by and post_per_page is ignored if $sorted/$limit is set!
 	 *
-	 * @return Fum_Event[] Sorted (if $sorted=true)
+	 * @return Ems_Event[] Sorted (if $sorted=true)
 	 */
 	public static function get_events( $sorted = true, $limit = -1, array $user_args = array() ) {
 
@@ -214,7 +214,6 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 		//We do this because order_by will be overwritten by php sort, so it's more consistent to do this also for $limit
 		array_merge( $user_args, $args );
 		$posts = get_posts( $args );
-
 		$events = array();
 		/** @var WP_Post[] $posts */
 		foreach ( $posts as $post ) {
@@ -229,7 +228,6 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 			}
 		}
 		uasort( $events, array( 'Ems_Event', 'compare' ) );
-
 		return $events;
 	}
 

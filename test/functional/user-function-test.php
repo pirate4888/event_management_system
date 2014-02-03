@@ -247,14 +247,31 @@ class User_Function_Test extends SauceWrapper {
 
 		$events = Ems_Event::get_events();
 		//Check if there is at least one event
-		$this->assertGreaterThan( 0, count( $events ) );
+		$this->assertGreaterThan( 1, count( $events ) );
 		$selected_event = $events[0];
 
 		$event_registration_post_id = get_option( Fum_Conf::$fum_event_registration_page );
 		$this->url( get_permalink( $event_registration_post_id ) );
-		$this->assertContains( get_the_title( $event_registration_post_id ), $this->title() );
-		$select = $this->select( $this->byName( 'ems_event' ) );
 
+		$this->assertContains( get_the_title( $event_registration_post_id ), $this->title() );
+
+		//Check if select event form is loaded
+		$driver                  = $this;
+		$spin_assert_form_loaded = function () use ( $driver ) {
+			try {
+				$driver->byName( 'ems_event' );
+				return true;
+			} catch ( Exception $e ) {
+				return false;
+			}
+		};
+		$this->spinAssert( "Couldn't find event selection ('ems_event') formular", $spin_assert_form_loaded );
+		$select         = $this->select( $this->byName( 'ems_event' ) );
+		$selected_value = $select->selectedValue();
+		//Avoid that we select the already selected element because this is no challenge
+		if ( $selected_value == 'ID_' . $selected_event->get_post()->ID ) {
+			$selected_event = $events[1];
+		}
 		$select->selectOptionByValue( 'ID_' . $selected_event->get_post()->ID );
 		//Selection should force load via javascript, so check if the new page was loaded
 		$driver            = $this;

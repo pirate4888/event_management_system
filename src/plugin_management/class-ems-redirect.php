@@ -10,7 +10,6 @@ class Ems_Redirect {
 	 * Redirects fum_event_registration with 'event' parameter to fum_event_registration with Fum_Event_Registration_Controller::$event_get_parameter
 	 * This necessary because 'event' seems to be a reserved parameter in wordpress
 	 */
-
 	public static function redirect_event_parameter() {
 		global $wp;
 		if ( isset( $_REQUEST['event'] ) && url_to_postid( trim( site_url( $wp->request ), '/' ) ) == get_option( Fum_Conf::$fum_event_registration_page ) ) {

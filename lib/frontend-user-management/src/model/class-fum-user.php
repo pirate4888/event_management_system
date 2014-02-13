@@ -1,9 +1,9 @@
 <?php
+
 /**
  * @author Christoph Bessei
  * @version
  */
-
 class Fum_User extends Fum_Observable implements Fum_Observer {
 
 	private static $object = NULL;
@@ -51,22 +51,23 @@ class Fum_User extends Fum_Observable implements Fum_Observer {
 			case Fum_Conf::$fum_edit_form_unique_name:
 			case Fum_Conf::$fum_event_register_form_unique_name:
 			case Fum_Conf::$fum_register_form_unique_name:
-				if ( is_user_logged_in() ) {
-					$ID = get_current_user_id();
-				}
-				else {
-					$ID = $form->get_input_field( 'fum_ID' )->get_value();
+
+			$ID = get_current_user_id();
+			if ( 0 === $ID ) {
+				$ID = $form->get_input_field( 'fum_ID' )->get_value();
 				}
 				$user_data_fields = get_userdata( $ID )->to_array();
 				$user_data        = array();
 				foreach ( $form->get_input_fields() as $input_field ) {
+					$value = $input_field->get_value();
+					$name  = $input_field->get_name();
 					//Check if input_field contains the data of a default wordpress user field
-					if ( in_array( $input_field->get_name(), $user_data_fields ) ) {
-						$user_data[$input_field->get_name()] = $input_field->get_value();
+					if ( in_array( $name, $user_data_fields ) ) {
+						$user_data[$name] = $value;
 					}
 					else {
-						if ( in_array( $input_field->get_name(), self::$user_fields ) ) {
-							update_user_meta( get_current_user_id(), $input_field->get_name(), $input_field->get_value() );
+						if ( in_array( $name, self::$user_fields ) ) {
+							update_user_meta( $ID, $name, $value );
 						}
 					}
 				}

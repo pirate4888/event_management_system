@@ -34,7 +34,7 @@ class Ems_Event_Test extends WP_UnitTestCase {
 	 * Tests if the returned event array is really sorted (used compare fuction is Ems_Event->compare)
 	 */
 	public function test_get_events_sorted() {
-		$events = Ems_Event::get_events( - 1, true );
+		$events = Ems_Event::get_events();
 
 		$this->assertGreaterThan( 1, count( $events ), 'At least two elements are needed to check order' );
 
@@ -51,6 +51,26 @@ class Ems_Event_Test extends WP_UnitTestCase {
 			if ( $first_start_date == $second_start_date && $first_end_date != $second_end_date ) {
 				$this->assertTrue( $first_end_date < $second_end_date, 'start dates are equal and end dates differ but end date of first element is great then end date of second element. first_end_date: ' . $first_end_date->getTimestamp() . ' seocond_end_date: ' . $second_end_date->getTimestamp() );
 			}
+		}
+	}
+
+	public function test_get_events_limit() {
+		$this->assertEquals( 5, count( Ems_Event::get_events( 5 ) ) );
+		$this->assertEquals( 1, count( Ems_Event::get_events( 1 ) ) );
+
+		$this->assertEquals( 5, count( Ems_Event::get_events( 5, false ) ) );
+		$this->assertEquals( 1, count( Ems_Event::get_events( 1, false ) ) );
+
+	}
+
+	public function test_get_events_reverse() {
+		$events         = Ems_Event::get_events();
+		$reverse_events = Ems_Event::get_events( - 1, true, true );
+
+		$reverse_events2 = array_reverse( $events );
+
+		foreach ( $reverse_events as $key => $event ) {
+			$this->assertEquals( $event->get_post()->post_title, $reverse_events2[$key]->get_post()->post_title );
 		}
 	}
 }

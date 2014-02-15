@@ -42,9 +42,9 @@ class Event_Management_System {
 
 	}
 
-	public function remove_fum_option_page( $options ) {
-		return array();
-	}
+//	public function remove_fum_option_page( $options ) {
+//		return array();
+//	}
 
 
 	public function autoload( $class_name ) {

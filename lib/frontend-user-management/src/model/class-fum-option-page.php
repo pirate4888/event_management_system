@@ -1,10 +1,10 @@
 <?php
+
 /**
  * @author Christoph Bessei
  * @version
  */
-
-class Fum_Option_Page {
+class Fum_Option_Page extends Fum_Observable {
 	private $name;
 	private $title;
 	private $option_groups;
@@ -19,6 +19,7 @@ class Fum_Option_Page {
 	public function __construct( $name, $title ) {
 		$this->name  = $name;
 		$this->title = $title;
+		$this->setChanged();
 	}
 
 	public function add_option_group( Fum_Option_Group $option_group ) {
@@ -29,6 +30,9 @@ class Fum_Option_Page {
 	 * @param Fum_Option_Group[] $option_groups
 	 */
 	public function set_option_groups( array $option_groups ) {
+		if ( $option_groups !== $this->option_groups ) {
+			$this->setChanged();
+		}
 		$this->option_groups = $option_groups;
 	}
 
@@ -43,6 +47,9 @@ class Fum_Option_Page {
 	 * @param mixed $name
 	 */
 	public function set_name( $name ) {
+		if ( $name !== $this->name ) {
+			$this->setChanged();
+		}
 		$this->name = $name;
 	}
 
@@ -57,7 +64,11 @@ class Fum_Option_Page {
 	 * @param mixed $title
 	 */
 	public function set_title( $title ) {
+		if ( $title !== $this->title ) {
+			$this->setChanged();
+		}
 		$this->title = $title;
+
 	}
 
 	/**
@@ -66,5 +77,4 @@ class Fum_Option_Page {
 	public function get_title() {
 		return $this->title;
 	}
-
 } 

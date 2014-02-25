@@ -1,8 +1,8 @@
 <?php
+
 /**
  * From http://ken-soft.com/2011/11/20/php-observerobservable-design-pattern/
  */
-
 class Fum_Observable {
 
 	private $changed = false;
@@ -14,7 +14,7 @@ class Fum_Observable {
 		if ( $o == null ) {
 			throw new Exception();
 		}
-		$contains = 0;
+		$contains = false;
 		foreach ( $this->observers as $observer ) {
 			if ( $o === $observer ) {
 				$contains = true;
@@ -50,28 +50,23 @@ class Fum_Observable {
 
 	}
 
-	public
-	function deleteObservers() {
+	public function deleteObservers() {
 		$this->observers = array();
 	}
 
-	protected
-	function setChanged() {
+	protected function setChanged() {
 		$this->changed = true;
 	}
 
-	protected
-	function clearChanged() {
+	protected function clearChanged() {
 		$this->changed = false;
 	}
 
-	public
-	function hasChanged() {
+	public function hasChanged() {
 		return $this->changed;
 	}
 
-	public
-	function countObservers() {
+	public function countObservers() {
 		return count( $this->observers );
 	}
 

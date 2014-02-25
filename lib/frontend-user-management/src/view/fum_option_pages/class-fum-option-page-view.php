@@ -1,27 +1,40 @@
 <?php
+
 /**
  * @author  Christoph Bessei
  * @version 0.01
  */
-class Fum_Option_Page_View {
-	public static function print_option_page() {
+class Fum_Option_Page_View implements Fum_Observer {
 
-		if ( $_GET['page'] === Fum_Option_Page_Controller::$parent_slug ) {
-			$option_page = Fum_Option_Page_Controller::$pages[0];
+	private static $instance = NULL;
+
+
+	public static function get_instance() {
+		if ( NULL === self::$instance ) {
+			self::$instance = new self;
+		}
+		return self::$instance;
+	}
+
+	private function __construct() {
+	}
+
+	private function __clone() {
+	}
+
+	public function update( Fum_Observable $o ) {
+		if ( $o instanceof Fum_Option_Page ) {
+			self::print_option_page( $o );
 		}
 		else {
-			foreach ( Fum_Option_Page_Controller::$pages as $page ) {
-				if ( $_GET['page'] === $page->get_name() ) {
-					$option_page = $page;
-					break;
-				}
-			}
+			throw new Exception( 'Cannot print object of class ' . get_class( $o ) );
 		}
+	}
 
 
+	private static function print_option_page( Fum_Option_Page $option_page ) {
 		?>
 		<div class="wrap">
-			<?php screen_icon(); ?>
 			<h2>Frontend User Management - <?php _e( $option_page->get_title(), 'fum_text_domain' ); ?></h2>
 			<?php foreach ( $option_page->get_option_groups() as $option_group ): ?>
 				<?php /*var @$option_group Fum_Option_Group*/ ?>
@@ -33,10 +46,11 @@ class Fum_Option_Page_View {
 								<th scope="row" title="<?php _e( $option->get_title(), 'fum_text_domain' ); ?>"><?php _e( $option->get_title(), 'fum_text_domain' ); ?></th>
 								<td>
 									<?php
+									echo $option->get_pre_option_html();
 									switch ( $option->get_type() ) {
 										case 'text':
 											?>
-											<input type="text" name="<?php echo $option->get_name(); ?>" value="<?php echo $option->get_value(); ?>" />
+											<input type="text" id="<?php echo $option->get_name(); ?>" name="<?php echo $option->get_name(); ?>" value="<?php echo $option->get_value(); ?>" class="<?php echo $option->get_class(); ?>" />
 											<?php
 
 											break;
@@ -44,24 +58,24 @@ class Fum_Option_Page_View {
 
 											?>
 
-											<input type="password" name="<?php echo $option->get_name(); ?>" value="<?php echo $option->get_value(); ?>" />
+											<input type="password" id="<?php echo $option->get_name(); ?>" name="<?php echo $option->get_name(); ?>" value="<?php echo $option->get_value(); ?>" />
 											<?php
 											break;
 										case 'checkbox':
 											?>
-											<input type="checkbox" name="<?php echo( $option->get_name() ); ?>" value="1" <?php checked( $option->get_value(), 1 ); ?>/>
+											<input type="checkbox" id="<?php echo $option->get_name(); ?>" name="<?php echo( $option->get_name() ); ?>" value="1" <?php checked( $option->get_value(), 1 ); ?>/>
 											<?php
 											break;
 										case 'radio':
 											foreach ( $option->get_possible_values() as $value ): ?>
-												<input type="radio" name="<?php echo( $option->get_name() ); ?>" value="<?php echo $value; ?>" <?php checked( $option->get_value(), $value ); ?>/> <?php echo $value; ?>
+												<input type="radio" id="<?php echo $option->get_name(); ?>" name="<?php echo( $option->get_name() ); ?>" value="<?php echo $value; ?>" <?php checked( $option->get_value(), $value ); ?>/> <?php echo $value; ?>
 												<br />
 											<?php
 											endforeach;
 											break;
 										case 'select':
 											?>
-											<select name="<?php echo $option->get_name(); ?>" <?php echo ( $option->get_multiple_selection() ) ? 'multiple="multiple"' : '' ?>>
+											<select id="<?php echo $option->get_name(); ?>" name="<?php echo $option->get_name(); ?>" <?php echo ( $option->get_multiple_selection() ) ? 'multiple="multiple"' : '' ?>>
 												<?php foreach ( $option->get_possible_values() as $value ): ?>
 													<option value="<?php echo $value ?>" <?php selected( $option->get_value(), $value ); ?>><?php echo $value ?></option>
 												<?php endforeach; ?>
@@ -71,10 +85,11 @@ class Fum_Option_Page_View {
 
 										case 'textarea':
 											?>
-											<textarea name="<?php echo( $option->get_name() ); ?>"><?php echo( $option->get_value() ); ?></textarea>
+											<textarea id="<?php echo $option->get_name(); ?>" name="<?php echo( $option->get_name() ); ?>"><?php echo( $option->get_value() ); ?></textarea>
 											<?php
 											break;
 									}
+									echo $option->get_post_option_html();
 									?>
 								</td>
 							</tr>

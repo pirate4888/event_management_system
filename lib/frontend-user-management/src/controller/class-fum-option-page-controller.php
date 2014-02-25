@@ -1,9 +1,9 @@
 <?php
+
 /**
  * @author Christoph Bessei
  * @version
  */
-
 class Fum_Option_Page_Controller {
 
 	public static $parent_slug = 'fum';
@@ -19,6 +19,7 @@ class Fum_Option_Page_Controller {
 
 		//Add General Settings Page
 		$page = new Fum_Option_Page( 'general_settings_page', 'Allgemeine Einstellungen' );
+		$page->addObserver( Fum_Option_Page_View::get_instance() );
 
 		//Add General Settings Fum_Option Group
 		$option_group = new Fum_Option_Group( Fum_Conf::$fum_general_option_group_hide_wp_login_php );
@@ -138,7 +139,7 @@ class Fum_Option_Page_Controller {
 		self::$pages = $pages;
 
 		//Add main menu
-		add_menu_page( 'Frontend User Management', 'Frontend User Management', 'manage_options', self::$parent_slug, array( 'Fum_Option_Page_View', 'print_option_page' ) );
+		add_menu_page( 'Frontend User Management', 'Frontend User Management', 'manage_options', self::$parent_slug, array( $page, 'notifyObservers' ) );
 		//Add first submenu to avoid duplicate entries: http://wordpress.org/support/topic/top-level-menu-duplicated-as-submenu-in-admin-section-plugin
 		add_submenu_page( self::$parent_slug, $pages[0]->get_title(), $pages[0]->get_title(), 'manage_options', self::$parent_slug );
 		//remove first submenu because we used this already
@@ -146,7 +147,7 @@ class Fum_Option_Page_Controller {
 
 		foreach ( $pages as $page ) {
 			/*@var $page Fum_Option_Page */
-			add_submenu_page( self::$parent_slug, $page->get_title(), $page->get_title(), 'manage_options', $page->get_name(), array( 'Fum_Option_Page_View', 'print_option_page' ) );
+			add_submenu_page( self::$parent_slug, $page->get_title(), $page->get_title(), 'manage_options', $page->get_name(), array( $page, 'notifyObservers' ) );
 		}
 	}
 

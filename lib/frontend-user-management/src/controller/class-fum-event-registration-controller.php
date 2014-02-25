@@ -5,7 +5,6 @@
  * @version
  */
 class Fum_Event_Registration_Controller {
-	//TODO PHP does not allow setting default values via functions, search a workaround so that 'ems' is set from Ems_Conf
 	public static $event_get_parameter = 'ems_event';
 
 	public static function create_event_registration_form() {

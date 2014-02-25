@@ -1,21 +1,40 @@
 <?php
+
 /**
  * @author Christoph Bessei
  * @version
  */
-
 class Fum_Option {
 	private $name;
 	private $title;
 	private $description;
 	private $value;
+	private $class;
 	private $option_group;
-	private $type; /*Possible types are the html input field types (text,password, checkbox , select etc.) */
-	private $possible_values; /*Used for select types, $value is the current value and $possible_values are the possible values which are shown in the dropdown */
+	/**
+	 * Possible types are the html input field types (text,password, checkbox , select etc.)
+	 * @var string
+	 */
+	private $type;
+	/**
+	 * Used for select types, $value is the current value and $possible_values are the possible values which are shown in the dropdown
+	 * @var array
+	 */
+	private $possible_values;
 	private $multiple_selection;
+	/**
+	 * Content is printed before the input field, maybe useful for something :-)
+	 * @var string
+	 */
+	private $pre_option_html;
+	/**
+	 * Content is printed after the input field, e.g. useful if you want to add some javascript
+	 * @var string
+	 */
+	private $post_option_html;
 
 
-	public function __construct( $name, $title, $description, $value, Fum_Option_Group $option_group, $type, $possible_values = NULL, $multiple_selection = false ) {
+	public function __construct( $name, $title, $description, $value, Fum_Option_Group $option_group, $type, $possible_values = array(), $multiple_selection = false, $pre_option_html = '', $post_option_html = '' ) {
 		$this->name               = $name;
 		$this->title              = $title;
 		$this->description        = $description;
@@ -24,6 +43,8 @@ class Fum_Option {
 		$this->type               = $type;
 		$this->possible_values    = $possible_values;
 		$this->multiple_selection = $multiple_selection;
+		$this->pre_option_html    = $pre_option_html;
+		$this->post_option_html   = $post_option_html;
 	}
 
 	/**
@@ -137,6 +158,48 @@ class Fum_Option {
 	 */
 	public function get_multiple_selection() {
 		return $this->multiple_selection;
+	}
+
+	/**
+	 * @param string $post_option_html
+	 */
+	public function set_post_option_html( $post_option_html ) {
+		$this->post_option_html = $post_option_html;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_post_option_html() {
+		return $this->post_option_html;
+	}
+
+	/**
+	 * @param string $pre_option_html
+	 */
+	public function set_pre_option_html( $pre_option_html ) {
+		$this->pre_option_html = $pre_option_html;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_pre_option_html() {
+		return $this->pre_option_html;
+	}
+
+	/**
+	 * @param mixed $class
+	 */
+	public function set_class( $class ) {
+		$this->class = $class;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_class() {
+		return $this->class;
 	}
 
 

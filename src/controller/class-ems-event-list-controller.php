@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @author Christoph Bessei
- * @version
+ * @author  Christoph Bessei
+ * @version 0.04
  */
 class Ems_Event_List_Controller {
 
@@ -11,17 +11,25 @@ class Ems_Event_List_Controller {
 		$events = Ems_Event::get_events();
 
 		foreach ( $events as $event ) {
-			/** @var DateTime $start_date */
-			$start_date = get_post_meta( $event->ID, 'ems_start_date', true );
-			$start_date = date( 'd.m.y', $start_date->getTimestamp() );
-			/** @var DateTime $end_date */
-			$end_date = get_post_meta( $event->ID, 'ems_end_date', true );
-
-			$end_date = date( 'd.m.y', $end_date->getTimestamp() );
-
+			/** @var DateTime $start_date_object */
+			$start_date_object = $event->get_start_date_time();
+			$start_date        = "";
+			if ( NULL !== $start_date_object ) {
+				$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
+			}
+			/** @var DateTime $end_date_object */
+			$end_date_object = $event->get_end_date_time();
+			$end_date        = "";
+			if ( NULL !== $end_date_object ) {
+				$end_date = date_i18n( get_option( 'date_format' ), $end_date_object->getTimestamp() );
+			}
+			$date_string = "";
+			if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+				$date_string = $start_date . ' - ' . $end_date;
+			}
 			?>
 			<p><a href="<?php echo get_permalink( $event->ID ); ?>"><?php echo $event->post_title; ?></a>
-				<i><?php echo $start_date . ' - ' . $end_date; ?> </i></p>
+				<i><?php echo $date_string; ?> </i></p>
 
 		<?php
 		}

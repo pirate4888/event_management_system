@@ -25,23 +25,25 @@ class Ems_Participant_List_Controller {
 			}
 			return;
 		}
-		$posts = Ems_Event::get_events();
+		$events = Ems_Event::get_events();
 
 		$form = new Fum_Html_Form( 'fum_parctipant_list_form', 'fum_participant_list_form', '#' );
 		$form->add_input_field( new Fum_Html_Input_Field( 'select_event', 'select_event', new Html_Input_Type_Enum( Html_Input_Type_Enum::SELECT ), 'Eventauswahl', 'select_event', false ) );
 
-		/** @var WP_Post[] $posts */
-		foreach ( $posts as $post ) {
-			/** @var DateTime $date_time */
-			$date_time = get_post_meta( $post->ID, 'ems_start_date', true );
 
-			$timestamp = $date_time->getTimestamp();
-			$year      = date( 'Y', $timestamp );
+		foreach ( $events as $event ) {
 
-			$title             = $post->post_title . ' ' . $year . ' (' . count( Ems_Event_Registration::get_registrations_of_event( $post->ID ) ) . ')';
-			$value             = 'ID_' . $post->ID;
+			$date_time = $event->get_start_date_time();
+			$year      = '';
+			if ( NULL !== $date_time ) {
+				$timestamp = $date_time->getTimestamp();
+				$year      = date( 'Y', $timestamp );
+			}
+
+			$title             = $event->post_title . ' ' . $year . ' (' . count( Ems_Event_Registration::get_registrations_of_event( $event->ID ) ) . ')';
+			$value             = 'ID_' . $event->ID;
 			$possible_values   = $form->get_input_field( 'select_event' )->get_possible_values();
-			$possible_values[] = array( 'title' => $title, 'value' => $value, 'ID' => $post->ID );
+			$possible_values[] = array( 'title' => $title, 'value' => $value, 'ID' => $event->ID );
 			$form->get_input_field( 'select_event' )->set_possible_values( $possible_values );
 		}
 		if ( isset( $_REQUEST[Fum_Conf::$fum_input_field_select_event] ) ) {

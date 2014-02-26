@@ -4,6 +4,16 @@ class Event_Management_System {
 
 	private static $plugin_path = NULL;
 	private static $plugin_url = NULL;
+	private static $src_directories = array(
+			'controller',
+			'lib',
+			'model',
+			'view',
+			'utility',
+			'plugin_management',
+			'../../../../wp-includes',
+			'abstract_class'
+	);
 
 	public function __construct( $plugin_path = NULL, $plugin_url = NULL ) {
 
@@ -51,37 +61,28 @@ class Event_Management_System {
 
 		if ( 'WP_GitHub_Updater' === $class_name ) {
 			require_once( __DIR__ . '/../lib/updater.php' );
+			return;
 		}
 
 		//Because of sucking wordpress name conventions class name != file name, convert it manually
 		$class_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) . '.php' );
 		if ( file_exists( Event_Management_System::$plugin_path . $class_name ) ) {
 			require_once( Event_Management_System::$plugin_path . $class_name );
+			return;
 		}
-		elseif ( file_exists( Event_Management_System::$plugin_path . 'controller/' . $class_name ) ) {
-			require_once( Event_Management_System::$plugin_path . 'controller/' . $class_name );
-		}
-		elseif ( file_exists( Event_Management_System::$plugin_path . '../lib/' . $class_name ) ) {
-			require_once( Event_Management_System::$plugin_path . '../lib/' . $class_name );
-		}
-		elseif ( file_exists( Event_Management_System::$plugin_path . 'model/' . $class_name ) ) {
-			require_once( Event_Management_System::$plugin_path . 'model/' . $class_name );
-		}
-		elseif ( file_exists( Event_Management_System::$plugin_path . 'view/' . $class_name ) ) {
-			require_once( Event_Management_System::$plugin_path . 'view/' . $class_name );
-		}
-		elseif ( file_exists( Event_Management_System::$plugin_path . 'utility/' . $class_name ) ) {
-			require_once( Event_Management_System::$plugin_path . 'utility/' . $class_name );
-		}
-		elseif ( file_exists( Event_Management_System::$plugin_path . 'plugin_management/' . $class_name ) ) {
-			require_once( Event_Management_System::$plugin_path . 'plugin_management/' . $class_name );
-		}
-		elseif ( file_exists( Event_Management_System::$plugin_path . '../../../../wp-includes/' . $class_name ) ) {
-			require_once( Event_Management_System::$plugin_path . '../../../../wp-includes/' . $class_name );
+
+		foreach ( self::$src_directories as $dir ) {
+			$dir  = trailingslashit( $dir );
+			$path = Event_Management_System::$plugin_path . $dir . $class_name;
+			if ( file_exists( $path ) ) {
+				require_once( $path );
+				return;
+			}
 		}
 	}
 
-	public static function get_plugin_path() {
+	public
+	static function get_plugin_path() {
 		return self::$plugin_path;
 	}
 

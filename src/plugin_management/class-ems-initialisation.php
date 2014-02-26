@@ -40,7 +40,8 @@ class Ems_Initialisation {
 		add_action( 'init', array( 'Ems_Initialisation', 'add_event_post_type' ) );
 		add_action( 'do_meta_boxes', array( 'Ems_Dhv_Jugend', 'remove_metabox_layout' ) );
 		add_action( 'widgets_init', create_function( '', 'return register_widget("Ems_Dhv_Jugend_Widget");' ) );
-		add_action( 'admin_enqueue_scripts', array( 'Ems_Dhv_Jugend', 'enqueue_datepicker_jquery' ) );
+		add_action( 'admin_enqueue_scripts', array( 'Ems_Script_Enqueue', 'admin_enqueue_script' ) );
+		add_action( 'wp_enqueue_scripts', array( 'Ems_Script_Enqueue', 'enqueue_script' ) );
 		add_action( 'save_post', array( 'Ems_Dhv_Jugend', 'save_meta_data_of_event' ) );
 	}
 
@@ -52,7 +53,7 @@ class Ems_Initialisation {
 						'public'             => true,
 						'publicly_queryable' => true,
 						'show_ui'            => true,
-						'post_type'          => Ems_Conf::$ems_custom_event_post_type,
+						'post_type' => Ems_Event::get_event_post_type(),
 						'show_in_menu'       => true,
 						'query_var'          => true,
 						'rewrite'            => true,
@@ -66,18 +67,18 @@ class Ems_Initialisation {
 	}
 
 	/**
-	 * Calls shortcode callback_header function in wp_head, useful for  add styles,scripts, change title, etc.
+	 * Calls shortcode callback_header function in wp_head, useful for add styles,scripts, change title, etc.
 	 *
 	 *
-	 * <p>Checks if the current post (it checks the complete WP_Post object) contains a shortcode with the FUM_NAME_PREFIX
+	 * <p>Checks if the current post (it checks the complete WP_Post object) contains a shortcode with the EMS_NAME_PREFIX
 	 * If a shortcode is found it takes the callback functionname adds _header and calls it (if it's callable)</p>
 	 *
 	 * <p><b>Example:</b></p>
-	 * <code>add_shortcode('FUM_NAME_PREFIX_test',array('Classname','functionname'));</code>
+	 * <code>add_shortcode('EMS_NAME_PREFIX_test',array('Classname','functionname'));</code>
 	 * then the following is called:<br>
 	 * <code>call_user_func(array('Classname','functionname_header'));</code>
 	 *
-	 * <code>add_shortcode('FUM_NAME_PREFIX_test','functionname');</code>
+	 * <code>add_shortcode('EMS_NAME_PREFIX_test','functionname');</code>
 	 * then the following is called:
 	 * <code>call_user_func('functionname_header');</code>
 	 */

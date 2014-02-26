@@ -5,7 +5,7 @@
  * @version
  */
 class Ems_Event_Report extends Ems_Post {
-	private static $post_type = 'ems_event_report';
+	protected static $post_type = 'ems_event_report';
 	/**
 	 * The event which the report is connected to
 	 * @var Ems_Event

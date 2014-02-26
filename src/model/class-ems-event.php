@@ -8,73 +8,52 @@
  * Class Ems_Event quasi(!) extends WP_Post, because WP_Post is final it fake the extends via __get and __set method
  * e.g you can access the WP_Post variable $post_title via $event->post_title
  */
-class Ems_Event extends Fum_Observable implements Fum_Observer {
+class Ems_Event extends Ems_Post {
 
 	//TODO Should be ems_event
-	private static $post_type = 'event';
+	protected static $post_type = 'event';
 
-	private static $object = NULL;
+	private static $start_date_meta_key = 'ems_start_date';
+	private static $end_date_meta_key = 'ems_end_date';
+	private static $leader_meta_key = 'ems_event_leader';
+	private static $show_event_meta_key = 'ems_show_event';
+
 
 	private $start_date_time;
 	private $end_date_time;
+	/**
+	 * If $show_event is true, the event will be shown even if the start and end date do not fit the requirements.
+	 *
+	 * @var bool
+	 */
+	private $show_event;
+	/**
+	 * place of event
+	 * @var ???
+	 */
 	private $location;
+
 	private $leader;
-	private $post;
 
 	public function __construct( WP_Post $post = NULL ) {
 		if ( NULL !== $post ) {
 			$this->post            = $post;
-			$this->start_date_time = get_post_meta( $post->ID, 'ems_start_date', true );
+			$this->start_date_time = get_post_meta( $post->ID, self::$start_date_meta_key, true );
 			if ( empty( $this->start_date_time ) ) {
-				$this->start_date_time = new DateTime();
-				$this->start_date_time->setTimestamp( 0 );
+				$this->start_date_time = NULL;
 			}
-			$this->end_date_time = get_post_meta( $post->ID, 'ems_end_date', true );
+			$this->end_date_time = get_post_meta( $post->ID, self::$end_date_meta_key, true );
 			if ( empty( $this->end_date_time ) ) {
-				$this->end_date_time = new DateTime();
-				$this->end_date_time->setTimestamp( 0 );
+				$this->end_date_time = NULL;
 			}
 
-			$this->leader = get_userdata( get_post_meta( $post->ID, 'ems_event_leader', true ) );
+			$this->leader = get_userdata( get_post_meta( $post->ID, self::$leader_meta_key, true ) );
 			if ( false === $this->leader ) {
-				$this->leader = get_post_meta( $post->ID, 'ems_event_leader', true );
+				$this->leader = get_post_meta( $post->ID, self::$leader_meta_key, true );
 			}
-		}
-	}
 
-	/**
-	 * With __get you can access Ems_Event like an WP_Post e.g. $event->ID returns the post ID
-	 * For consistency also the event member variables are accessible like this e.g. $event->end_date_time
-	 *
-	 * Be careful: If WP_Post and Ems_Event have a variable with the same name, Ems_Event variable is used
-	 *
-	 * @param string $var name of the class variable
-	 *
-	 * @return array|mixed
-	 */
-	public function __get( $var ) {
-		if ( property_exists( $this, $var ) ) {
-			return $this->$var;
+			$this->show_event = get_post_meta( $post->ID, self::$show_event_meta_key, true );
 		}
-
-		if ( NULL !== $this->post ) {
-			return $this->post->$var;
-		}
-		throw new Exception( "Property " . $var . " does not exist in Ems_Event and WP_Post property is NULL" );
-	}
-
-	/**
-	 * Calls the underlying WP_Post functions
-	 *
-	 * @param $method
-	 * @param $args
-	 */
-	public function __call( $method, $args ) {
-		//__call is not called if the function exists in Ems_Event, so we just have to check if the function exists in WP_Post
-		if ( is_callable( array( $this->post, $method ) ) ) {
-			return call_user_func_array( array( $this->post, $method ), $args );
-		}
-		throw new Exception( "Tried to call function: " . print_r( $method, true ) . " which does not exist in WP_Post and Ems_Event" );
 	}
 
 	/**
@@ -120,20 +99,6 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	}
 
 	/**
-	 * @param WP_Post $post
-	 */
-	public function set_post( $post ) {
-		$this->post = $post;
-	}
-
-	/**
-	 * @return WP_Post
-	 */
-	public function get_post() {
-		return $this->post;
-	}
-
-	/**
 	 * @param mixed $location
 	 */
 	public function set_location( $location ) {
@@ -145,6 +110,20 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	 */
 	public function get_location() {
 		return $this->location;
+	}
+
+	/**
+	 * @param boolean $show_event
+	 */
+	public function set_show_event( $show_event ) {
+		$this->show_event = $show_event;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function get_show_event() {
+		return $this->show_event;
 	}
 
 
@@ -173,7 +152,7 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 
 		$a_start = 0;
 		if ( $a->get_start_date_time() instanceof DateTime ) {
-			$a_start = $a->start_date_time->getTimestamp();
+			$a_start = $a->get_start_date_time()->getTimestamp();
 		}
 
 		$b_start = 0;
@@ -209,15 +188,17 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 	/**
 	 * Returns an array of events (posts with post_type Ems_Event::$post_type)
 	 *
-	 * @param int      $limit              limits the returned events. If $sort the events gets sorted first and then the first $limit events will be returned
-	 *                                     without sort
-	 * @param bool     $sort               sort events (true) or not (false)
-	 * @param bool     $reverse_order      reverse the order after sort, has no affect if $sort=false
-	 * @param callable $user_sort_callback function which compares two Ems_Event objects, used with usort(). Default is Ems_Event->compare
-	 * @param array    $user_args          array of arguments to use in wordpress get_posts. 'post_type','posts_per_page' and 'order_by' are ignored! Use $sort and $limit instead
+	 * @param int             $limit              limits the returned events. If $sort the events gets sorted first and then the first $limit events will be returned
+	 *                                            without sort
+	 * @param bool            $sort               sort events (true) or not (false)
+	 * @param bool            $reverse_order      reverse the order after sort, has no affect if $sort=false
+	 * @param callable        $user_sort_callback function which compares two Ems_Event objects, used with usort(). Default is Ems_Event->compare
+	 * @param array           $user_args          array of arguments to use in wordpress get_posts. 'post_type','posts_per_page' and 'order_by' are ignored! Use $sort and $limit instead
+	 * @param Ems_Date_Period $start_period       period in which the event should start, if $start_period AND $end_period are NOT set, no filtering is done
+	 * @param Ems_Date_Period $end_period         period in which the event should end
 	 *
+	 * @throws Exception
 	 * @return Ems_Event[]    returns an array of Ems_Event
-	 * @throws Exception      throws exception if there occurs an error during sort
 	 */
 	public static function get_events( $limit = -1, $sort = true, $reverse_order = false, callable $user_sort_callback = NULL, array $user_args = array(), Ems_Date_Period $start_period = NULL, Ems_Date_Period $end_period = NULL ) {
 
@@ -241,22 +222,25 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 		);
 		$posts = get_posts( array_merge( $user_args, $args ) );
 
-		//Use all events if $start_period and $end_period are undefined
-		$events = $posts;
-
 		/* @var DatePeriod $start_period */
 		$events = array();
 		/** @var WP_Post[] $posts */
 		foreach ( $posts as $post ) {
-			$event = new Ems_Event( $post );
-			/** @var DateTime $date_time */
-			$timestamp = $event->get_start_date_time()->getTimestamp();
-			$year      = date( 'Y', $timestamp );
-			//TODO Use $start_period and $end_period
-			if ( $year == 2014 ) {
-				//$events[] = array( 'title' => $post->post_title, 'value' => 'ID_' . $post->ID, 'ID' => $post->ID );
-				$events[] = $event;
+			$event           = new Ems_Event( $post );
+			$start_date_time = $event->get_start_date_time();
+			//Check if start period is set and if the event start fits in
+			if ( NULL !== $start_period && ( ! $start_date_time instanceof DateTime || ! $start_period->contains( $event->get_start_date_time() ) ) ) {
+				//Skip event if start isn't in start period
+				continue;
 			}
+
+			$end_date_time = $event->get_end_date_time();
+			//Check if end period is set and if the event end fits in
+			if ( NULL !== $end_period && ( ! $end_date_time instanceof DateTime || ! $end_period->contains( $event->get_end_date_time() ) ) ) {
+				//Skip event if end isn't in end period
+				continue;
+			}
+			$events[] = $event;
 		}
 
 
@@ -264,6 +248,7 @@ class Ems_Event extends Fum_Observable implements Fum_Observer {
 			if ( NULL === $user_sort_callback ) {
 				$user_sort_callback = array( __CLASS__, 'compare' );
 			}
+
 			if ( false === usort( $events, $user_sort_callback ) ) {
 				throw new Exception( "Couldn't sort events with " . print_r( $user_sort_callback, true ) . " as callback function" );
 			}

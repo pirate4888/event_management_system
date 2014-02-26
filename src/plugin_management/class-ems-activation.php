@@ -18,7 +18,6 @@ class Ems_Activation {
 									 'publish_events'      => true,
 									 'read_private_events' => true,
 									 'read'                => true,
-
 		);
 
 		remove_role( 'eventleiter' );

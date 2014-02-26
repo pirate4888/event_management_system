@@ -6,15 +6,6 @@
  */
 class Ems_Dhv_Jugend {
 
-
-	public static function enqueue_datepicker_jquery() {
-		wp_enqueue_script( 'jquery-ui-datepicker' );
-		$path = Event_Management_System::get_plugin_url() . 'css/jquery.ui.datepicker.min.css';
-		wp_register_style( 'ems_smoothness_jquery_css', $path );
-
-		wp_enqueue_style( 'ems_smoothness_jquery_css' );
-	}
-
 	public static function save_meta_data_of_event( $post_id ) {
 
 
@@ -142,34 +133,10 @@ class Ems_Dhv_Jugend {
 
 
 		<label for="ems_start_date">Anfangsdatum<br />
-			<input type="text" id="ems_start_date" name="ems_start_date" value="<?php echo $start_date; ?>" /></label>
+			<input type="text" id="ems_start_date" name="ems_start_date" value="<?php echo $start_date; ?>" class="datepicker_period_start" /></label>
 		<br />
 		<label for="ems_end_date">Enddatum<br />
-			<input type="text" id="ems_end_date" name="ems_end_date" value="<?php echo $end_date; ?>" /></label>
-
-		<script type="text/javascript">
-
-
-			jQuery(document).ready(function () {
-				jQuery("#ems_start_date").datepicker({
-					defaultDate: "+1w",
-					changeMonth: true,
-					dateFormat : 'dd.mm.yy',
-					onClose    : function (selectedDate) {
-						jQuery("#ems_end_date").datepicker("option", "minDate", selectedDate);
-					}
-				});
-				jQuery("#ems_end_date").datepicker({
-					defaultDate: "+1w",
-					changeMonth: true,
-					dateFormat : 'dd.mm.yy',
-					onClose    : function (selectedDate) {
-						jQuery("#ems_start_date").datepicker("option", "maxDate", selectedDate);
-					}
-				});
-			});
-
-		</script>
+			<input type="text" id="ems_end_date" name="ems_end_date" value="<?php echo $end_date; ?>" class="datepicker_period_end" /></label>
 
 	<?php
 
@@ -233,7 +200,7 @@ class Ems_Dhv_Jugend {
 		<br />
 		<label for="ems_event_leader_mail">Eventleiter Mailadresse (nur wenn "Eventleiter" auf Benutzerdefiniert<br />
 			<input type="text" id="ems_event_leader_mail" name="ems_event_leader_mail" value="<?php echo $event_leader_mail; ?>"></label>
-	<?
+	<?php
 	}
 
 	private static function get_name( $user ) {
@@ -479,8 +446,6 @@ switch ( $post->post_status ) {
 				<div class="clear"></div>
 			</div>
 		</div>
-
 	<?php
 	}
-
 } 

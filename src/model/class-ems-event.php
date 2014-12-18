@@ -10,8 +10,9 @@
  */
 class Ems_Event extends Ems_Post {
 
-	//TODO Should be ems_event
-	protected static $post_type = 'event';
+	protected static $post_type = 'ems_event';
+	protected static $capability_type = array( 'ems_event', 'ems_events' );
+	protected static $object = null;
 
 	private static $start_date_meta_key = 'ems_start_date';
 	private static $end_date_meta_key = 'ems_end_date';
@@ -35,26 +36,109 @@ class Ems_Event extends Ems_Post {
 
 	private $leader;
 
-	public function __construct( WP_Post $post = NULL ) {
-		if ( NULL !== $post ) {
-			$this->post            = $post;
-			$this->start_date_time = get_post_meta( $post->ID, self::$start_date_meta_key, true );
-			if ( empty( $this->start_date_time ) ) {
-				$this->start_date_time = NULL;
-			}
-			$this->end_date_time = get_post_meta( $post->ID, self::$end_date_meta_key, true );
-			if ( empty( $this->end_date_time ) ) {
-				$this->end_date_time = NULL;
-			}
-
-			$this->leader = get_userdata( get_post_meta( $post->ID, self::$leader_meta_key, true ) );
-			if ( false === $this->leader ) {
-				$this->leader = get_post_meta( $post->ID, self::$leader_meta_key, true );
-			}
-
-			$this->show_event = get_post_meta( $post->ID, self::$show_event_meta_key, true );
+	public function __construct( $post ) {
+		if ( is_numeric( $post ) ) {
+			$post = get_post( $post );
 		}
+
+		$this->post            = $post;
+		$this->start_date_time = get_post_meta( $post->ID, self::$start_date_meta_key, true );
+		if ( empty( $this->start_date_time ) ) {
+			$this->start_date_time = null;
+		}
+		$this->end_date_time = get_post_meta( $post->ID, self::$end_date_meta_key, true );
+		if ( empty( $this->end_date_time ) ) {
+			$this->end_date_time = null;
+		}
+
+		$this->leader = get_userdata( get_post_meta( $post->ID, self::$leader_meta_key, true ) );
+		if ( false === $this->leader ) {
+			$this->leader = get_post_meta( $post->ID, self::$leader_meta_key, true );
+		}
+
+		$this->show_event = get_post_meta( $post->ID, self::$show_event_meta_key, true );
+
 	}
+
+
+	public function save_post() {
+		/*
+   * We need to verify this came from the our screen and with proper authorization,
+   * because save_post can be triggered at other times.
+   */
+
+		// If this is an autosave, our form has not been submitted, so we don't want to do anything.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return $this->ID;
+		}
+
+		// Check the user's permissions.
+		if ( ( isset( $_REQUEST['post_type'] ) && Ems_Event::get_post_type() == $_REQUEST['post_type'] ) ) {
+			if ( ! current_user_can( Ems_Event::get_edit_capability(), $this->ID ) ) {
+				return $this->ID;
+			}
+		}
+
+
+		//Save form options first, then date stuff
+		if ( isset( $_REQUEST['ems_premium_field_nonce'] ) && wp_verify_nonce( $_REQUEST['ems_premium_field_nonce'], 'ems_premium_field' ) ) {
+
+			/* OK, its safe for us to save the data now. */
+			if ( ! isset( $_REQUEST['ems_premium_field'] ) ) {
+				$_REQUEST['ems_premium_field'] = 0;
+			}
+			$premium_field = sanitize_text_field( $_REQUEST['ems_premium_field'] );
+			update_post_meta( $this->ID, 'ems_premium_field', $premium_field );
+			$ID = preg_replace( "/[^0-9]/", "", $_REQUEST['ems_event_leader'] );
+			//Set mail address if "Benutzerdefiniert" was set as leader
+			if ( "0" === $ID ) {
+				update_post_meta( $this->ID, 'ems_event_leader_mail', sanitize_text_field( $_REQUEST['ems_event_leader_mail'] ) );
+			} else {
+				update_post_meta( $this->ID, 'ems_event_leader_mail', "" );
+			}
+			update_post_meta( $this->ID, 'ems_event_leader', $ID );
+			if ( ! isset( $_REQUEST['ems_inform_via_mail'] ) ) {
+				$_REQUEST['ems_inform_via_mail'] = 0;
+			}
+			$inform_via_mail = sanitize_text_field( $_REQUEST['ems_inform_via_mail'] );
+			update_post_meta( $this->ID, 'ems_inform_via_mail', $inform_via_mail );
+
+		}
+
+		// Check if our nonce is set.
+		if ( isset( $_REQUEST['ems_calendar_meta_box_nonce'] ) && wp_verify_nonce( $_REQUEST['ems_calendar_meta_box_nonce'], 'ems_calendar_meta_box' ) ) {
+
+			/* OK, its safe for us to save the data now. */
+
+			$format = get_option( 'date_format' );
+
+
+			$start_date = $_REQUEST['ems_start_date'];
+			$end_date   = $_REQUEST['ems_end_date'];
+			$start_date = Ems_Date_Helper::get_timestamp( $format, $start_date );
+			$end_date   = Ems_Date_Helper::get_timestamp( $format, $end_date );
+
+			$date_time_start_date = new DateTime( '@' . $start_date );
+			$date_time_end_date   = new DateTime( '@' . $end_date );
+
+			//Convert Datetime back to $_POST values, to check if date is valid
+			if ( date_i18n( $format, $date_time_start_date->getTimestamp() ) == sanitize_text_field( $_REQUEST['ems_start_date'] ) ) {
+				// Update the meta field in the database.
+				update_post_meta( $this->ID, 'ems_start_date', $date_time_start_date );
+			} else {
+				return $this->ID;
+			}
+
+
+			if ( date_i18n( $format, $date_time_end_date->getTimestamp() ) == sanitize_text_field( $_REQUEST['ems_end_date'] ) ) {
+				// Update the meta field in the database.
+				update_post_meta( $this->ID, 'ems_end_date', $date_time_end_date );
+			}
+		}
+
+		return $this->ID;
+	}
+
 
 	/**
 	 * @param DateTime $end_date_time
@@ -180,7 +264,7 @@ class Ems_Event extends Ems_Post {
 
 	public static function observe_object( Fum_Observable $observable ) {
 		if ( self::$object === NULL ) {
-			self::$object = new Ems_Event();
+			self::$object = new Ems_Event( - 1 );
 		}
 		$observable->addObserver( self::$object );
 	}
@@ -217,12 +301,11 @@ class Ems_Event extends Ems_Post {
 			$posts_per_page = - 1;
 		}
 		$args  = array(
-				'post_type'      => self::get_event_post_type(),
+			'post_type' => self::get_post_type(),
 				'posts_per_page' => $posts_per_page,
 		);
 		$posts = get_posts( array_merge( $user_args, $args ) );
 
-		/* @var DatePeriod $start_period */
 		$events = array();
 		/** @var WP_Post[] $posts */
 		foreach ( $posts as $post ) {
@@ -264,11 +347,6 @@ class Ems_Event extends Ems_Post {
 		return $events;
 	}
 
-
-	public static function get_event_post_type() {
-		return self::$post_type;
-	}
-
 	private static function register_user_to_event( $event_post_id, $user_id, Fum_Html_Form $form = NULL ) {
 		$event_registration = new Ems_Event_Registration( $event_post_id, $user_id );
 		$data               = array();
@@ -293,7 +371,53 @@ class Ems_Event extends Ems_Post {
 		Ems_Event_Registration::add_event_registration( $event_registration );
 	}
 
+
+	public static function get_event_by_id( $id ) {
+		return get_post( $id );
+	}
+
 	private static function delete_user_from_event( Fum_Html_Form $form ) {
 
 	}
+
+	public static function register_post_type() {
+		register_post_type( self::get_post_type(),
+			array(
+				'labels'             => array( 'name' => __( 'Events' ), 'singular_name' => __( 'Event' ) ),
+				'public'             => true,
+				'publicly_queryable' => true,
+				'show_ui'            => true,
+				'post_type'          => self::get_post_type(),
+				'show_in_menu'       => true,
+				'query_var'          => true,
+				'rewrite'            => true,
+				'capability_type'    => self::get_capability_type(),
+				'has_archive'        => false,
+				'hierarchical'       => false,
+				'supports'           => array( 'title', 'editor', 'custom_fields' ),
+			)
+		);
+	}
+
+	public static function get_custom_columns() {
+		return array();
+		// TODO: Implement get_custom_columns() method.
+	}
+
+	public function get_meta_value( $name ) {
+		// TODO: Implement get_meta_value() method.
+	}
+
+	/**
+	 * Returns a meta value in a "nice" format. e.g. not the post ID but the post title, not an array but a string etc.
+	 *
+	 * @param string $name name of the meta value
+	 *
+	 * @return string print friendly string
+	 */
+	public function get_meta_value_printable( $name ) {
+		// TODO: Implement get_meta_value_printable() method.
+	}
+
+
 }

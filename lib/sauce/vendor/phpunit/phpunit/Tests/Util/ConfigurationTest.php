@@ -272,7 +272,7 @@ class Util_ConfigurationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( FALSE, $GLOBALS['foo'] );
 		$this->assertEquals( TRUE, $_ENV['foo'] );
 		$this->assertEquals( TRUE, getenv( 'foo' ) );
-		$this->assertEquals( 'bar', $_POST['foo'] );
+		$this->assertEquals( 'bar', $_REQUEST['foo'] );
 		$this->assertEquals( 'bar', $_GET['foo'] );
 		$this->assertEquals( 'bar', $_COOKIE['foo'] );
 		$this->assertEquals( 'bar', $_SERVER['foo'] );

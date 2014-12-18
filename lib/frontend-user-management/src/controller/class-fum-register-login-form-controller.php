@@ -151,7 +151,7 @@ class Fum_Register_Login_Form_Controller {
 					 */
 					do_action( 'lost_password' );
 
-					$user_login = isset( $_POST['user_login'] ) ? wp_unslash( $_POST['user_login'] ) : '';
+					$user_login = isset( $_REQUEST['user_login'] ) ? wp_unslash( $_REQUEST['user_login'] ) : '';
 					if ( is_wp_error( $errors ) ) {
 						foreach ( $errors->get_error_messages() as $message ) {
 							echo $message . "<br/>";
@@ -211,7 +211,7 @@ class Fum_Register_Login_Form_Controller {
 
 					$errors = new WP_Error();
 
-					if ( isset( $_POST['pass1'] ) && $_POST['pass1'] != $_POST['pass2'] )
+				if ( isset( $_REQUEST['pass1'] ) && $_REQUEST['pass1'] != $_REQUEST['pass2'] )
 						$errors->add( 'password_reset_mismatch', __( 'The passwords do not match.' ) );
 
 					/**
@@ -224,8 +224,8 @@ class Fum_Register_Login_Form_Controller {
 					 */
 					do_action( 'validate_password_reset', $errors, $user );
 
-					if ( ( ! $errors->get_error_code() ) && isset( $_POST['pass1'] ) && ! empty( $_POST['pass1'] ) ) {
-						reset_password( $user, $_POST['pass1'] );
+				if ( ( ! $errors->get_error_code() ) && isset( $_REQUEST['pass1'] ) && ! empty( $_REQUEST['pass1'] ) ) {
+					reset_password( $user, $_REQUEST['pass1'] );
 						echo '<p><strong>Passwortänderung war erfolgreich</strong></p>';
 						echo '<a href="' . get_permalink( get_option( Fum_Conf::$fum_register_login_page_name ) ) . '">Anmelden</a>';
 						exit();
@@ -407,16 +407,15 @@ class Fum_Register_Login_Form_Controller {
 
 		$errors = new WP_Error();
 
-		if ( empty( $_POST['user_login'] ) ) {
+		if ( empty( $_REQUEST['user_login'] ) ) {
 			$errors->add( 'empty_username', __( '<strong>ERROR</strong>: Enter a username or e-mail address.' ) );
-		}
-		else if ( strpos( $_POST['user_login'], '@' ) ) {
-			$user_data = get_user_by( 'email', trim( $_POST['user_login'] ) );
+		} else if ( strpos( $_REQUEST['user_login'], '@' ) ) {
+			$user_data = get_user_by( 'email', trim( $_REQUEST['user_login'] ) );
 			if ( empty( $user_data ) )
 				$errors->add( 'invalid_email', __( '<strong>ERROR</strong>: There is no user registered with that email address.' ) );
 		}
 		else {
-			$login     = trim( $_POST['user_login'] );
+			$login = trim( $_REQUEST['user_login'] );
 			$user_data = get_user_by( 'login', $login );
 		}
 

@@ -33,7 +33,7 @@ class Ems_Menu {
 				/** @var WP_Post[] $children */
 				$children = get_posts( array(
 								'posts_per_page' => - 1,
-								'post_type'      => Ems_Conf::$ems_custom_event_post_type,
+								'post_type' => Ems_Event::get_post_type(),
 						)
 				);
 

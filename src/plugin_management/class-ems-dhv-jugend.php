@@ -6,97 +6,6 @@
  */
 class Ems_Dhv_Jugend {
 
-	public static function save_meta_data_of_event( $post_id ) {
-
-
-		/*
-   * We need to verify this came from the our screen and with proper authorization,
-   * because save_post can be triggered at other times.
-   */
-
-		// If this is an autosave, our form has not been submitted, so we don't want to do anything.
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
-			return $post_id;
-
-
-		// Check the user's permissions.
-		if ( ( isset( $_POST['post_type'] ) && 'event' == $_POST['post_type'] ) ) {
-			if ( ! current_user_can( 'edit_event', $post_id ) )
-				return $post_id;
-		}
-
-
-		//Save form options first, then date stuff
-		if ( isset( $_POST['ems_premium_field_nonce'] ) && wp_verify_nonce( $_POST['ems_premium_field_nonce'], 'ems_premium_field' ) ) {
-
-			/* OK, its safe for us to save the data now. */
-			if ( ! isset( $_POST['ems_premium_field'] ) ) {
-				$_POST['ems_premium_field'] = 0;
-			}
-			$premium_field = sanitize_text_field( $_POST['ems_premium_field'] );
-			update_post_meta( $post_id, 'ems_premium_field', $premium_field );
-			$ID = preg_replace( "/[^0-9]/", "", $_POST['ems_event_leader'] );
-			//Set mail address if "Benutzerdefiniert" was set as leader
-			if ( "0" === $ID ) {
-				update_post_meta( $post_id, 'ems_event_leader_mail', sanitize_text_field( $_POST['ems_event_leader_mail'] ) );
-			}
-			else {
-				update_post_meta( $post_id, 'ems_event_leader_mail', "" );
-			}
-			update_post_meta( $post_id, 'ems_event_leader', $ID );
-			if ( ! isset( $_POST['ems_inform_via_mail'] ) ) {
-				$_POST['ems_inform_via_mail'] = 0;
-			}
-			$inform_via_mail = sanitize_text_field( $_POST['ems_inform_via_mail'] );
-			update_post_meta( $post_id, 'ems_inform_via_mail', $inform_via_mail );
-
-		}
-
-		// Check if our nonce is set.
-		if ( isset( $_POST['ems_calendar_meta_box_nonce'] ) && wp_verify_nonce( $_POST['ems_calendar_meta_box_nonce'], 'ems_calendar_meta_box' ) ) {
-
-			/* OK, its safe for us to save the data now. */
-
-			// Sanitize user input.
-			$start_date = sanitize_text_field( $_POST['ems_start_date'] );
-			$end_date   = sanitize_text_field( $_POST['ems_end_date'] );
-			$start_date = explode( '.', $start_date );
-			$end_date   = explode( '.', $end_date );
-
-			if ( count( $start_date ) != 3 || count( $end_date ) != 3 ) {
-				return $post_id;
-			}
-
-			$date_time_start_date = new DateTime();
-			$date_time_start_date->setDate( $start_date[2], $start_date[1], $start_date[0] );
-			$date_time_start_date->setTime( 0, 0, 0 );
-
-			$date_time_end_date = new DateTime();
-			$date_time_end_date->setDate( $end_date[2], $end_date[1], $end_date[0] );
-			$date_time_end_date->setTime( 0, 0, 0 );
-
-
-			//Convert Datetime back to $_POST values, to check if date is valid
-			if ( date( "d.m.Y", $date_time_start_date->getTimestamp() ) == sanitize_text_field( $_POST['ems_start_date'] ) ) {
-				// Update the meta field in the database.
-				update_post_meta( $post_id, 'ems_start_date', $date_time_start_date );
-			}
-			else {
-				return $post_id;
-			}
-
-
-			if ( date( "d.m.Y", $date_time_end_date->getTimestamp() ) == sanitize_text_field( $_POST['ems_end_date'] ) ) {
-				// Update the meta field in the database.
-				update_post_meta( $post_id, 'ems_end_date', $date_time_end_date );
-			}
-			else {
-				return $post_id;
-			}
-		}
-		return $post_id;
-	}
-
 	public static function add_calendar_meta_box( WP_Post $post ) {
 		// Add an nonce field so we can check for it later.
 		wp_nonce_field( 'ems_calendar_meta_box', 'ems_calendar_meta_box_nonce' );
@@ -117,7 +26,7 @@ class Ems_Dhv_Jugend {
 		else {
 
 			$start_timestamp = $date_time_start_date->getTimestamp();
-			$start_date      = date( "d.m.Y", $start_timestamp );
+			$start_date = date_i18n( get_option( 'date_format' ), $start_timestamp );
 		}
 
 		if ( empty( $date_time_end_date ) ) {
@@ -126,7 +35,7 @@ class Ems_Dhv_Jugend {
 		else {
 
 			$end_timestamp = $date_time_end_date->getTimestamp();
-			$end_date      = date( "d.m.Y", $end_timestamp );
+			$end_date = date_i18n( get_option( 'date_format' ), $end_timestamp );
 		}
 
 		?>
@@ -144,22 +53,46 @@ class Ems_Dhv_Jugend {
 	}
 
 	public static function remove_metabox_layout() {
-		remove_meta_box( 'layout_sectionid', 'event', 'normal' );
-		remove_meta_box( 'slider_sectionid', 'event', 'normal' );
+		remove_meta_box( 'layout_sectionid', Ems_Event::get_post_type(), 'normal' );
+		remove_meta_box( 'slider_sectionid', Ems_Event::get_post_type(), 'normal' );
 	}
 
 
 	public static function add_meta_box_to_event() {
-		global $wp_meta_boxes;
-
-		add_meta_box( 'register_form', 'Optionen', array( 'Ems_Dhv_Jugend', 'add_registration_form_meta_box' ), 'event', 'normal', 'core' );
-		add_meta_box( 'calendar_meta_box', 'Kalender', array( 'Ems_Dhv_Jugend', 'add_calendar_meta_box' ), 'event', 'side', 'core' );
-
-
-		/*		echo '<pre>';
-				print_r( $wp_meta_boxes );
-				echo '</pre>';*/
+		add_meta_box( 'register_form', 'Optionen', array(
+			'Ems_Dhv_Jugend',
+			'add_registration_form_meta_box'
+		), Ems_Event::get_post_type(), 'normal', 'core' );
+		add_meta_box( 'calendar_meta_box', 'Kalender', array(
+			'Ems_Dhv_Jugend',
+			'add_calendar_meta_box'
+		), Ems_Event::get_post_type(), 'side', 'core' );
 	}
+
+	public static function add_meta_box_to_event_report() {
+		add_meta_box( Ems_Event_Daily_News::get_connected_event_meta_key(), 'Zugehöriges Event', array(
+			'Ems_Dhv_Jugend',
+			'add_connected_event_meta_box'
+		), Ems_Event_Daily_News::get_post_type(), 'side' );
+	}
+
+	public static function add_connected_event_meta_box( WP_Post $post ) {
+		// Add an nonce field so we can check for it later.
+		wp_nonce_field( Ems_Event_Daily_News::get_connected_event_meta_key(), Ems_Event_Daily_News::get_connected_event_meta_key() . '_nonce' );
+		$current_selected_event = get_post_meta( $post->ID, Ems_Event_Daily_News::get_connected_event_meta_key(), true );
+
+		$events = Ems_Event::get_events();
+		$name   = Ems_Event_Daily_News::get_connected_event_meta_key();
+		?>
+		<label for="<?php echo $name; ?>">Eventleiter<br />
+			<select id="<?php echo $name; ?>" name="<?php echo $name; ?>">
+				<?php foreach ( $events as $event ): ?>
+					<option value="ID_<?php echo $event->ID; ?>" <?php selected( $event->ID, $current_selected_event ); ?>><?php echo $event->post_title; ?></option>
+				<?php endforeach; ?>
+			</select></label>
+	<?php
+	}
+
 
 	public static function add_registration_form_meta_box( WP_Post $post ) {
 		// Add an nonce field so we can check for it later.
@@ -178,7 +111,7 @@ class Ems_Dhv_Jugend {
 		}
 		$user_defined     = new WP_User();
 		$data             = new stdClass();
-		$data->first_name = 'Benutzdefiniert...';
+		$data->first_name = 'Benutzdefiniert ...';
 		$data->last_name  = '';
 		$data->ID         = 0;
 		$user_defined->init( $data );
@@ -233,7 +166,7 @@ class Ems_Dhv_Jugend {
 		$can_publish      = current_user_can( $post_type_object->cap->publish_posts );
 
 		$args = null;
-		if ( post_type_supports( $post_type, 'revisions' ) && 'auto-draft' != $post->post_status ) {
+		if ( post_type_supports( $post_type, 'revisions' ) && 'auto - draft' != $post->post_status ) {
 			$revisions = wp_get_post_revisions( $post->ID );
 
 			// We should aim to show the revisions metabox only when there are revisions.
@@ -259,8 +192,7 @@ class Ems_Dhv_Jugend {
 						<?php if ( 'publish' != $post->post_status && 'future' != $post->post_status && 'pending' != $post->post_status ) { ?>
 							<input <?php if ('private' == $post->post_status) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post" value="<?php esc_attr_e( 'Save Draft' ); ?>" class="button" />
 						<?php
-						}
-						elseif ( 'pending' == $post->post_status && $can_publish ) {
+						} elseif ( 'pending' == $post->post_status && $can_publish ) {
 							?>
 							<input type="submit" name="save" id="save-post" value="<?php esc_attr_e( 'Save as Pending' ); ?>" class="button" />
 						<?php } ?>
@@ -268,20 +200,19 @@ class Ems_Dhv_Jugend {
 					</div>
 					<?php if ( $post_type_object->public ) : ?>
 						<div id="preview-action">
-							<?php
-							if ( 'publish' == $post->post_status ) {
-								$preview_link   = esc_url( get_permalink( $post->ID ) );
-								$preview_button = __( 'Preview Changes' );
-							}
-							else {
-								$preview_link   = set_url_scheme( get_permalink( $post->ID ) );
-								$preview_link   = esc_url( apply_filters( 'preview_post_link', add_query_arg( 'preview', 'true', $preview_link ) ) );
-								$preview_button = __( 'Preview' );
-							}
-							?>
+						<?php
+						if ( 'publish' == $post->post_status ) {
+							$preview_link   = esc_url( get_permalink( $post->ID ) );
+							$preview_button = __( 'Preview Changes' );
+						} else {
+							$preview_link   = set_url_scheme( get_permalink( $post->ID ) );
+							$preview_link   = esc_url( apply_filters( 'preview_post_link', add_query_arg( 'preview', 'true', $preview_link ) ) );
+							$preview_button = __( 'Preview' );
+						}
+						?>
 							<a class="preview button" href="<?php echo $preview_link; ?>" target="wp-preview" id="post-preview"><?php echo $preview_button; ?></a>
 							<input type="hidden" name="wp-preview" id="wp-preview" value="" />
-						</div>
+					</div>
 					<?php endif; // public post type ?>
 					<div class="clear"></div>
 				</div>
@@ -289,7 +220,8 @@ class Ems_Dhv_Jugend {
 
 				<div id="misc-publishing-actions">
 
-					<div class="misc-pub-section misc-pub-post-status"><label for="post_status"><?php _e( 'Status:' ) ?></label>
+					<div class="misc-pub-section misc-pub-post-status">
+						<label for="post_status"><?php _e( 'Status:' ) ?></label>
 <span id="post-status-display">
 <?php
 switch ( $post->post_status ) {
@@ -306,7 +238,7 @@ switch ( $post->post_status ) {
 		_e( 'Pending Review' );
 		break;
 	case 'draft':
-	case 'auto-draft':
+	case 'auto - draft':
 		_e( 'Draft' );
 		break;
 }
@@ -316,7 +248,7 @@ switch ( $post->post_status ) {
 							<a href="#post_status" <?php if ('private' == $post->post_status) { ?>style="display:none;" <?php } ?>class="edit-post-status hide-if-no-js"><?php _e( 'Edit' ) ?></a>
 
 							<div id="post-status-select" class="hide-if-js">
-								<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ( 'auto-draft' == $post->post_status ) ? 'draft' : $post->post_status ); ?>" />
+								<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ( 'auto - draft' == $post->post_status ) ? 'draft' : $post->post_status ); ?>" />
 								<select name='post_status' id='post_status'>
 									<?php if ( 'publish' == $post->post_status ) : ?>
 										<option<?php selected( $post->post_status, 'publish' ); ?> value='publish'><?php _e( 'Published' ) ?></option>
@@ -327,8 +259,8 @@ switch ( $post->post_status ) {
 										<option<?php selected( $post->post_status, 'future' ); ?> value='future'><?php _e( 'Scheduled' ) ?></option>
 									<?php endif; ?>
 									<option<?php selected( $post->post_status, 'pending' ); ?> value='pending'><?php _e( 'Pending Review' ) ?></option>
-									<?php if ( 'auto-draft' == $post->post_status ) : ?>
-										<option<?php selected( $post->post_status, 'auto-draft' ); ?> value='draft'><?php _e( 'Draft' ) ?></option>
+									<?php if ( 'auto - draft' == $post->post_status ) : ?>
+										<option<?php selected( $post->post_status, 'auto - draft' ); ?> value='draft'><?php _e( 'Draft' ) ?></option>
 									<?php else : ?>
 										<option<?php selected( $post->post_status, 'draft' ); ?> value='draft'><?php _e( 'Draft' ) ?></option>
 									<?php endif; ?>
@@ -348,24 +280,21 @@ switch ( $post->post_status ) {
 					$datef = __( 'M j, Y @ G:i' );
 					if ( 0 != $post->ID ) {
 						if ( 'future' == $post->post_status ) { // scheduled for publishing at a future date
-							$stamp = __( 'Scheduled for: <b>%1$s</b>' );
-						}
-						else if ( 'publish' == $post->post_status || 'private' == $post->post_status ) { // already published
-							$stamp = __( 'Published on: <b>%1$s</b>' );
-						}
-						else if ( '0000-00-00 00:00:00' == $post->post_date_gmt ) { // draft, 1 or more saves, no date specified
-							$stamp = __( 'Publish <b>immediately</b>' );
-						}
-						else if ( time() < strtotime( $post->post_date_gmt . ' +0000' ) ) { // draft, 1 or more saves, future date specified
-							$stamp = __( 'Schedule for: <b>%1$s</b>' );
-						}
-						else { // draft, 1 or more saves, date specified
-							$stamp = __( 'Publish on: <b>%1$s</b>' );
+							$stamp = __( 'Scheduled for: <
+					b >%1$s </b > ' );
+					} else if ( 'publish' == $post->post_status || 'private' == $post->post_status ) { // already published
+							$stamp = __( 'Published on: <b >%1$s </b > ' );
+					} else if ( '0000 - 00 - 00 00:00:00' == $post->post_date_gmt ) { // draft, 1 or more saves, no date specified
+							$stamp = __( 'Publish < b>immediately </b > ' );
+						} else if ( time() < strtotime( $post->post_date_gmt . ' + 0000' ) ) { // draft, 1 or more saves, future date specified
+							$stamp = __( 'Schedule for: <
+						b >%1$s </b > ' );
+						} else { // draft, 1 or more saves, date specified
+							$stamp = __( 'Publish on: <b >%1$s </b > ' );
 						}
 						$date = date_i18n( $datef, strtotime( $post->post_date ) );
-					}
-					else { // draft (no saves, and thus no date specified)
-						$stamp = __( 'Publish <b>immediately</b>' );
+					} else { // draft (no saves, and thus no date specified)
+						$stamp = __( 'Publish < b>immediately </b > ' );
 						$date  = date_i18n( $datef, strtotime( current_time( 'mysql' ) ) );
 					}
 
@@ -375,15 +304,14 @@ switch ( $post->post_status ) {
 						<div class="misc-pub-section misc-pub-revisions">
 							<?php
 							if ( $revisions_to_keep > 0 && $revisions_to_keep <= $args['args']['revisions_count'] ) {
-								echo '<span title="' . esc_attr( sprintf( __( 'Your site is configured to keep only the last %s revisions.' ),
-												number_format_i18n( $revisions_to_keep ) ) ) . '">';
-								printf( __( 'Revisions: %s' ), '<b>' . number_format_i18n( $args['args']['revisions_count'] ) . '+</b>' );
-								echo '</span>';
+								echo ' < span title = "' . esc_attr( sprintf( __( 'Your site is configured to keep only the last %s revisions.' ),
+										number_format_i18n( $revisions_to_keep ) ) ) . '" > ';
+								printf( __( 'Revisions: %s' ), ' < b>' . number_format_i18n( $args['args']['revisions_count'] ) . ' +</b > ' );
+								echo '</span > ';
+							} else {
+								printf( __( 'Revisions: %s' ), ' < b>' . number_format_i18n( $args['args']['revisions_count'] ) . ' </b > ' );
 							}
-							else {
-								printf( __( 'Revisions: %s' ), '<b>' . number_format_i18n( $args['args']['revisions_count'] ) . '</b>' );
-							}
-							?>
+						?>
 							<a class="hide-if-no-js" href="<?php echo esc_url( get_edit_post_link( $args['args']['revision_id'] ) ); ?>"><?php _ex( 'Browse', 'revisions' ); ?></a>
 						</div>
 					<?php endif;
@@ -396,11 +324,12 @@ switch ( $post->post_status ) {
 						<a href="#edit_timestamp" class="edit-timestamp hide-if-no-js"><?php _e( 'Edit' ) ?></a>
 
 						<div id="timestampdiv" class="hide-if-js"><?php touch_time( ( $action == 'edit' ), 1 ); ?></div>
-						</div><?php // /misc-pub-section ?>
+						</div><?php // /misc-pub-section
+						?>
 					<?php endif; ?>
 
 					<?php do_action( 'post_submitbox_misc_actions' ); ?>
-				</div>
+			</div>
 				<div class="clear"></div>
 			</div>
 
@@ -409,10 +338,11 @@ switch ( $post->post_status ) {
 				<div id="delete-action">
 					<?php
 					if ( current_user_can( "delete_post", $post->ID ) ) {
-						if ( ! EMPTY_TRASH_DAYS )
+						if ( ! EMPTY_TRASH_DAYS ) {
 							$delete_text = __( 'Delete Permanently' );
-						else
+						} else {
 							$delete_text = __( 'Move to Trash' );
+						}
 						?>
 						<a class="submitdelete deletion" href="<?php echo get_delete_post_link( $post->ID ); ?>"><?php echo $delete_text; ?></a><?php
 					} ?>
@@ -429,20 +359,19 @@ switch ( $post->post_status ) {
 							<?php else : ?>
 								<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish' ) ?>" />
 								<?php submit_button( __( 'Publish' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) ); ?>
-							<?php  endif;
+							<?php endif;
 						else : ?>
 							<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Submit for Review' ) ?>" />
 							<?php submit_button( __( 'Submit for Review' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) ); ?>
-						<?php
+					<?php
 						endif;
-					}
-					else {
+					} else {
 						?>
 						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Update' ) ?>" />
 						<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<?php esc_attr_e( 'Update' ) ?>" />
 					<?php
 					} ?>
-				</div>
+			</div>
 				<div class="clear"></div>
 			</div>
 		</div>

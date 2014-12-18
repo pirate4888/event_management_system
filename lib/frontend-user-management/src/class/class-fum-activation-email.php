@@ -71,7 +71,10 @@ class Fum_Activation_Email {
 	//TODO Make activation link more secure with an extra field which contains the username, so we do not check every activation code
 	public static function activate_user( $content ) {
 		if ( isset( $_GET[self::$activation_key_field] ) ) {
-			$url_activation_key = $_GET[self::$activation_key_field];
+			$url_activation_key = trim( $_GET[ self::$activation_key_field ] );
+			if ( empty( $url_activation_key ) ) {
+				return '<strong>' . __( 'Invalid activation key' ) . '</strong>' . $content;
+			}
 			//Get all user IDs
 			$options  = array( 'fields' => 'ID' );
 			$user_ids = get_users( $options );

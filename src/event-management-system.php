@@ -6,13 +6,14 @@ class Event_Management_System {
 	private static $plugin_url = NULL;
 	private static $src_directories = array(
 			'controller',
-			'lib',
+		'../lib',
 			'model',
 			'view',
 			'utility',
 			'plugin_management',
 			'../../../../wp-includes',
-			'abstract_class'
+		'abstract',
+		'interface',
 	);
 
 	public function __construct( $plugin_path = NULL, $plugin_url = NULL ) {

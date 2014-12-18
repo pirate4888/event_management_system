@@ -183,7 +183,7 @@ class Ems_Event_Registration {
 	public static function send_mail_via_smtp( $email, $subject, $message, $reply_to = 'info@dhv-jugend.de' ) {
 
 		$mail = new PHPMailer();
-		$mail->IsSendmail(); //1 und 1 doesn't support isSMTP from webshosting packages
+		$mail->IsSMTP(); //1 und 1 doesn't support isSMTP from webshosting packages
 		$mail->CharSet    = 'utf-8';
 		$mail->Host       = get_option( 'fum_smtp_host' ); // Specify main and backup server
 		$mail->SMTPAuth   = true; // Enable SMTP authentication
@@ -207,7 +207,27 @@ class Ems_Event_Registration {
 		$mail->Body    = $message;
 
 		if ( ! $mail->send() ) {
-			throw new Exception( "Could not sent Mail, maybe your server has a problem? " . $mail->ErrorInfo );
+			throw new Exception( "Could not sent mail, maybe your server has a problem? " . $mail->ErrorInfo );
+		}
+
+
+		//Check if imap extension is installed
+		if ( function_exists( "imap_open" ) ) {
+			$stream = imap_open( "{imap.1und1.de:143}Gesendete Objekte", get_option( 'fum_smtp_username' ), get_option( 'fum_smtp_password' ) );
+			if ( false === $stream ) {
+				throw new Exception( "Could not copy mail to sent directory, please check your IMAP server and IMAP directory configuration" );
+			}
+
+			imap_append( $stream, "{imap.1und1.de:143}Gesendete Objekte"
+				, "From: " . get_option( 'fum_smtp_sender' ) . "\r\n"
+				  . "To: " . $email . "\r\n"
+				  . "Subject: " . $subject . "\r\n"
+				  . "\r\n"
+				  . $message . "\r\n"
+			);
+
+			$check = imap_check( $stream );
+			imap_close( $stream );
 		}
 	}
 

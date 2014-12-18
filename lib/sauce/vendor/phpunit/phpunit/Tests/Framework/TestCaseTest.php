@@ -61,7 +61,7 @@ require_once dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEP
 
 $GLOBALS['a']  = 'a';
 $_ENV['b']     = 'b';
-$_POST['c']    = 'c';
+$_REQUEST['c'] = 'c';
 $_GET['d']     = 'd';
 $_COOKIE['e']  = 'e';
 $_SERVER['f']  = 'f';
@@ -229,7 +229,7 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( 'a', $a );
 		$this->assertEquals( 'a', $GLOBALS['a'] );
 		$this->assertEquals( 'b', $_ENV['b'] );
-		$this->assertEquals( 'c', $_POST['c'] );
+		$this->assertEquals( 'c', $_REQUEST['c'] );
 		$this->assertEquals( 'd', $_GET['d'] );
 		$this->assertEquals( 'e', $_COOKIE['e'] );
 		$this->assertEquals( 'f', $_SERVER['f'] );
@@ -241,7 +241,7 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase {
 		$GLOBALS['a']   = 'aa';
 		$GLOBALS['foo'] = 'bar';
 		$_ENV['b']      = 'bb';
-		$_POST['c']     = 'cc';
+		$_REQUEST['c'] = 'cc';
 		$_GET['d']      = 'dd';
 		$_COOKIE['e']   = 'ee';
 		$_SERVER['f']   = 'ff';
@@ -253,7 +253,7 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( 'aa', $GLOBALS['a'] );
 		$this->assertEquals( 'bar', $GLOBALS['foo'] );
 		$this->assertEquals( 'bb', $_ENV['b'] );
-		$this->assertEquals( 'cc', $_POST['c'] );
+		$this->assertEquals( 'cc', $_REQUEST['c'] );
 		$this->assertEquals( 'dd', $_GET['d'] );
 		$this->assertEquals( 'ee', $_COOKIE['e'] );
 		$this->assertEquals( 'ff', $_SERVER['f'] );
@@ -270,7 +270,7 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( 'a', $a );
 		$this->assertEquals( 'a', $GLOBALS['a'] );
 		$this->assertEquals( 'b', $_ENV['b'] );
-		$this->assertEquals( 'c', $_POST['c'] );
+		$this->assertEquals( 'c', $_REQUEST['c'] );
 		$this->assertEquals( 'd', $_GET['d'] );
 		$this->assertEquals( 'e', $_COOKIE['e'] );
 		$this->assertEquals( 'f', $_SERVER['f'] );

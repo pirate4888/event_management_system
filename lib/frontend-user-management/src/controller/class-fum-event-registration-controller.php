@@ -5,7 +5,10 @@
  * @version
  */
 class Fum_Event_Registration_Controller {
-	public static $event_get_parameter = 'ems_event';
+
+	public static function get_event_request_parameter() {
+		return 'select_' . Ems_Event::get_post_type();
+	}
 
 	public static function create_event_registration_form() {
 
@@ -25,8 +28,8 @@ class Fum_Event_Registration_Controller {
 		$form = Fum_Html_Form::get_form( Fum_Conf::$fum_event_register_form_unique_name );
 
 		$event_field = $form->get_input_field( Fum_Conf::$fum_input_field_select_event );
-		if ( isset( $_REQUEST[self::$event_get_parameter] ) ) {
-			$event_field->set_value( $_REQUEST[self::$event_get_parameter] );
+		if ( isset( $_REQUEST[ self::get_event_request_parameter() ] ) ) {
+			$event_field->set_value( $_REQUEST[ self::get_event_request_parameter() ] );
 			$event_field->set_readonly( true );
 			//Check if event is an valid event
 			$return_value = self::validate_event_select_field( $event_field );
@@ -39,8 +42,8 @@ class Fum_Event_Registration_Controller {
 		}
 		else {
 			//if no event is specified, just show the select event field
-			$event_field->set_name( self::$event_get_parameter );
-			$event_field->set_id( self::$event_get_parameter );
+			$event_field->set_name( self::get_event_request_parameter() );
+			$event_field->set_id( self::get_event_request_parameter() );
 			$form->set_input_fields( array( $event_field ) );
 			$form->set_unique_name( 'select_event' );
 			$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_submit ) );
@@ -53,9 +56,9 @@ class Fum_Event_Registration_Controller {
 
 		$form = Fum_User::fill_form( $form );
 		$url  = $form->get_action();
-		$form->set_action( add_query_arg( array( self::$event_get_parameter => $event_field->get_value() ), $url ) );
+		$form->set_action( add_query_arg( array( self::get_event_request_parameter() => $event_field->get_value() ), $url ) );
 		if ( $url == '#' ) {
-			$form->set_action( add_query_arg( array( self::$event_get_parameter => $event_field->get_value() ) ) );
+			$form->set_action( add_query_arg( array( self::get_event_request_parameter() => $event_field->get_value() ) ) );
 		}
 
 
@@ -112,7 +115,7 @@ class Fum_Event_Registration_Controller {
 			<script type="text/javascript">
 				var test = document.getElementsByName('<?php echo (isset($event_field) ? $event_field->get_name() : ''); ?>')[0];
 				test.onchange = function () {
-					var url = "<?php echo get_permalink().'?'.self::$event_get_parameter.'='; ?>" + this.options[this.selectedIndex].value;
+					var url = "<?php echo get_permalink().'?'.self::get_event_request_parameter().'='; ?>" + this.options[this.selectedIndex].value;
 					document.location.href = url;
 				}
 			</script>
@@ -138,7 +141,7 @@ class Fum_Event_Registration_Controller {
 	public static function validate_event_select_field( Fum_Html_Input_Field $input_field ) {
 		$posts          = get_posts( array(
 				'posts_per_page' => - 1,
-				'post_type'      => Ems_Conf::$ems_custom_event_post_type,
+				'post_type' => Ems_Event::get_post_type(),
 		) );
 		$is_valid_event = false;
 		$ID             = NULL;

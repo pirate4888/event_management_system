@@ -547,7 +547,7 @@ class Fum_Html_Input_Field extends Fum_Observable implements Fum_Observer {
 	 * @return bool|WP_Error
 	 */
 	private static function mail_address_callback( Fum_Html_Input_Field $input_field, array $params = array() ) {
-		$regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/';
+		$regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/i';
 // Run the preg_match() function on regex against the email address
 		if ( preg_match( $regex, $input_field->get_value() ) ) {
 			return true;

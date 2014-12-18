@@ -8,7 +8,7 @@ class Ems_Initialisation {
 	public static function initiate_plugin() {
 		add_shortcode( 'ems_teilnehmerlisten', array( 'Ems_Participant_List_Controller', 'get_participant_lists' ) );
 		add_shortcode( 'ems_event_list', array( 'Ems_Event_List_Controller', 'get_event_list' ) );
-
+		add_shortcode( 'ems_event_report_list', array( 'Ems_Event_Report_Controller', 'process_event_report_list' ) );
 
 		self::add_action();
 		self::add_filter();
@@ -18,6 +18,11 @@ class Ems_Initialisation {
 	private static function add_filter() {
 		if ( ! is_admin() ) {
 			add_filter( 'wp_get_nav_menu_items', array( new Ems_Menu(), 'add_children_to_menu' ) );
+		}
+
+		if ( is_admin() ) {
+			add_filter( 'manage_pages_columns', array( 'Ems_Initialisation', 'add_custom_column' ) );
+			add_filter( 'manage_posts_columns', array( 'Ems_Initialisation', 'add_custom_column' ) );
 		}
 
 	}
@@ -37,33 +42,69 @@ class Ems_Initialisation {
 		add_action( 'parse_request', array( 'Ems_Redirect', 'redirect_event_parameter' ) );
 
 		add_action( 'add_meta_boxes', array( 'Ems_Dhv_Jugend', 'add_meta_box_to_event' ), 10, 2 );
-		add_action( 'init', array( 'Ems_Initialisation', 'add_event_post_type' ) );
+		add_action( 'add_meta_boxes', array( 'Ems_Dhv_Jugend', 'add_meta_box_to_event_report' ), 10, 2 );
+
+		add_action( 'save_post', array( 'Ems_Initialisation', 'save_post' ) );
+
+		add_action( 'manage_pages_custom_column', array( 'Ems_Initialisation', 'manage_custom_column' ), 10, 2 );
+		add_action( 'manage_posts_custom_column', array( 'Ems_Initialisation', 'manage_custom_column' ), 10, 2 );
+
+		add_action( 'init', array( 'Ems_Initialisation', 'register_custom_post_types' ) );
 		add_action( 'do_meta_boxes', array( 'Ems_Dhv_Jugend', 'remove_metabox_layout' ) );
 		add_action( 'widgets_init', create_function( '', 'return register_widget("Ems_Dhv_Jugend_Widget");' ) );
 		add_action( 'admin_enqueue_scripts', array( 'Ems_Script_Enqueue', 'admin_enqueue_script' ) );
 		add_action( 'wp_enqueue_scripts', array( 'Ems_Script_Enqueue', 'enqueue_script' ) );
-		add_action( 'save_post', array( 'Ems_Dhv_Jugend', 'save_meta_data_of_event' ) );
+
 	}
 
-	public static function add_event_post_type() {
+	/**
+	 * Calls the save_post function of the Ems_Post interface if $post_id belongs to a post which implements this interface
+	 *
+	 * @param int $post_id ID of postmanage_posts_custom_column
+	 *
+	 * @return int ID of post
+	 */
+	public static function save_post( $post_id ) {
+		$type  = get_post_type( $post_id );
+		$class = str_replace( ' ', '_', ucwords( str_replace( '_', ' ', $type ) ) );
+		if ( is_subclass_of( $class, 'Ems_Post' ) ) {
+			/* @var $object Ems_Post */
+			$object = new $class( $post_id );
+			$object->save_post();
+		}
 
-		register_post_type( Ems_Conf::$ems_custom_event_post_type,
-				array(
-						'labels'             => array( 'name' => __( 'Events' ) ),
-						'public'             => true,
-						'publicly_queryable' => true,
-						'show_ui'            => true,
-						'post_type' => Ems_Event::get_event_post_type(),
-						'show_in_menu'       => true,
-						'query_var'          => true,
-						'rewrite'            => true,
-						'capability_type'    => array( 'event', 'events' ),
-						'capabilities'       => array(),
-						'has_archive'        => false,
-						'hierarchical'       => false,
-						'supports'           => array( 'title', 'editor', 'custom_fields' ),
-				)
-		);
+		return $post_id;
+	}
+
+	public static function manage_custom_column( $column, $post_id ) {
+		/** @var Ems_Post $class */
+		$class = Ems_Name_Conversion::convert_post_type_to_class_name( get_post_type() );
+		if ( is_subclass_of( $class, 'Ems_Post' ) ) {
+			/** @var Ems_Post $object */
+			$object = new $class( $post_id );
+			_e( $object->get_meta_value_printable( $column ) );
+		}
+	}
+
+	public static function add_custom_column( $columns ) {
+		/** @var Ems_Post $class */
+		$class = Ems_Name_Conversion::convert_post_type_to_class_name( get_post_type() );
+		if ( is_subclass_of( $class, 'Ems_Post' ) ) {
+			$custom_columns = $class::get_custom_columns();
+			if ( count( $custom_columns ) > 0 ) {
+				//TODO Make column sortable
+				//add_filter( 'manage_edit-post_sortable_columns', array( $class, ) );
+			}
+			$columns = array_merge( $columns, $custom_columns );
+		}
+
+		return $columns;
+	}
+
+	public static function register_custom_post_types() {
+		Ems_Event::register_post_type();
+		Ems_Event_Daily_News::register_post_type();
+		Ems_Event_Daily_news::register_post_type();
 	}
 
 	/**

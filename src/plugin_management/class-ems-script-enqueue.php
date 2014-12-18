@@ -18,7 +18,7 @@ class Ems_Script_Enqueue {
 	public static function admin_enqueue_script( $hook_suffix ) {
 		$post_type = get_post_type();
 		//Check if page is event editor
-		if ( Ems_Event::get_event_post_type() === get_post_type() ) {
+		if ( Ems_Event::get_post_type() === get_post_type() ) {
 			//Load jquery, datepicker and register styles
 			wp_enqueue_script( 'jquery' );
 			wp_enqueue_script( 'jquery-ui-datepicker' );

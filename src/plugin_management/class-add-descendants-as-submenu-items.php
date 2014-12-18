@@ -141,10 +141,10 @@ class Add_Descendants_As_Submenu_Items {
 				'add' => 0,
 		);
 
-		if ( ! current_user_can( 'edit_theme_options' ) || empty( $_POST['id'] ) )
+		if ( ! current_user_can( 'edit_theme_options' ) || empty( $_REQUEST['id'] ) )
 			exit( json_encode( $response ) );
 
-		$id = (int) $_POST['id'];
+		$id = (int) $_REQUEST['id'];
 
 		if ( ! $this->is_menu_item_supported( $id ) )
 			exit( json_encode( $response ) );
@@ -209,16 +209,16 @@ class Add_Descendants_As_Submenu_Items {
 	 * @since 1.0.0
 	 */
 	public function save_nav_menu_custom_fields() {
-		if ( empty( $_POST[$this->form_idtracker] ) )
+		if ( empty( $_REQUEST[ $this->form_idtracker ] ) )
 			return;
 
-		$ids = array_map( 'intval', explode( ',', ltrim( $_POST[$this->form_idtracker], ',' ) ) );
+		$ids = array_map( 'intval', explode( ',', ltrim( $_REQUEST[ $this->form_idtracker ], ',' ) ) );
 
 		foreach ( $ids as $id ) {
 			if ( ! $id )
 				continue;
 
-			if ( isset( $_POST[$this->form_checkbox_prefix . $id] ) )
+			if ( isset( $_REQUEST[ $this->form_checkbox_prefix . $id ] ) )
 				update_post_meta( $id, $this->meta_key, true );
 			else
 				delete_post_meta( $id, $this->meta_key );

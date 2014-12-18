@@ -7,7 +7,7 @@
 class Fum_Initialisation {
 
 	public static function initiate_plugin() {
-		//Removes 'next' link in head because this could cause SEO problems and firefox is fetching the link in backround which makes more traffic
+		//Removes 'next' link in head because this could cause SEO problems and firefox is fetching the link in background which causes more traffic
 		remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );
 
 		self::add_action_hooks();
@@ -24,7 +24,7 @@ class Fum_Initialisation {
 
 	public static function my_recent_posts_shortcode( $atts ) {
 		$q = new WP_Query(
-				array( 'orderby' => 'date', 'posts_per_page' => '4' )
+			array( 'orderby' => 'date', 'posts_per_page' => '1' )
 		);
 
 		$list = '<ul class="recent-posts">';

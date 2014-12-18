@@ -10,7 +10,7 @@ class Ems_Participant_List_Controller {
 	public static $pages;
 
 	public static function get_participant_lists() {
-		if ( ! current_user_can( 'edit_event' ) ) {
+		if ( ! current_user_can( Ems_Event::get_edit_capability() ) ) {
 			global $wp;
 			?>
 			<p><strong>Du hast keinen Zugriff auf diese Seite.</strong></p>
@@ -70,14 +70,47 @@ class Ems_Participant_List_Controller {
 				unset( $user_data[Fum_Conf::$fum_input_field_submit] );
 				unset( $user_data[Fum_Conf::$fum_input_field_accept_agb] );
 				$merged_array = array_merge( $user_data, $registration->get_data() );
-//				ksort( $merged_array );
 				$participant_list[] = $merged_array;
-//				echo '<pre>';
-//				print_r( $participant_list );
-//				echo '</pre>';
 			}
 
+			$excel_array_private = array();
+			$excel_array_public  = array();
+
+			$public_fields = array(
+				"Vorname",
+				"Nachname",
+				"E-Mail",
+				"Stadt",
+				"Postleitzahl",
+				"Bundesland",
+				"Telefonnummer",
+				"Handynummer",
+				"Suche Mitfahrgelegenheit",
+				"Biete Mitfahrgelgenheit"
+			);
+
+
 			$order = $participant_list[0];
+
+			//Generate title row
+			foreach ( $order as $title => $value ) {
+				$excel_array_private[0][] = Fum_Html_Input_Field::get_input_field( $title )->get_title();
+				if ( in_array( Fum_Html_Input_Field::get_input_field( $title )->get_title(), $public_fields ) ) {
+					$excel_array_public[0][] = Fum_Html_Input_Field::get_input_field( $title )->get_title();
+				}
+			}
+
+			//Generate entry rows
+			foreach ( $participant_list as $index => $participant ) {
+				foreach ( $order as $title => $unused ) {
+					//$index+1 because $index=0 is the title row
+					$excel_array_private[ $index + 1 ][] = ( 0 === $participant[ $title ] ? 'Nein' : ( "1" === $participant[ $title ] ? 'Ja' : $participant[ $title ] ) );
+					if ( in_array( Fum_Html_Input_Field::get_input_field( $title )->get_title(), $public_fields ) ) {
+						$excel_array_public[ $index + 1 ][] = ( 0 === $participant[ $title ] ? 'Nein' : ( "1" === $participant[ $title ] ? 'Ja' : $participant[ $title ] ) );
+					}
+				}
+			}
+
 			//TODO Should be in view
 			//Print html table
 			?>
@@ -107,32 +140,44 @@ class Ems_Participant_List_Controller {
 			//Create excel table
 			$objPHPExcel = new PHPExcel();
 
-			//TODO Sort Array titles and values (maybe participant 1 has another order then participant 2 ), maybe check also html table order
-			//Add title row on top of array
-			foreach ( $participant_list as $key => $participant ) {
-				ksort( $participant );
-				$participant_list[$key] = $participant;
-
-			}
-
-			$titles = array();
-
-			foreach ( $participant_list[0] as $title => $value ) {
-				$titles[] = $title;
-			}
-			sort( $titles );
-			$participant_list = array_merge( array( $titles ), $participant_list );
-			// Create a new worksheet called "My Data"
 			$myWorkSheet = new PHPExcel_Worksheet( $objPHPExcel, 'Teilnehmerliste' );
+
+			//Use customized value binder so phone numbers with leading zeros are preserved
+			PHPExcel_Cell::setValueBinder( new PHPExcel_Value_Binder() );
+
+			//Remove default worksheet named "Worksheet"
+			$objPHPExcel->removeSheetByIndex( 0 );
 
 			// Attach the "My Data" worksheet as the first worksheet in the PHPExcel object
 			$objPHPExcel->addSheet( $myWorkSheet, 0 );
-			$objPHPExcel->getActiveSheet()->fromArray( $participant_list );
+			$objPHPExcel->setActiveSheetIndex( 0 );
+			$objPHPExcel->getActiveSheet()->fromArray( $excel_array_private );
 
 			$objWriter = new PHPExcel_Writer_Excel2007( $objPHPExcel );
 			$filename  = $id . '.xlsx';
 			$objWriter->save( Event_Management_System::get_plugin_path() . $filename );
-			echo '<p><a href="' . Event_Management_System::get_plugin_url() . $filename . '">Teilnehmerliste als Excelfile downloaden</a></p>';
+			echo '<p><a href="' . Event_Management_System::get_plugin_url() . $filename . '">Teilnehmerliste für Eventleiter als Excelfile downloaden</a></p>';
+
+			//Public participant list excel table
+			$objPHPExcel = new PHPExcel();
+
+			$myWorkSheet = new PHPExcel_Worksheet( $objPHPExcel, 'Teilnehmerliste' );
+
+			//Use customized value binder so phone numbers with leading zeros are preserved
+			PHPExcel_Cell::setValueBinder( new PHPExcel_Value_Binder() );
+
+			//Remove default worksheet named "Worksheet"
+			$objPHPExcel->removeSheetByIndex( 0 );
+
+			// Attach the "My Data" worksheet as the first worksheet in the PHPExcel object
+			$objPHPExcel->addSheet( $myWorkSheet, 0 );
+			$objPHPExcel->setActiveSheetIndex( 0 );
+			$objPHPExcel->getActiveSheet()->fromArray( $excel_array_public );
+
+			$objWriter = new PHPExcel_Writer_Excel2007( $objPHPExcel );
+			$filename    = $id . "_public" . '.xlsx';
+			$objWriter->save( Event_Management_System::get_plugin_path() . $filename );
+			echo '<p><a href="' . Event_Management_System::get_plugin_url() . $filename . '">Teilnehmerliste für Teilnehmer als Excelfile downloaden</a></p>';
 		}
 	}
 }

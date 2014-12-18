@@ -9,5 +9,4 @@ class Ems_Deactivation {
 		Fum_Deactivation::deactivate_plugin();
 		error_log( 'ems_deactivate_plugin' );
 	}
-
 } 

@@ -68,7 +68,7 @@ class WP_GitHub_Updater {
 	 * @return void
 	 */
 	public function __construct( $config = array() ) {
-
+		echo "Constructor";
 		$defaults = array(
 			'slug'               => plugin_basename( __FILE__ ),
 			'proper_folder_name' => dirname( plugin_basename( __FILE__ ) ),

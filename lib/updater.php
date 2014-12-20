@@ -83,6 +83,7 @@ class WP_GitHub_Updater {
 			$message = 'The GitHub Updater was initialized without the minimum required configuration, please check the config in your plugin. The following params are missing: ';
 			$message .= implode( ',', $this->missing_config );
 			_doing_it_wrong( __CLASS__, $message, self::VERSION );
+			echo "Missing config Stuff - GitHub Updater";
 			return;
 		}
 

@@ -27,42 +27,6 @@ class Event_Management_System {
 		Event_Management_System::$plugin_url  = plugin_dir_url( __FILE__ );
 
 		Ems_Initialisation::initiate_plugin();
-
-
-		//Add Github Updater
-		if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
-			$branch = 'master';
-			if ( false !== get_option( 'ems_git_branch' ) && get_option( 'ems_git_branch' ) == 'experimental' ) {
-				$branch = 'experimental';
-			}
-			error_log( "plugin path: " . $plugin_path );
-			$config = array(
-				'slug' => "event-management-system/event-management-system.php",
-				// this is the slug of your plugin
-				'proper_folder_name' => 'event-management-system',
-				// this is the name of the folder your plugin lives in
-				'api_url'            => 'https://api.github.com/repos/SchwarzwaldFalke/event_management_system',
-				// the github API url of your github repo
-				'raw_url'            => 'https://raw.github.com/SchwarzwaldFalke/event_management_system/' . $branch,
-				// the github raw url of your github repo
-				'github_url'         => 'https://github.com/SchwarzwaldFalke/event_management_system',
-				// the github url of your github repo
-				'zip_url'            => 'https://github.com/SchwarzwaldFalke/event_management_system/archive/' . $branch . '.zip',
-				// the zip url of the github repo
-				'sslverify'          => true,
-				// wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
-				'requires'           => '3.7',
-				// which version of WordPress does your plugin require?
-				'tested'             => '4.1',
-				// which version of WordPress is your plugin tested up to?
-				'readme'             => 'README.MD'
-				// which file to use as the readme for the version number
-			);
-			new WP_GitHub_Updater( $config );
-			echo "Called WP_GitHub_Updater";
-		}
-
-
 	}
 
 //	public function remove_fum_option_page( $options ) {

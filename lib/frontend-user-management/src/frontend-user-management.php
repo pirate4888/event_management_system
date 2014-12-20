@@ -10,29 +10,6 @@ class Frontend_User_Management {
 		spl_autoload_register( array( $this, 'autoload' ) );
 		//Set path to plugin dir
 		Frontend_User_Management::$plugin_path = plugin_dir_path( __FILE__ );
-
-		//Add Github Updater
-		if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
-			$branch = 'master';
-			if ( false !== get_option( 'fum_git_branch' ) && get_option( 'fum_git_branch' ) == 'experimental' ) {
-				$branch = 'experimental';
-			}
-			$config = array(
-					'slug'               => plugin_basename( __FILE__ ), // this is the slug of your plugin
-					'proper_folder_name' => 'frontend-user-management', // this is the name of the folder your plugin lives in
-					'api_url'            => 'https://api.github.com/repos/SchwarzwaldFalke/frontend_user_management', // the github API url of your github repo
-					'raw_url'            => 'https://raw.github.com/SchwarzwaldFalke/frontend_user_management/' . $branch, // the github raw url of your github repo
-					'github_url'         => 'https://github.com/SchwarzwaldFalke/frontend_user_management', // the github url of your github repo
-					'zip_url'            => 'https://github.com/SchwarzwaldFalke/frontend_user_management/archive/' . $branch . '.zip', // the zip url of the github repo
-					'sslverify'          => true, // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
-					'requires'           => '3.7', // which version of WordPress does your plugin require?
-					'tested'             => '3.8', // which version of WordPress is your plugin tested up to?
-					'readme'             => 'README.MD' // which file to use as the readme for the version number
-			);
-			new WP_GitHub_Updater( $config );
-		}
-
-
 		Fum_Initialisation::initiate_plugin();
 		add_filter( 'tc_post_metas', array( $this, 'remove_meta' ) );
 	}
@@ -52,10 +29,6 @@ class Frontend_User_Management {
 
 		if ( 'Options' === $class_name ) {
 			require_once( Frontend_User_Management::$plugin_path . 'options.php' );
-		}
-
-		if ( 'WP_GitHub_Updater' === $class_name ) {
-			require_once( Frontend_User_Management::$plugin_path . 'updater.php' );
 		}
 
 		//Because of sucking wordpress name conventions class name != file name, convert it manually

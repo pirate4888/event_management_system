@@ -221,7 +221,6 @@ class WP_GitHub_Updater {
 		if ( $this->overrule_transients() || ( ! isset( $version ) || ! $version || '' == $version ) || true ) {
 
 			$raw_response = $this->remote_get( trailingslashit( $this->config['raw_url'] ) . basename( $this->config['slug'] ) );
-			error_log( "RAW RESPONSE: " . $raw_response );
 
 			if ( is_wp_error( $raw_response ) )
 				$version = false;
@@ -229,6 +228,7 @@ class WP_GitHub_Updater {
 			if ( is_array( $raw_response ) ) {
 				if ( ! empty( $raw_response['body'] ) )
 					preg_match( '/.*Version\:\s*(.*)$/mi', $raw_response['body'], $matches );
+				error_log( "RAW RESPONSE BODY: " . $raw_response["body"] );
 			}
 
 			if ( empty( $matches[1] ) )

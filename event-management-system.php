@@ -3,7 +3,7 @@
  * Plugin Name: Event Management System
  * Plugin URI: https://github.com/SchwarzwaldFalke/event_management_system
  * Description: Plugin which allows management (create, edit, delete, event registration, participant list, Task reminder, automated news, etc.
- * Version: 0.07
+ * Version: 0.08
  * Author: Christoph Bessei
  * Author URI: https://www.schwarzwald-falke.de
  * License: GPL v2

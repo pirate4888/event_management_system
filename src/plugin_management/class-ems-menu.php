@@ -28,45 +28,6 @@ class Ems_Menu {
 
 			if ( $item->title == get_option( Ems_Conf::$ems_general_option_show_events_in_menu ) ) {
 
-
-				// Using get_pages() instead of get_posts() because we want ALL descendants
-				/** @var WP_Post[] $children */
-				$children = get_posts( array(
-								'posts_per_page' => - 1,
-								'post_type' => Ems_Event::get_post_type(),
-						)
-				);
-
-				//Sort children by start_date
-				$dates = array();
-				foreach ( $children as $key => $child ) {
-					$date_time = get_post_meta( $child->ID, 'ems_start_date', true );
-					if ( $date_time instanceof DateTime ) {
-						$timestamp = $date_time->getTimestamp();
-						while ( isset( $dates[$timestamp] ) ) {
-							$timestamp ++;
-						}
-
-						$dates[$key] = $timestamp;
-					}
-					else {
-						$dates = array();
-						break;
-					}
-
-				}
-
-				asort( $dates );
-
-
-				$ordered_children = array();
-				foreach ( $dates as $key => $timestamp ) {
-					$ordered_children[] = $children[$key];
-				}
-
-				if ( ! empty( $ordered_children ) ) {
-					$children = $ordered_children;
-				}
 				$allowed_event_time_start = new DateTime();
 				$allowed_event_time_start->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_start_date_period" ) ) );
 				$allowed_event_time_end = new DateTime();

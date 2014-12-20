@@ -36,7 +36,7 @@ class Event_Management_System {
 				$branch = 'experimental';
 			}
 			$config = array(
-				'slug'               => plugin_basename( __FILE__ ),
+				'slug' => $plugin_path,
 				// this is the slug of your plugin
 				'proper_folder_name' => 'event-management-system',
 				// this is the name of the folder your plugin lives in

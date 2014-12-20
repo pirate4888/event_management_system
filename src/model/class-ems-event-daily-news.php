@@ -23,7 +23,7 @@ class Ems_Event_Daily_news extends Ems_Post {
 
 	public function save_post() {
 		/*
-		 * We need to verify this came from the our screen and with proper authorization,
+		 * We need to verify this came from our screen and with proper authorization,
 		 * because save_post can be triggered at other times.
 		 */
 
@@ -102,25 +102,25 @@ class Ems_Event_Daily_news extends Ems_Post {
 	}
 
 	public static function register_post_type() {
-		register_post_type( self::get_post_type(),
-			array(
-				'labels'             => array( 'name'          => __( 'Tagesberichte' ),
-				                               'singular_name' => __( 'Tagesbericht' )
-				),
-				'public'             => true,
-				'publicly_queryable' => true,
-				'show_ui'            => true,
-				'post_type'          => self::get_post_type(),
-				'show_in_menu'       => true,
-				'menu_icon'          => 'dashicons-admin-page',
-				'query_var'          => true,
-				'rewrite'            => true,
-				'capability_type'    => self::get_capability_type(),
-				'has_archive'        => false,
-				'hierarchical'       => false,
-				'supports'           => array( 'title', 'editor', 'custom_fields' ),
-			)
-		);
+//		register_post_type( self::get_post_type(),
+//			array(
+//				'labels'             => array( 'name'          => __( 'Tagesberichte' ),
+//				                               'singular_name' => __( 'Tagesbericht' )
+//				),
+//				'public'             => true,
+//				'publicly_queryable' => true,
+//				'show_ui'            => true,
+//				'post_type'          => self::get_post_type(),
+//				'show_in_menu'       => true,
+//				'menu_icon'          => 'dashicons-admin-page',
+//				'query_var'          => true,
+//				'rewrite'            => true,
+//				'capability_type'    => self::get_capability_type(),
+//				'has_archive'        => false,
+//				'hierarchical'       => false,
+//				'supports'           => array( 'title', 'editor', 'custom_fields' ),
+//			)
+//		);
 	}
 
 	public static function get_custom_columns() {

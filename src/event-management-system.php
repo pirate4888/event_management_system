@@ -2,21 +2,21 @@
 
 class Event_Management_System {
 
-	private static $plugin_path = NULL;
-	private static $plugin_url = NULL;
+	private static $plugin_path = null;
+	private static $plugin_url = null;
 	private static $src_directories = array(
-			'controller',
+		'controller',
 		'../lib',
-			'model',
-			'view',
-			'utility',
-			'plugin_management',
-			'../../../../wp-includes',
+		'model',
+		'view',
+		'utility',
+		'plugin_management',
+		'../../../../wp-includes',
 		'abstract',
 		'interface',
 	);
 
-	public function __construct( $plugin_path = NULL, $plugin_url = NULL ) {
+	public function __construct( $plugin_path = null, $plugin_url = null ) {
 
 		//add_filter( 'fum_option_page_entries', array( $this, 'remove_fum_option_page' ) );
 
@@ -36,16 +36,26 @@ class Event_Management_System {
 				$branch = 'experimental';
 			}
 			$config = array(
-					'slug'               => plugin_basename( __FILE__ ), // this is the slug of your plugin
-					'proper_folder_name' => 'event-management-system', // this is the name of the folder your plugin lives in
-					'api_url'            => 'https://api.github.com/repos/SchwarzwaldFalke/event_management_system', // the github API url of your github repo
-					'raw_url'            => 'https://raw.github.com/SchwarzwaldFalke/event_management_system/' . $branch, // the github raw url of your github repo
-					'github_url'         => 'https://github.com/SchwarzwaldFalke/event_management_system', // the github url of your github repo
-					'zip_url'            => 'https://github.com/SchwarzwaldFalke/event_management_system/archive/' . $branch . '.zip', // the zip url of the github repo
-					'sslverify'          => true, // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
-					'requires'           => '3.7', // which version of WordPress does your plugin require?
-					'tested'             => '3.8', // which version of WordPress is your plugin tested up to?
-					'readme'             => 'README.MD' // which file to use as the readme for the version number
+				'slug'               => plugin_basename( __FILE__ ),
+				// this is the slug of your plugin
+				'proper_folder_name' => 'event-management-system',
+				// this is the name of the folder your plugin lives in
+				'api_url'            => 'https://api.github.com/repos/SchwarzwaldFalke/event_management_system',
+				// the github API url of your github repo
+				'raw_url'            => 'https://raw.github.com/SchwarzwaldFalke/event_management_system/' . $branch,
+				// the github raw url of your github repo
+				'github_url'         => 'https://github.com/SchwarzwaldFalke/event_management_system',
+				// the github url of your github repo
+				'zip_url'            => 'https://github.com/SchwarzwaldFalke/event_management_system/archive/' . $branch . '.zip',
+				// the zip url of the github repo
+				'sslverify'          => true,
+				// wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
+				'requires'           => '3.7',
+				// which version of WordPress does your plugin require?
+				'tested'             => '4.1',
+				// which version of WordPress is your plugin tested up to?
+				'readme'             => 'README.MD'
+				// which file to use as the readme for the version number
 			);
 			new WP_GitHub_Updater( $config );
 		}
@@ -62,6 +72,7 @@ class Event_Management_System {
 
 		if ( 'WP_GitHub_Updater' === $class_name ) {
 			require_once( __DIR__ . '/../lib/updater.php' );
+
 			return;
 		}
 
@@ -69,6 +80,7 @@ class Event_Management_System {
 		$class_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) . '.php' );
 		if ( file_exists( Event_Management_System::$plugin_path . $class_name ) ) {
 			require_once( Event_Management_System::$plugin_path . $class_name );
+
 			return;
 		}
 
@@ -77,6 +89,7 @@ class Event_Management_System {
 			$path = Event_Management_System::$plugin_path . $dir . $class_name;
 			if ( file_exists( $path ) ) {
 				require_once( $path );
+
 				return;
 			}
 		}

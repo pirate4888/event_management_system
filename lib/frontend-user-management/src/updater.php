@@ -348,7 +348,9 @@ class WP_GitHub_Updater {
 	 */
 	public function get_plugin_data() {
 		include_once ABSPATH . '/wp-admin/includes/plugin.php';
+		error_log( "get_plugin_data()" . WP_PLUGIN_DIR . '/' . $this->config['slug'] );
 		$data = get_plugin_data( WP_PLUGIN_DIR . '/' . $this->config['slug'] );
+		error_log( print_r( $data, true ) );
 		return $data;
 	}
 

@@ -67,6 +67,15 @@ class Ems_Menu {
 				if ( ! empty( $ordered_children ) ) {
 					$children = $ordered_children;
 				}
+				$allowed_event_time_start = new DateTime();
+				$allowed_event_time_start->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_start_date_period" ) ) );
+				$allowed_event_time_end = new DateTime();
+				$allowed_event_time_end->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_end_date_period" ) ) );
+				$allowed_event_time_period = new Ems_Date_Period( $allowed_event_time_start, $allowed_event_time_end );
+				$events                    = Ems_Event::get_events( - 1, true, false, null, array(), $allowed_event_time_period );
+				foreach ( $events as $event ) {
+					$children[] = $event->get_post();
+				};
 
 
 				$parent_field = 'post_parent';
@@ -86,7 +95,7 @@ class Ems_Menu {
 			if ( ! $filter_added )
 				add_filter( 'wp_nav_menu_objects', array( 'Ems_Menu', 'fix_menu_current_item' ) );
 
-			//Add Eventanmeldung as child
+			//Add Eventregistration as child
 			$children[] = get_post( get_option( Fum_Conf::$fum_event_registration_page ) );
 
 			// Add each child to the menu

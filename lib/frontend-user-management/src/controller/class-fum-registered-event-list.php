@@ -30,8 +30,9 @@ class Fum_Registered_Event_list {
 			foreach ( $registrations as $registration ) {
 				$id = $registration->get_event_post_id();
 				$event = Ems_Event::get_event( $id );
+				//Skip if event does not exist or is not accesible (e.g when set to private)
 				if ( null === $event ) {
-					echo "WTF";
+					continue;
 				}
 				//Is it allowed to register/unregister for events in the past?
 				if ( ! get_option( "ems_allow_event_management_past_events" ) && $event->get_start_date_time()->getTimestamp() < time() ) {

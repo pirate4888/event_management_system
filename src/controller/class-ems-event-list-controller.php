@@ -16,10 +16,6 @@ class Ems_Event_List_Controller {
 			$start_date        = "";
 			if ( NULL !== $start_date_object ) {
 				$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
-				//Is it allowed to register/unregister for events in the past?
-				if ( ! get_option( "ems_allow_event_management_past_events" ) && $start_date_object->getTimestamp() < time() ) {
-					continue;
-				}
 			}
 			/** @var DateTime $end_date_object */
 			$end_date_object = $event->get_end_date_time();

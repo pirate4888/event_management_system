@@ -28,9 +28,12 @@ class Fum_Registered_Event_list {
 
 			$type_checkbox = new Html_Input_Type_Enum( Html_Input_Type_Enum::CHECKBOX );
 			foreach ( $registrations as $registration ) {
-				echo get_option( 'ems_allow_event_management_past_events' );
 				$id = $registration->get_event_post_id();
 				$event = Ems_Event::get_event( $id );
+				//Is it allowed to register/unregister for events in the past?
+				if ( ! get_option( "ems_allow_event_management_past_events" ) && $event->get_start_date_time()->getTimestamp() < time() ) {
+					continue;
+				}
 
 				$name = get_post( $id )->post_title;
 

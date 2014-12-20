@@ -99,6 +99,7 @@ class WP_GitHub_Updater {
 
 		// set sslverify for zip download
 		add_filter( 'http_request_args', array( $this, 'http_request_sslverify' ), 10, 2 );
+		echo "Added filter in WP_GitHub_Updater";
 	}
 
 	public function has_minimum_config() {

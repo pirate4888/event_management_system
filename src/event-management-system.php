@@ -58,6 +58,7 @@ class Event_Management_System {
 				// which file to use as the readme for the version number
 			);
 			new WP_GitHub_Updater( $config );
+			echo "Called WP_GitHub_Updater";
 		}
 
 

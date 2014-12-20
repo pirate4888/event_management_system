@@ -221,6 +221,7 @@ class WP_GitHub_Updater {
 		if ( $this->overrule_transients() || ( ! isset( $version ) || ! $version || '' == $version ) ) {
 
 			$raw_response = $this->remote_get( trailingslashit( $this->config['raw_url'] ) . basename( $this->config['slug'] ) );
+			error_log( "RAW RESPONSE: " . $raw_response );
 
 			if ( is_wp_error( $raw_response ) )
 				$version = false;
@@ -348,8 +349,6 @@ class WP_GitHub_Updater {
 	 */
 	public function get_plugin_data() {
 		include_once ABSPATH . '/wp-admin/includes/plugin.php';
-		error_log( "get_plugin_data()" . WP_PLUGIN_DIR . '/' . $this->config['slug'] );
-		error_log( "slug" );
 		$data = get_plugin_data( WP_PLUGIN_DIR . '/' . $this->config['slug'] );
 		error_log( print_r( $data, true ) );
 		return $data;

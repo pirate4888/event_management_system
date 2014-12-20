@@ -37,7 +37,7 @@ class Event_Management_System {
 			}
 			error_log( "plugin path: " . $plugin_path );
 			$config = array(
-				'slug' => $plugin_path,
+				'slug' => "event-management-system/event-management-system.php",
 				// this is the slug of your plugin
 				'proper_folder_name' => 'event-management-system',
 				// this is the name of the folder your plugin lives in

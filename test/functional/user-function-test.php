@@ -5,7 +5,7 @@ require_once( 'config.php' );
 class User_Function_Test extends SauceWrapper {
 
 	public function setUpPage() {
-		$this->url( get_site_url() );
+//		$this->url( get_site_url() );
 	}
 
 	/**

@@ -80,7 +80,6 @@ class Ems_Option_Page_Controller {
 		$description = '';
 		$option = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'checkbox' );
 		$options[]   = $option;
-		print_r( $options );
 
 		//Add created options to $option_group and register $option_group
 		$option_group->set_options( $options );

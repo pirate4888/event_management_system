@@ -100,6 +100,7 @@ class WP_GitHub_Updater {
 
 		// set sslverify for zip download
 		add_filter( 'http_request_args', array( $this, 'http_request_sslverify' ), 10, 2 );
+		error_log( "Added Filter" );
 	}
 
 	public function has_minimum_config() {
@@ -362,6 +363,7 @@ class WP_GitHub_Updater {
 *@return object $transient updated plugin data transient
 	 */
 	public function api_check( $transient ) {
+		error_log( "API CHECK" );
 
 		// Check if the transient contains the 'checked' information
 		// If not, just return its value without hacking it

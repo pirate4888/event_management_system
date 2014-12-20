@@ -71,12 +71,6 @@ class Event_Management_System {
 
 	public function autoload( $class_name ) {
 
-		if ( 'WP_GitHub_Updater' === $class_name ) {
-			require_once( __DIR__ . '/../lib/updater.php' );
-
-			return;
-		}
-
 		//Because of sucking wordpress name conventions class name != file name, convert it manually
 		$class_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) . '.php' );
 		if ( file_exists( Event_Management_System::$plugin_path . $class_name ) ) {

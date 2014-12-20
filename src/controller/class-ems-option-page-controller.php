@@ -45,7 +45,7 @@ class Ems_Option_Page_Controller {
 		//Add option to option_group
 		$options[] = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
 
-		//Create hide wordpress login and register page checkbox
+		//Create hide wordpress login and register page checkboxtext
 		$name  = 'ems_git_branch';
 		$title = 'Welche Version soll verwendet werden (Experimental beinhaltet nicht geteste Versionen!)';
 
@@ -74,11 +74,13 @@ class Ems_Option_Page_Controller {
 		$option->set_class( 'datepicker_period_end' );
 		$options[] = $option;
 
+		//Add
 		$name        = 'ems_allow_event_management_past_events';
 		$title       = 'Dürfen Benutzer sich bei Events die in der Vergangenheit liegen (bereits angefangen haben) an- und abmelden?';
 		$description = '';
-		$option      = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
+		$option = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'checkbox' );
 		$options[]   = $option;
+		print_r( $options );
 
 		//Add created options to $option_group and register $option_group
 		$option_group->set_options( $options );

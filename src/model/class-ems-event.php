@@ -40,6 +40,7 @@ class Ems_Event extends Ems_Post {
 		if ( is_numeric( $post ) ) {
 			$post = get_post( $post );
 		}
+		echo get_class( $post );
 
 		$this->post            = $post;
 		$this->start_date_time = get_post_meta( $post->ID, self::$start_date_meta_key, true );

@@ -35,6 +35,7 @@ class Event_Management_System {
 			if ( false !== get_option( 'ems_git_branch' ) && get_option( 'ems_git_branch' ) == 'experimental' ) {
 				$branch = 'experimental';
 			}
+			error_log( "plugin path: " . $plugin_path );
 			$config = array(
 				'slug' => $plugin_path,
 				// this is the slug of your plugin

@@ -9,6 +9,7 @@ class Ems_Initialisation {
 		add_shortcode( 'ems_teilnehmerlisten', array( 'Ems_Participant_List_Controller', 'get_participant_lists' ) );
 		add_shortcode( 'ems_event_list', array( 'Ems_Event_List_Controller', 'get_event_list' ) );
 		add_shortcode( 'ems_event_report_list', array( 'Ems_Event_Report_Controller', 'process_event_report_list' ) );
+		//TODO Add Shortcode For "Register here" Link
 
 		self::add_action();
 		self::add_filter();

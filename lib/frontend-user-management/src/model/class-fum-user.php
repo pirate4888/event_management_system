@@ -81,7 +81,11 @@ class Fum_User extends Fum_Observable implements Fum_Observer {
 	}
 
 	public static function get_user_data( $id ) {
-		$user_data = get_userdata( $id )->to_array();
+		$user_data = get_userdata( $id );
+		if ( false === $user_data ) {
+			throw new Exception( "Couldn't find user data of user id " . $id );
+		}
+		$user_data = $user_data->to_array();
 		$user_meta = get_user_meta( $id );
 
 		$callback = create_function( '$value', 'return implode( "", $value );' );

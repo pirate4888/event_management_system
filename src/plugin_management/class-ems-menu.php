@@ -28,6 +28,7 @@ class Ems_Menu {
 
 			if ( $item->title == get_option( Ems_Conf::$ems_general_option_show_events_in_menu ) ) {
 
+				//TODO Need helper function which returns Date Period for allowed events
 				$allowed_event_time_start = new DateTime();
 				$allowed_event_time_start->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_start_date_period" ) ) );
 				$allowed_event_time_end = new DateTime();

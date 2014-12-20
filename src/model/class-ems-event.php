@@ -276,6 +276,8 @@ class Ems_Event extends Ems_Post {
 				return $event;
 			}
 		}
+
+		return null;
 	}
 
 

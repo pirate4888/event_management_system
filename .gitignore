@@ -1,0 +1,3 @@
+# Created by .gitignore support plugin (hsz.mobi)
+wp-content/plugins/event-management-system/src/*.xlsx
+event-management-system-updater.php

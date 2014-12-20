@@ -67,6 +67,9 @@ class Ems_Participant_List_Controller {
 			foreach ( $registrations as $registration ) {
 
 				$user_data = array_intersect_key( Fum_User::get_user_data( $registration->get_user_id() ), Fum_Html_Form::get_form( Fum_Conf::$fum_event_register_form_unique_name )->get_unique_names_of_input_fields() );
+				if ( empty( $user_data ) ) {
+					continue;
+				}
 				unset( $user_data[Fum_Conf::$fum_input_field_submit] );
 				unset( $user_data[Fum_Conf::$fum_input_field_accept_agb] );
 				$merged_array = array_merge( $user_data, $registration->get_data() );

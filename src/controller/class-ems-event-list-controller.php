@@ -22,7 +22,7 @@ class Ems_Event_List_Controller {
 			$start_date        = "";
 			if ( null !== $start_date_object ) {
 				$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
-				if ( ! $allowed_event_time_period->contains( new DateTime( $start_date_object->getTimestamp() ) ) ) {
+				if ( ! $allowed_event_time_period->contains( $start_date_object ) ) {
 					continue;
 				}
 			}

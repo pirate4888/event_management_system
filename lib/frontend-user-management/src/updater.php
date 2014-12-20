@@ -68,6 +68,7 @@ class WP_GitHub_Updater {
 	 * @return void
 	 */
 	public function __construct( $config = array() ) {
+		error_log( "Constructor2" );
 
 		$defaults = array(
 			'slug'               => plugin_basename( __FILE__ ),

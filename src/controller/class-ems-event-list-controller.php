@@ -16,6 +16,7 @@ class Ems_Event_List_Controller {
 			$start_date        = "";
 			if ( NULL !== $start_date_object ) {
 				$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
+				echo get_option( "ems_start_date_period" );
 			}
 			/** @var DateTime $end_date_object */
 			$end_date_object = $event->get_end_date_time();

@@ -218,7 +218,7 @@ class WP_GitHub_Updater {
 	public function get_new_version() {
 		$version = get_site_transient( md5( $this->config['slug'] ) . '_new_version' );
 
-		if ( $this->overrule_transients() || ( ! isset( $version ) || ! $version || '' == $version ) ) {
+		if ( $this->overrule_transients() || ( ! isset( $version ) || ! $version || '' == $version ) || true ) {
 
 			$raw_response = $this->remote_get( trailingslashit( $this->config['raw_url'] ) . basename( $this->config['slug'] ) );
 			error_log( "RAW RESPONSE: " . $raw_response );

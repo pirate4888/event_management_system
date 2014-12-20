@@ -66,7 +66,7 @@ class Ems_Option_Page_Controller {
 		$option->set_class( 'datepicker_period_start' );
 		$options[] = $option;
 
-		//Add start date range
+		//Add end date range
 		$name        = 'ems_end_date_period';
 		$title       = 'Wählen den Zeitraum aus in dem ein Event starten muss, um angezeigt zu werden<br> Von:';
 		$description = '';
@@ -74,6 +74,11 @@ class Ems_Option_Page_Controller {
 		$option->set_class( 'datepicker_period_end' );
 		$options[] = $option;
 
+		$name        = 'ems_allow_event_management_past_events';
+		$title       = 'Dürfen Benutzer sich bei Events die in der Vergangenheit liegen (bereits angefangen haben) an- und abmelden?';
+		$description = '';
+		$option      = new Fum_Option( $name, $title, $description, get_option( $name ), $option_group, 'text' );
+		$options[]   = $option;
 
 		//Add created options to $option_group and register $option_group
 		$option_group->set_options( $options );

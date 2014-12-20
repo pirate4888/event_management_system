@@ -263,10 +263,19 @@ class Ems_Event extends Ems_Post {
 	}
 
 	public static function observe_object( Fum_Observable $observable ) {
-		if ( self::$object === NULL ) {
+		if ( self::$object === null ) {
 			self::$object = new Ems_Event( - 1 );
 		}
 		$observable->addObserver( self::$object );
+	}
+
+	public static function get_event( $id ) {
+		$events = self::get_events();
+		foreach ( $events as $event ) {
+			if ( $id == $event->ID ) {
+				return $event;
+			}
+		}
 	}
 
 	/**
@@ -284,7 +293,7 @@ class Ems_Event extends Ems_Post {
 	 * @throws Exception
 	 * @return Ems_Event[]    returns an array of Ems_Event
 	 */
-	public static function get_events( $limit = -1, $sort = true, $reverse_order = false, callable $user_sort_callback = NULL, array $user_args = array(), Ems_Date_Period $start_period = NULL, Ems_Date_Period $end_period = NULL ) {
+	public static function get_events( $limit = - 1, $sort = true, $reverse_order = false, callable $user_sort_callback = null, array $user_args = array(), Ems_Date_Period $start_period = null, Ems_Date_Period $end_period = null ) {
 
 		//return empty array if limit is 0
 		if ( 0 === $limit ) {
@@ -301,8 +310,8 @@ class Ems_Event extends Ems_Post {
 			$posts_per_page = - 1;
 		}
 		$args  = array(
-			'post_type' => self::get_post_type(),
-				'posts_per_page' => $posts_per_page,
+			'post_type'      => self::get_post_type(),
+			'posts_per_page' => $posts_per_page,
 		);
 		$posts = get_posts( array_merge( $user_args, $args ) );
 
@@ -312,14 +321,14 @@ class Ems_Event extends Ems_Post {
 			$event           = new Ems_Event( $post );
 			$start_date_time = $event->get_start_date_time();
 			//Check if start period is set and if the event start fits in
-			if ( NULL !== $start_period && ( ! $start_date_time instanceof DateTime || ! $start_period->contains( $event->get_start_date_time() ) ) ) {
+			if ( null !== $start_period && ( ! $start_date_time instanceof DateTime || ! $start_period->contains( $event->get_start_date_time() ) ) ) {
 				//Skip event if start isn't in start period
 				continue;
 			}
 
 			$end_date_time = $event->get_end_date_time();
 			//Check if end period is set and if the event end fits in
-			if ( NULL !== $end_period && ( ! $end_date_time instanceof DateTime || ! $end_period->contains( $event->get_end_date_time() ) ) ) {
+			if ( null !== $end_period && ( ! $end_date_time instanceof DateTime || ! $end_period->contains( $event->get_end_date_time() ) ) ) {
 				//Skip event if end isn't in end period
 				continue;
 			}
@@ -328,7 +337,7 @@ class Ems_Event extends Ems_Post {
 
 
 		if ( $sort ) {
-			if ( NULL === $user_sort_callback ) {
+			if ( null === $user_sort_callback ) {
 				$user_sort_callback = array( __CLASS__, 'compare' );
 			}
 
@@ -344,15 +353,16 @@ class Ems_Event extends Ems_Post {
 		if ( $sort && $limit > - 1 ) {
 			$events = array_splice( $events, 0, $limit );
 		}
+
 		return $events;
 	}
 
-	private static function register_user_to_event( $event_post_id, $user_id, Fum_Html_Form $form = NULL ) {
+	private static function register_user_to_event( $event_post_id, $user_id, Fum_Html_Form $form = null ) {
 		$event_registration = new Ems_Event_Registration( $event_post_id, $user_id );
 		$data               = array();
 
 		$used_input_fields = Fum_Activation::get_event_input_fields();
-		if ( NULL !== $form ) {
+		if ( null !== $form ) {
 			foreach ( $form->get_input_fields() as $input_field ) {
 				//Skip select_event field (contains ID) because we already have $event_post_id
 				if ( $input_field->get_unique_name() == 'select_event' || $input_field->get_unique_name() == Fum_Conf::$fum_input_field_accept_agb ) {
@@ -363,7 +373,7 @@ class Ems_Event extends Ems_Post {
 					if ( empty( $value ) ) {
 						$value = 0;
 					}
-					$data[$input_field->get_unique_name()] = $value;
+					$data[ $input_field->get_unique_name() ] = $value;
 				}
 			}
 		}

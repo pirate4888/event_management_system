@@ -278,6 +278,17 @@ class Ems_Event extends Ems_Post {
 		}
 	}
 
+
+	public static function get_active_events() {
+		$allowed_event_time_start = new DateTime();
+		$allowed_event_time_start->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_start_date_period" ) ) );
+		$allowed_event_time_end = new DateTime();
+		$allowed_event_time_end->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_end_date_period" ) ) );
+		$allowed_event_time_period = new Ems_Date_Period( $allowed_event_time_start, $allowed_event_time_end );
+
+		return self::get_events( - 1, true, false, null, array(), $allowed_event_time_period );
+	}
+
 	/**
 	 * Returns an array of events (posts with post_type Ems_Event::$post_type)
 	 *

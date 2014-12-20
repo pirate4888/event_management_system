@@ -23,19 +23,16 @@ class Ems_Participant_List_Controller {
 				</p>
 			<?php
 			}
+
 			return;
 		}
-		$events = Ems_Event::get_events();
-
-		$form = new Fum_Html_Form( 'fum_parctipant_list_form', 'fum_participant_list_form', '#' );
-		$form->add_input_field( new Fum_Html_Input_Field( 'select_event', 'select_event', new Html_Input_Type_Enum( Html_Input_Type_Enum::SELECT ), 'Eventauswahl', 'select_event', false ) );
-
+		$events = Ems_Event::get_active_events();
 
 		foreach ( $events as $event ) {
 
 			$date_time = $event->get_start_date_time();
 			$year      = '';
-			if ( NULL !== $date_time ) {
+			if ( null !== $date_time ) {
 				$timestamp = $date_time->getTimestamp();
 				$year      = date( 'Y', $timestamp );
 			}
@@ -46,18 +43,19 @@ class Ems_Participant_List_Controller {
 			$possible_values[] = array( 'title' => $title, 'value' => $value, 'ID' => $event->ID );
 			$form->get_input_field( 'select_event' )->set_possible_values( $possible_values );
 		}
-		if ( isset( $_REQUEST[Fum_Conf::$fum_input_field_select_event] ) ) {
-			$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_value( $_REQUEST[Fum_Conf::$fum_input_field_select_event] );
+		if ( isset( $_REQUEST[ Fum_Conf::$fum_input_field_select_event ] ) ) {
+			$form->get_input_field( Fum_Conf::$fum_input_field_select_event )->set_value( $_REQUEST[ Fum_Conf::$fum_input_field_select_event ] );
 		}
 		$form->add_input_field( Fum_Html_Input_Field::get_input_field( Fum_Conf::$fum_input_field_submit ) );
 		Fum_Form_View::output( $form );
 
 		//print particpant list if event selected
-		if ( isset( $_REQUEST[Fum_Conf::$fum_input_field_select_event] ) ) {
-			$id            = preg_replace( "/[^0-9]/", "", $_REQUEST[Fum_Conf::$fum_input_field_select_event] );
+		if ( isset( $_REQUEST[ Fum_Conf::$fum_input_field_select_event ] ) ) {
+			$id       = preg_replace( "/[^0-9]/", "", $_REQUEST[ Fum_Conf::$fum_input_field_select_event ] );
 			$registrations = Ems_Event_Registration::get_registrations_of_event( $id );
 			if ( empty( $registrations ) ) {
 				echo '<p><strong>Bisher gibt es keine Anmeldungen für dieses Event</strong></p>';
+
 				return;
 			}
 
@@ -70,8 +68,8 @@ class Ems_Participant_List_Controller {
 				if ( empty( $user_data ) ) {
 					continue;
 				}
-				unset( $user_data[Fum_Conf::$fum_input_field_submit] );
-				unset( $user_data[Fum_Conf::$fum_input_field_accept_agb] );
+				unset( $user_data[ Fum_Conf::$fum_input_field_submit ] );
+				unset( $user_data[ Fum_Conf::$fum_input_field_accept_agb ] );
 				$merged_array = array_merge( $user_data, $registration->get_data() );
 				$participant_list[] = $merged_array;
 			}
@@ -131,7 +129,7 @@ class Ems_Participant_List_Controller {
 					<?php foreach ( $participant_list as $participant ): ?>
 						<tr>
 							<?php foreach ( $order as $title => $unused ): ?>
-								<td><?php echo( 0 === $participant[$title] ? 'Nein' : ( "1" === $participant[$title] ? 'Ja' : $participant[$title] ) ); ?></td>
+								<td><?php echo( 0 === $participant[ $title ] ? 'Nein' : ( "1" === $participant[ $title ] ? 'Ja' : $participant[ $title ] ) ); ?></td>
 							<?php endforeach; ?>
 						</tr>
 					<?php endforeach; ?>
@@ -178,7 +176,7 @@ class Ems_Participant_List_Controller {
 			$objPHPExcel->getActiveSheet()->fromArray( $excel_array_public );
 
 			$objWriter = new PHPExcel_Writer_Excel2007( $objPHPExcel );
-			$filename    = $id . "_public" . '.xlsx';
+			$filename = $id . "_public" . '.xlsx';
 			$objWriter->save( Event_Management_System::get_plugin_path() . $filename );
 			echo '<p><a href="' . Event_Management_System::get_plugin_url() . $filename . '">Teilnehmerliste für Teilnehmer als Excelfile downloaden</a></p>';
 		}

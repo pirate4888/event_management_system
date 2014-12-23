@@ -18,6 +18,7 @@ class Fum_Redirect {
 		else {
 			$action = '';
 		}
+		$encoded_current_args = array_map( "urlencode", $_GET );
 		$link = add_query_arg( array_merge( $_GET, array( 'action' => $action ) ), get_permalink( get_option( Fum_Conf::$fum_register_login_page_name ) ) );
 		wp_safe_redirect( $link );
 		exit();

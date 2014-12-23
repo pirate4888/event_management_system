@@ -201,9 +201,6 @@ class Fum_Register_Login_Form_Controller {
 				case 'resetpass':
 				case 'rp':
 
-				global $wp_query;
-				error_log( print_r( $wp_query, true ) );
-				error_log( "get_query_var():" . get_query_var( "login" ) );
 				$user = check_password_reset_key( $_GET['key'], $_GET['login'] );
 				error_log( print_r( $_GET, true ) );
 				error_log( print_r( $user, true ) );
@@ -422,6 +419,7 @@ class Fum_Register_Login_Form_Controller {
 		}
 		else {
 			$login = trim( $_REQUEST['user_login'] );
+			error_log( "LOGIN AFTER INPUT." . $login );
 			$user_data = get_user_by( 'login', $login );
 		}
 
@@ -503,7 +501,7 @@ class Fum_Register_Login_Form_Controller {
 		$message .= sprintf( __( 'Username: %s' ), $user_login ) . "\r\n\r\n";
 		$message .= __( 'If this was a mistake, just ignore this email and nothing will happen.' ) . "\r\n\r\n";
 		$message .= __( 'To reset your password, visit the following address:' ) . "\r\n\r\n";
-		$message .= '<' . network_site_url( "wp-login.php?action=rp&key=$key&login=" . urlencode( $user_login ), 'login' ) . ">\r\n";
+		$message .= '<' . network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user_login ), 'login' ) . ">\r\n";
 
 		if ( is_multisite() )
 			$blogname = $GLOBALS['current_site']->site_name;

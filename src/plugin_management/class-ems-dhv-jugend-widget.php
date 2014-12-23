@@ -35,10 +35,10 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 			<?php if ( is_user_logged_in() && ( current_user_can( 'read_event' ) || current_user_can( "read_ems_event" ) ) ): ?>
 				<li><a href="<?php echo get_permalink( get_option( 'ems_partcipant_list_page' ) ); ?>">Teilnehmerlisten</a></li>
 			<?php endif; ?>
-			<?php if ( is_user_logged_in() && current_user_can( 'read_event' ) ): ?>
-				<li><a href="http://archiv.dhv-jugend.de">Internes Forum</a></li>
-			<?php endif; ?>
-			<?php if ( ! is_user_logged_in() || current_user_can( 'manage_options' ) || current_user_can( 'read_event' ) ): ?>
+			<!--			--><?php //if ( is_user_logged_in() && (current_user_can( 'read_event' ) || current_user_can( "read_ems_event" ))): ?>
+			<!--				<li><a href="http://archiv.dhv-jugend.de">Internes Forum</a></li>-->
+			<!--			--><?php //endif; ?>
+			<?php if ( ! is_user_logged_in() || current_user_can( 'manage_options' ) || ( current_user_can( 'read_event' ) || current_user_can( "read_ems_event" ) ) ): ?>
 				<?php wp_register(); ?>
 			<?php endif; ?>
 			<?php if ( is_user_logged_in() ): ?>

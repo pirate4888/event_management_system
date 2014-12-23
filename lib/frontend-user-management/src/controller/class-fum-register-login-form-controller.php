@@ -200,7 +200,10 @@ class Fum_Register_Login_Form_Controller {
 					break;
 				case 'resetpass':
 				case 'rp':
-
+				echo '<pre>';
+				print_r( $_GET );
+				print_r( $_REQUEST );
+				echo '</pre>';
 				$user = check_password_reset_key( $_GET['key'], $_GET['login'] );
 				error_log( print_r( $_GET, true ) );
 				error_log( print_r( $user, true ) );
@@ -419,7 +422,6 @@ class Fum_Register_Login_Form_Controller {
 		}
 		else {
 			$login = trim( $_REQUEST['user_login'] );
-			error_log( "LOGIN AFTER INPUT." . $login );
 			$user_data = get_user_by( 'login', $login );
 		}
 

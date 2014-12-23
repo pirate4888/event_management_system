@@ -28,6 +28,10 @@ class Ems_Participant_List_Controller {
 		}
 		$events = Ems_Event::get_active_events();
 
+		$form = new Fum_Html_Form( 'fum_parctipant_list_form', 'fum_participant_list_form', '#' );
+		$form->add_input_field( new Fum_Html_Input_Field( 'select_event', 'select_event', new Html_Input_Type_Enum( Html_Input_Type_Enum::SELECT ), 'Eventauswahl', 'select_event', false ) );
+
+
 		foreach ( $events as $event ) {
 
 			$date_time = $event->get_start_date_time();

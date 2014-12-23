@@ -200,7 +200,7 @@ class Fum_Register_Login_Form_Controller {
 					break;
 				case 'resetpass':
 				case 'rp':
-					$user = check_password_reset_key( $_GET['key'], $_GET['login'] );
+				$user = check_password_reset_key( $_GET['key'], urldecode( $_GET['login'] ) );
 					if ( is_wp_error( $user ) ) {
 						if ( $user->get_error_code() === 'expired_key' )
 							wp_redirect( get_permalink() . '?action=lostpassword&error=expiredkey' );

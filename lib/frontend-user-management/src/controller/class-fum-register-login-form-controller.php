@@ -203,6 +203,7 @@ class Fum_Register_Login_Form_Controller {
 				echo '<pre>';
 				print_r( $_GET );
 				print_r( $_REQUEST );
+				print_r( $_SERVER );
 				echo '</pre>';
 				$user = check_password_reset_key( $_GET['key'], $_GET['login'] );
 				error_log( print_r( $_GET, true ) );

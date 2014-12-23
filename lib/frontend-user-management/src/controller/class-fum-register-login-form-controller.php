@@ -203,6 +203,7 @@ class Fum_Register_Login_Form_Controller {
 
 				global $wp_query;
 				error_log( print_r( $wp_query, true ) );
+				error_log( "get_query_var():" . get_query_var( "login" ) );
 				$user = check_password_reset_key( $_GET['key'], $_GET['login'] );
 				error_log( print_r( $_GET, true ) );
 				error_log( print_r( $user, true ) );

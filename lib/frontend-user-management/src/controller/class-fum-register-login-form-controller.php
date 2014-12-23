@@ -207,14 +207,14 @@ class Fum_Register_Login_Form_Controller {
 				$user = check_password_reset_key( $_GET['key'], $_GET['login'] );
 				error_log( print_r( $_GET, true ) );
 				error_log( print_r( $user, true ) );
-					if ( is_wp_error( $user ) ) {
-						if ( $user->get_error_code() === 'expired_key' )
-							wp_redirect( get_permalink() . '?action=lostpassword&error=expiredkey' );
-						else
-							wp_redirect( get_permalink() . '?action=lostpassword&error=invalidkey' );
-						exit;
-					}
-
+//					if ( is_wp_error( $user ) ) {
+//						if ( $user->get_error_code() === 'expired_key' )
+//							wp_redirect( get_permalink() . '?action=lostpassword&error=expiredkey' );
+//						else
+//							wp_redirect( get_permalink() . '?action=lostpassword&error=invalidkey' );
+//						exit;
+//					}
+				exit();
 					$errors = new WP_Error();
 
 				if ( isset( $_REQUEST['pass1'] ) && $_REQUEST['pass1'] != $_REQUEST['pass2'] )

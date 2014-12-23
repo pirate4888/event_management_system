@@ -31,7 +31,7 @@ class Fum_Redirect {
 	}
 
 	public static function redirect_to_home_if_user_cannot_manage_options() {
-		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_event' ) && $_SERVER['PHP_SELF'] != '/wp-admin/profile.php' ) {
+		if ( ! current_user_can( 'manage_options' ) && ! ( current_user_can( 'edit_event' ) || current_user_can( 'edit_ems_event' ) ) && $_SERVER['PHP_SELF'] != '/wp-admin/profile.php' ) {
 			wp_safe_redirect( home_url() );
 		}
 	}

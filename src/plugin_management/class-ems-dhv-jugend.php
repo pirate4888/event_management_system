@@ -105,7 +105,7 @@ class Ems_Dhv_Jugend {
 		/** @var WP_User[] $users */
 		$users = get_users();
 		foreach ( $users as $key => $user ) {
-			if ( ! $user->has_cap( 'edit_event' ) ) {
+			if ( ! ( $user->has_cap( 'edit_event' ) || $user->has_cap( "edit_ems_event" ) ) ) {
 				unset( $users[$key] );
 			}
 		}

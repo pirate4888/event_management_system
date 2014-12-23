@@ -19,7 +19,7 @@ class Ems_Activation {
 		foreach ( $caps as $cap => $value ) {
 			$admin_role->add_cap( $cap );
 		}
-		error_log( print_r( $cap, true ) );
+		error_log( print_r( $caps, true ) );
 
 		remove_role( 'eventleiter' );
 		add_role( 'eventleiter', 'Eventleiter', $caps );

@@ -200,7 +200,7 @@ class Fum_Register_Login_Form_Controller {
 					break;
 				case 'resetpass':
 				case 'rp':
-				$user = check_password_reset_key( $_GET['key'], urldecode( $_GET['login'] ) );
+				$user = check_password_reset_key( $_GET['key'], $_GET['login'] );
 				error_log( print_r( $_GET, true ) );
 				error_log( print_r( $user, true ) );
 					if ( is_wp_error( $user ) ) {

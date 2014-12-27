@@ -45,15 +45,19 @@ class Ems_Event_Statistic_Controller {
 					$current_year_events = Ems_Event::get_events_by_start_date( new Ems_Date_Period( $start, $end ) );
 					echo "<h4>Teilnehmerzahlen</h4>";
 					$users = array();
+					$registration_count = 0;
 					foreach ( $current_year_events as $event ) {
 						$registrations = Ems_Event_Registration::get_registrations_of_event( $event->ID );
 						foreach ( $registrations as $registration ) {
+							$registration_count ++;
 							$users[ $registration->get_user_id() ] = true;
 						}
 						echo $event->post_title . ": " . count( $registrations ) . "<br>";
 					}
 					echo "<h4>Teilnehmer im Jahr " . $start_year . "</h4>";
 					echo count( $users );
+					echo "<h4>Anmeldungen im Jahr " . $start_year . "</h4>";
+					echo $registration_count;
 
 				}
 			}

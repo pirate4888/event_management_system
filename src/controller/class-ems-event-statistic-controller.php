@@ -27,23 +27,19 @@ class Ems_Event_Statistic_Controller {
 					$startdate_latest_event = $start_date_time;
 				}
 			}
-			error_log( print_r( $startdate_latest_event, true ) );
-			error_log( print_r( $startdate_oldest_event, true ) );
 
 			if ( null !== $startdate_oldest_event && null !== $startdate_latest_event ) {
 				$start_year = date( "Y", $startdate_oldest_event->getTimestamp() );
 				$end_year   = date( "Y", $startdate_latest_event->getTimestamp() );
-				error_log( "start: " . $start_year );
-				error_log( "End: " . $end_year );
 
 				for ( ; $start_year <= $end_year; $start_year ++ ) {
-					echo "<h3>" . $start_year . "</h3>";
+					echo "<h2>" . $start_year . "</h2>";
 					$start = new DateTime();
 					$start->setTimestamp( strtotime( "1-1-" . $start_year ) );
 					$end = new DateTime();
 					$end->setTimestamp( strtotime( "31-12-" . $end_year ) );
 					$current_year_events = Ems_Event::get_events_by_start_date( new Ems_Date_Period( $start, $end ) );
-					echo "<h4>Teilnehmerzahlen</h4>";
+					echo "<h2>Teilnehmerzahlen</h2>";
 					$users = array();
 					$registration_count = 0;
 					foreach ( $current_year_events as $event ) {
@@ -54,11 +50,10 @@ class Ems_Event_Statistic_Controller {
 						}
 						echo $event->post_title . ": " . count( $registrations ) . "<br>";
 					}
-					echo "<h4>Teilnehmer im Jahr " . $start_year . "</h4>";
+					echo "<h3>Teilnehmer im Jahr " . $start_year . "</h3>";
 					echo count( $users );
-					echo "<h4>Anmeldungen im Jahr " . $start_year . "</h4>";
+					echo "<h3>Anmeldungen im Jahr " . $start_year . "</h3>";
 					echo $registration_count;
-
 				}
 			}
 

@@ -33,13 +33,12 @@ class Ems_Event_Statistic_Controller {
 				$end_year   = date( "Y", $startdate_latest_event->getTimestamp() );
 
 				for ( ; $start_year <= $end_year; $start_year ++ ) {
-					echo "<h2>" . $start_year . "</h2>";
 					$start = new DateTime();
 					$start->setTimestamp( strtotime( "1-1-" . $start_year ) );
 					$end = new DateTime();
 					$end->setTimestamp( strtotime( "31-12-" . $end_year ) );
 					$current_year_events = Ems_Event::get_events_by_start_date( new Ems_Date_Period( $start, $end ) );
-					echo "<h2>Teilnehmerzahlen</h2>";
+					echo "<h2>Teilnehmerzahlen " . $start_year . "</h2>";
 					$users = array();
 					$registration_count = 0;
 					foreach ( $current_year_events as $event ) {

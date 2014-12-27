@@ -36,11 +36,17 @@ class Ems_Event_Statistic_Controller {
 				error_log( "start: " . $start_year );
 				error_log( "End: " . $end_year );
 
-				for ( ; $end_year <= $start_year; $start_year ++ ) {
+				for ( ; $start_year <= $end_year; $start_year ++ ) {
 					echo "<h3>" . $start_year . "</h3>";
-//					$start = new DateTime();
-//					$start->setTimestamp()
-//					$current_year_events = Ems_Event::get_events_by_start_date(new Ems_Date_Period(DateTime::c))
+					$start = new DateTime();
+					$start->setTimestamp( strtotime( "1-1-" . $start_year ) );
+					$end = new DateTime();
+					$end->setTimestamp( strtotime( "31-12-" . $end_year ) );
+					$current_year_events = Ems_Event::get_events_by_start_date( new Ems_Date_Period( $start, $end ) );
+					foreach ( $current_year_events as $event ) {
+						$registrations = Ems_Event_Registration::get_registrations_of_event( $event->ID );
+						echo $event->post_title . ": " . count( $registrations );
+					}
 				}
 			}
 

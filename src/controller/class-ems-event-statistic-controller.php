@@ -15,7 +15,7 @@ class Ems_Event_Statistic_Controller {
 
 			if ( $startdate_oldest_event instanceof DateTime ) {
 				$year = date( "Y", $startdate_oldest_event->getTimestamp() );
-				for ( $current_year = date( "Y" ); $year >= $current_year; $year ++ ) {
+				for ( $current_year = date( "Y" ); $year <= $current_year; $year ++ ) {
 					echo "<h3>" . $year . "</h3>";
 //					$start = new DateTime();
 //					$start->setTimestamp()

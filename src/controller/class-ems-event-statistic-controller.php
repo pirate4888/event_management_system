@@ -33,6 +33,8 @@ class Ems_Event_Statistic_Controller {
 			if ( null !== $startdate_oldest_event && null !== $startdate_latest_event ) {
 				$start_year = date( "Y", $startdate_oldest_event->getTimestamp() );
 				$end_year   = date( "Y", $startdate_latest_event->getTimestamp() );
+				error_log( "start: " . $start_year );
+				error_log( "End: " . $end_year );
 
 				for ( ; $end_year <= $start_year; $start_year ++ ) {
 					echo "<h3>" . $start_year . "</h3>";

@@ -29,9 +29,11 @@ class Ems_Event_Statistic_Controller {
 			}
 
 			if ( null !== $startdate_oldest_event && null !== $startdate_latest_event ) {
-				$year = date( "Y", $startdate_oldest_event->getTimestamp() );
-				for ( $current_year = date( "Y" ); $year <= $current_year; $year ++ ) {
-					echo "<h3>" . $year . "</h3>";
+				$start_year = date( "Y", $startdate_oldest_event->getTimestamp() );
+				$end_year   = date( "Y", $startdate_latest_event->getTimestamp() );
+
+				for ( ; $end_year <= $start_year; $start_year ++ ) {
+					echo "<h3>" . $start_year . "</h3>";
 //					$start = new DateTime();
 //					$start->setTimestamp()
 //					$current_year_events = Ems_Event::get_events_by_start_date(new Ems_Date_Period(DateTime::c))

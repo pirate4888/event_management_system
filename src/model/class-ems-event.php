@@ -280,7 +280,11 @@ class Ems_Event extends Ems_Post {
 		return null;
 	}
 
-
+	/**
+	 * Returns the events which are currently active (starts between ems_start_date_period and ems_end_date_period)
+	 * @return Ems_Event[]
+	 * @throws Exception
+	 */
 	public static function get_active_events() {
 		$allowed_event_time_start = new DateTime();
 		$allowed_event_time_start->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_start_date_period" ) ) );
@@ -290,6 +294,29 @@ class Ems_Event extends Ems_Post {
 
 		return self::get_events( - 1, true, false, null, array(), $allowed_event_time_period );
 	}
+
+
+	/**
+	 * @param Ems_Date_Period $start_period
+	 *
+	 * @return Ems_Event[]
+	 * @throws Exception
+	 */
+	public static function get_events_by_start_date( Ems_Date_Period $start_period ) {
+
+		return self::get_events( - 1, true, false, null, array(), $start_period );
+	}
+
+	/**
+	 * @param Ems_Date_Period $end_period
+	 *
+	 * @return Ems_Event[]
+	 * @throws Exception
+	 */
+	public static function get_events_by_end_date( Ems_Date_Period $end_period ) {
+		return self::get_events( - 1, true, false, null, array(), null, $end_period );
+	}
+
 
 	/**
 	 * Returns an array of events (posts with post_type Ems_Event::$post_type)

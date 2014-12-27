@@ -6,9 +6,23 @@
  */
 class Ems_Initialisation {
 	public static function initiate_plugin() {
-		add_shortcode( 'ems_teilnehmerlisten', array( 'Ems_Participant_List_Controller', 'get_participant_lists' ) );
-		add_shortcode( 'ems_event_list', array( 'Ems_Event_List_Controller', 'get_event_list' ) );
-		add_shortcode( 'ems_event_report_list', array( 'Ems_Event_Report_Controller', 'process_event_report_list' ) );
+		add_shortcode( Ems_Conf::EMS_NAME_PREFIX . 'teilnehmerlisten', array(
+			'Ems_Participant_List_Controller',
+			'get_participant_lists'
+		) );
+		add_shortcode( Ems_Conf::EMS_NAME_PREFIX . 'event_list', array(
+			'Ems_Event_List_Controller',
+			'get_event_list'
+		) );
+		add_shortcode( Ems_Conf::EMS_NAME_PREFIX . 'event_report_list', array(
+			'Ems_Event_Report_Controller',
+			'process_event_report_list'
+		) );
+		add_shortcode( Ems_Conf::EMS_NAME_PREFIX . 'event_statistic', array(
+			'Ems_Event_Statistic_Controller',
+			'get_event_statistic'
+		) );
+
 		//TODO Add Shortcode For "Register here" Link
 
 		self::add_action();

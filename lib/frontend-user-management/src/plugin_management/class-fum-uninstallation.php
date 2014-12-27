@@ -6,7 +6,6 @@
  */
 class Fum_Uninstallation {
 	public static function uninstall_plugin() {
-		error_log( 'fum_uninstall_plugin' );
 		delete_option( Fum_Conf::$fum_register_form_use_activation_mail_option );
 
 

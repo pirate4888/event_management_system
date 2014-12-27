@@ -72,7 +72,6 @@ class Fum_Activation {
 	);
 
 	public static function activate_plugin() {
-		error_log( 'fum_activate_plugin' );
 		$front_end_form = new Fum_Front_End_Form();
 		$post_ids       = $front_end_form->add_form_posts();
 		add_option( Fum_Conf::$fum_register_login_page_name, $post_ids[Fum_Conf::$fum_register_login_page_name] );

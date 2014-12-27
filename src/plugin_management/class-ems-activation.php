@@ -9,7 +9,6 @@ class Ems_Activation {
 
 		//Setup frontend user management first (must be called here, because a second 'register_activation_hook' didn't work
 		Fum_Activation::activate_plugin();
-		error_log( 'ems_activate_plugin' );
 
 
 		$admin_role = get_role( 'administrator' );
@@ -19,16 +18,19 @@ class Ems_Activation {
 		foreach ( $caps as $cap => $value ) {
 			$admin_role->add_cap( $cap );
 		}
-		error_log( print_r( $caps, true ) );
 
 		remove_role( 'eventleiter' );
 		add_role( 'eventleiter', 'Eventleiter', $caps );
 
 
-		$post_id = Fum_Post::add_post( 'Eventverwaltung', 'Eventverwaltung', '[ems_eventverwaltung]' );
-		update_option( 'ems_eventmanagement_page', $post_id );
-		$post_id = Fum_Post::add_post( 'Teilnehmerlisten', 'Teilnehmerlisten', '[ems_teilnehmerlisten]' );
-		update_option( 'ems_partcipant_list_page', $post_id );
+		$post_id = Fum_Post::add_post( 'Event Statistiken', 'Event Statistiken', '[' . Ems_Conf::EMS_NAME_PREFIX . 'event_statistic]' );
+		update_option( Ems_Conf::EMS_NAME_PREFIX . 'event_statistic_page', $post_id );
+
+		$post_id = Fum_Post::add_post( 'Eventverwaltung', 'Eventverwaltung', '[' . Ems_Conf::EMS_NAME_PREFIX . 'eventverwaltung]' );
+		update_option( Ems_Conf::EMS_NAME_PREFIX . 'eventmanagement_page', $post_id );
+
+		$post_id = Fum_Post::add_post( 'Teilnehmerlisten', 'Teilnehmerlisten', '[' . Ems_Conf::EMS_NAME_PREFIX . 'teilnehmerlisten]' );
+		update_option( Ems_Conf::EMS_NAME_PREFIX . 'partcipant_list_page', $post_id );
 
 	}
 

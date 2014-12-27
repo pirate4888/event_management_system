@@ -27,8 +27,8 @@ class Ems_Event_Statistic_Controller {
 					$startdate_latest_event = $start_date_time;
 				}
 			}
-			error_log( $startdate_latest_event );
-			error_log( $startdate_oldest_event );
+			error_log( print_r( $startdate_latest_event, true ) );
+			error_log( print_r( $startdate_oldest_event, true ) );
 
 			if ( null !== $startdate_oldest_event && null !== $startdate_latest_event ) {
 				$start_year = date( "Y", $startdate_oldest_event->getTimestamp() );

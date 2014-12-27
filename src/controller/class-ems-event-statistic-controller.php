@@ -27,6 +27,8 @@ class Ems_Event_Statistic_Controller {
 					$startdate_latest_event = $start_date_time;
 				}
 			}
+			error_log( $startdate_latest_event );
+			error_log( $startdate_oldest_event );
 
 			if ( null !== $startdate_oldest_event && null !== $startdate_latest_event ) {
 				$start_year = date( "Y", $startdate_oldest_event->getTimestamp() );
@@ -40,7 +42,7 @@ class Ems_Event_Statistic_Controller {
 				}
 			}
 
-			return true;
+			return;
 		}
 		echo "Couldn't create statistic. No Events found.";
 	}

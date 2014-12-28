@@ -233,7 +233,7 @@ class Ems_Event extends Ems_Post {
 		$start_date        = "";
 		if ( null !== $start_date_object ) {
 			if ( $short ) {
-				$start_date = date_i18n( "D.M", $start_date_object->getTimestamp() );
+				$start_date = date_i18n( "j.n", $start_date_object->getTimestamp() );
 			} else {
 				$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
 			}
@@ -243,7 +243,7 @@ class Ems_Event extends Ems_Post {
 		$end_date        = "";
 		if ( null !== $end_date_object ) {
 			if ( $short ) {
-				$end_date = date_i18n( "D.M", $end_date_object->getTimestamp() );
+				$end_date = date_i18n( "j.n", $end_date_object->getTimestamp() );
 
 			} else {
 				$end_date = date_i18n( get_option( 'date_format' ), $end_date_object->getTimestamp() );

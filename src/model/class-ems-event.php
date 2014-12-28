@@ -225,6 +225,30 @@ class Ems_Event extends Ems_Post {
 	}
 
 	/**
+	 * @return null|string
+	 */
+	public function get_formatted_date() {
+		/** @var DateTime $start_date_object */
+		$start_date_object = $this->get_start_date_time();
+		$start_date        = "";
+		if ( null !== $start_date_object ) {
+			$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
+		}
+		/** @var DateTime $end_date_object */
+		$end_date_object = $this->get_end_date_time();
+		$end_date        = "";
+		if ( null !== $end_date_object ) {
+			$end_date = date_i18n( get_option( 'date_format' ), $end_date_object->getTimestamp() );
+		}
+		$date_string = null;
+		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+			$date_string = $start_date . ' - ' . $end_date;
+		}
+
+		return $date_string;
+	}
+
+	/**
 	 * Orders event ascending by start date and end date (if start dates are equal)
 	 *
 	 * @param Ems_Event $a

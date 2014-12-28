@@ -52,14 +52,9 @@ class Ems_Event_Statistic_Controller {
 							$registration_count ++;
 							$users[ $registration->get_user_id() ] = true;
 						}
-//						echo $event->post_title . ": " . count( $registrations ) . "<br>";
 					}
 					$participant_data->addPoint( new Point( $start_year, count( $users ) ) );
 					$registration_data->addPoint( new Point( $start_year, $registration_count ) );
-//					echo "<h3>Teilnehmer im Jahr " . $start_year . "</h3>";
-//					echo count( $users );
-//					echo "<h3>Anmeldungen im Jahr " . $start_year . "</h3>";
-//					echo $registration_count;
 				}
 				$participant_chart->setDataSet( $participant_data );
 				$participant_chart->setTitle( "Anzahl Teilnehmer pro Jahr" );

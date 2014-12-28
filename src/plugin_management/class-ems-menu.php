@@ -59,12 +59,12 @@ class Ems_Menu {
 				}
 
 				//Check if $child is already an item in the menu
-				if ( self::is_child_already_in_menu( $items, $event->get_post() ) ) {
+				if ( self::is_child_already_in_menu( $items, $event ) ) {
 					continue;
 				}
 				$event->post_parent = $parent_ID;
 
-				$event->set_post( wp_setup_nav_menu_item( $event->get_post() ) );
+				$event->set_post( wp_setup_nav_menu_item( $event ) );
 				$event->db_id = $event->ID;
 
 				self::$added[ $event->ID ] = true; // We'll need this later

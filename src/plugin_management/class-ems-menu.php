@@ -64,9 +64,9 @@ class Ems_Menu {
 				if ( self::is_child_already_in_menu( $items, $event ) ) {
 					continue;
 				}
-//				$event->post_parent = $parent_ID;
+				$event->post_parent = $parent_ID;
 //
-//				$event        = wp_setup_nav_menu_item( $event );
+				$event = wp_setup_nav_menu_item( $event );
 //				$event->db_id = $event->ID;
 //
 //				self::$added[ $event->ID ] = true; // We'll need this later

@@ -60,32 +60,32 @@ class Ems_Menu {
 //					}
 //				}
 
-				//Check if $child is already an item in the menu
-				if ( self::is_child_already_in_menu( $items, $event ) ) {
-					continue;
-				}
-				$event->post_parent = $parent_ID;
-
-				$event        = wp_setup_nav_menu_item( $event );
-				$event->db_id = $event->ID;
-
-				self::$added[ $event->ID ] = true; // We'll need this later
-
-				// Set the parent menu item.
-				// When adding items as children of existing menu items, their IDs won't match up
-				// which means that the parent value can't always be used.
-				if ( $event->$parent_field == $item->object_id ) {
-					$event->menu_item_parent = $item->ID; // Children
-				} else {
-					$event->menu_item_parent = $event->$parent_field; // Grandchildren, etc.
-				}
-
-				// The menu_order has to be unique, so make up new ones
-				// The items are already sorted due to the get_pages()
-				$menu_order ++;
-				$event->menu_order = $menu_order;
-
-				$items[] = $event;
+//				//Check if $child is already an item in the menu
+//				if ( self::is_child_already_in_menu( $items, $event ) ) {
+//					continue;
+//				}
+//				$event->post_parent = $parent_ID;
+//
+//				$event        = wp_setup_nav_menu_item( $event );
+//				$event->db_id = $event->ID;
+//
+//				self::$added[ $event->ID ] = true; // We'll need this later
+//
+//				// Set the parent menu item.
+//				// When adding items as children of existing menu items, their IDs won't match up
+//				// which means that the parent value can't always be used.
+//				if ( $event->$parent_field == $item->object_id ) {
+//					$event->menu_item_parent = $item->ID; // Children
+//				} else {
+//					$event->menu_item_parent = $event->$parent_field; // Grandchildren, etc.
+//				}
+//
+//				// The menu_order has to be unique, so make up new ones
+//				// The items are already sorted due to the get_pages()
+//				$menu_order ++;
+//				$event->menu_order = $menu_order;
+//
+//				$items[] = $event;
 			}
 		}
 
@@ -105,11 +105,6 @@ class Ems_Menu {
 
 		foreach ( $items as $item ) {
 			if ( $item->object_id == $child->ID ) {
-				/*				echo '<pre>';
-								print_r( $child );
-								print_r( $item );
-								echo '</pre>';*/
-
 				return true;
 			}
 		}

@@ -14,7 +14,6 @@ class Event_Management_System {
 		'../../../../wp-includes',
 		'abstract',
 		'interface',
-		'../lib/libchart/classes',
 	);
 
 	public function __construct( $plugin_path = null, $plugin_url = null ) {

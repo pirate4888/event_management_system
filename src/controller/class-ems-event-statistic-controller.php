@@ -6,6 +6,7 @@
  */
 class Ems_Event_Statistic_Controller {
 	public static function get_event_statistic() {
+		require_once( Event_Management_System::get_plugin_path() . "lib/libchart/classes/libchart.php" );
 		$events = Ems_Event::get_events();
 		if ( ! empty( $events ) ) {
 			$startdate_oldest_event = null;

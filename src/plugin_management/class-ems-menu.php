@@ -54,7 +54,7 @@ class Ems_Menu {
 			foreach ( $events as $event ) {
 				$post = $event->get_post();
 				//Set Title for menu
-				$date = $event->get_formatted_date();
+				$date = $event->get_formatted_date( true );
 				if ( null !== $date ) {
 					$post->post_title = $post->post_title . "<br>(" . $date . ")";
 				}

@@ -227,18 +227,27 @@ class Ems_Event extends Ems_Post {
 	/**
 	 * @return null|string
 	 */
-	public function get_formatted_date() {
+	public function get_formatted_date( $short = false ) {
 		/** @var DateTime $start_date_object */
 		$start_date_object = $this->get_start_date_time();
 		$start_date        = "";
 		if ( null !== $start_date_object ) {
-			$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
+			if ( $short ) {
+				$start_date = date_i18n( "d.m", $start_date_object->getTimestamp() );
+			} else {
+				$start_date = date_i18n( get_option( 'date_format' ), $start_date_object->getTimestamp() );
+			}
 		}
 		/** @var DateTime $end_date_object */
 		$end_date_object = $this->get_end_date_time();
 		$end_date        = "";
 		if ( null !== $end_date_object ) {
-			$end_date = date_i18n( get_option( 'date_format' ), $end_date_object->getTimestamp() );
+			if ( $short ) {
+				$end_date = date_i18n( "d.m", $end_date_object->getTimestamp() );
+
+			} else {
+				$end_date = date_i18n( get_option( 'date_format' ), $end_date_object->getTimestamp() );
+			}
 		}
 		$date_string = null;
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {

@@ -60,10 +60,10 @@ class Ems_Menu {
 //					}
 //				}
 
-//				//Check if $child is already an item in the menu
-//				if ( self::is_child_already_in_menu( $items, $event ) ) {
-//					continue;
-//				}
+				//Check if $child is already an item in the menu
+				if ( self::is_child_already_in_menu( $items, $event ) ) {
+					continue;
+				}
 //				$event->post_parent = $parent_ID;
 //
 //				$event        = wp_setup_nav_menu_item( $event );

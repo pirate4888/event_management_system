@@ -48,7 +48,7 @@ class Ems_Menu {
 			}
 
 			//Add Eventregistration as child
-			$events[] = get_post( get_option( Fum_Conf::$fum_event_registration_page ) );
+			$events[] = new Ems_Event( get_post( get_option( Fum_Conf::$fum_event_registration_page ) ) );
 
 			// Add each child to the menu
 			foreach ( $events as $event ) {

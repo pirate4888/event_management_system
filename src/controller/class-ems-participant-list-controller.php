@@ -6,7 +6,7 @@
  */
 class Ems_Participant_List_Controller {
 	public static $parent_slug = 'ems_participant_list';
-	/** @var  Ems_Option_Page[] $pages */
+	/** @var  Fum_Option_Page[] $pages */
 	public static $pages;
 
 	public static function get_participant_lists() {

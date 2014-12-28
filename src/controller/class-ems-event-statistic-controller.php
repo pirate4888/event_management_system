@@ -6,6 +6,11 @@
  */
 class Ems_Event_Statistic_Controller {
 	public static function get_event_statistic() {
+		//If user has no access, redirect to home
+		if ( ! current_user_can( Ems_Event::get_edit_capability() ) ) {
+			wp_redirect( home_url() );
+			exit;
+		}
 		require_once( Event_Management_System::get_plugin_path() . "../lib/libchart/classes/libchart.php" );
 		$events = Ems_Event::get_events();
 		if ( ! empty( $events ) ) {

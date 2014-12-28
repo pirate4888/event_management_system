@@ -7,7 +7,11 @@
 class Ems_Event_List_Controller {
 
 	public static function get_event_list() {
-
+		//If user has no access, redirect to home
+		if ( ! current_user_can( Ems_Event::get_edit_capability() ) ) {
+			wp_redirect( home_url() );
+			exit;
+		}
 
 		$allowed_event_time_start = new DateTime();
 		$allowed_event_time_start->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_start_date_period" ) ) );

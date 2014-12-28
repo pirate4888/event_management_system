@@ -82,8 +82,8 @@ class Ems_Menu {
 
 //				// The menu_order has to be unique, so make up new ones
 //				// The items are already sorted due to the get_pages()
-				$menu_order ++;
-				$event->menu_order = $menu_order;
+//				$menu_order ++;
+//				$event->menu_order = $menu_order;
 
 				$items[] = $event;
 			}

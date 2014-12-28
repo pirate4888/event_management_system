@@ -34,10 +34,10 @@ class Ems_Event_List_Controller {
 				$date_string = $start_date . ' - ' . $end_date;
 			}
 			?>
-			<div style="margin-bottom: 20px;">
+			<div style="margin-bottom: 5px;">
 				<div style="width:60%; min-width:300px;float:left;">
 					<a href="<?php echo get_permalink( $event->ID ); ?>"><?php echo $event->post_title; ?></a></div>
-				<div><i><?php echo $date_string; ?> </i></div>
+				<div style="width:39%;text-align: right;"><i><?php echo $date_string; ?> </i></div>
 			</div>
 
 		<?php

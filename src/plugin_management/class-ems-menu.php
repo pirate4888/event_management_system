@@ -83,7 +83,7 @@ class Ems_Menu {
 				$menu_order ++;
 				$event->menu_order = $menu_order;
 
-				$items[] = $event;
+				$items[] = $event->get_post();
 			}
 		}
 

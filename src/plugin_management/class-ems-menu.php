@@ -56,7 +56,7 @@ class Ems_Menu {
 				//Set Title for menu
 				$date = $event->get_formatted_date();
 				if ( null !== $date ) {
-					$post->post_title = $post->post_title . "(" . $date . ")";
+					$post->post_title = $post->post_title . "<br>(" . $date . ")";
 				}
 
 				//Check if $child is already an item in the menu

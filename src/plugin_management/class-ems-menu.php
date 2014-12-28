@@ -64,7 +64,7 @@ class Ems_Menu {
 				}
 				$event->post_parent = $parent_ID;
 
-				$child        = wp_setup_nav_menu_item( $event->get_post() );
+				$child = wp_setup_nav_menu_item( $event );
 				$child->db_id = $child->ID;
 
 				self::$added[ $child->ID ] = true; // We'll need this later

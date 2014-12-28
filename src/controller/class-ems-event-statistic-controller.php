@@ -33,15 +33,17 @@ class Ems_Event_Statistic_Controller {
 				$start_year = date( "Y", $startdate_oldest_event->getTimestamp() );
 				$end_year   = date( "Y", $startdate_latest_event->getTimestamp() );
 
-				$chart   = new VerticalBarChart( 500, 250 );
-				$dataSet = new XYDataSet();
+				$participant_chart  = new VerticalBarChart( 500, 250 );
+				$registration_chart = new VerticalBarChart( 500, 250 );
+				$participant_data   = new XYDataSet();
+				$registration_data  = new XYDataSet();
 				for ( ; $start_year <= $end_year; $start_year ++ ) {
 					$start = new DateTime();
 					$start->setTimestamp( strtotime( "1-1-" . $start_year ) );
 					$end = new DateTime();
 					$end->setTimestamp( strtotime( "31-12-" . $end_year ) );
 					$current_year_events = Ems_Event::get_events_by_start_date( new Ems_Date_Period( $start, $end ) );
-					echo "<h2>Teilnehmerzahlen " . $start_year . " (" . count( $current_year_events ) . " Events)</h2>";
+//					echo "<h2>Teilnehmerzahlen " . $start_year . " (" . count( $current_year_events ) . " Events)</h2>";
 					$users = array();
 					$registration_count = 0;
 					foreach ( $current_year_events as $event ) {
@@ -52,16 +54,23 @@ class Ems_Event_Statistic_Controller {
 						}
 //						echo $event->post_title . ": " . count( $registrations ) . "<br>";
 					}
-					$dataSet->addPoint( new Point( $start_year, count( $users ) ) );
-					echo "<h3>Teilnehmer im Jahr " . $start_year . "</h3>";
-					echo count( $users );
-					echo "<h3>Anmeldungen im Jahr " . $start_year . "</h3>";
-					echo $registration_count;
+					$participant_data->addPoint( new Point( $start_year, count( $users ) ) );
+					$registration_data->addPoint( new Point( $start_year, $registration_count ) );
+//					echo "<h3>Teilnehmer im Jahr " . $start_year . "</h3>";
+//					echo count( $users );
+//					echo "<h3>Anmeldungen im Jahr " . $start_year . "</h3>";
+//					echo $registration_count;
 				}
-				$chart->setDataSet( $dataSet );
-				$chart->setTitle( "Anzahl Teilnehmer pro Jahr" );
-				$path = "images/participants_" . time() . ".png";
-				$chart->render( Event_Management_System::get_plugin_path() . $path );
+				$participant_chart->setDataSet( $participant_data );
+				$participant_chart->setTitle( "Anzahl Teilnehmer pro Jahr" );
+				$path = "images/participant_count.png";
+				$participant_chart->render( Event_Management_System::get_plugin_path() . $path );
+				echo '<img src="' . Event_Management_System::get_plugin_url() . $path . '">';
+
+				$registration_chart->setDataSet( $registration_data );
+				$registration_chart->setTitle( "Anzahl Anmeldungen pro Jahr" );
+				$path = "images/registration_count.png";
+				$registration_chart->render( Event_Management_System::get_plugin_path() . $path );
 				echo '<img src="' . Event_Management_System::get_plugin_url() . $path . '">';
 			}
 

@@ -61,12 +61,12 @@ class Ems_Menu {
 //				}
 
 				//Check if $child is already an item in the menu
-				if ( self::is_child_already_in_menu( $items, $event ) ) {
+				if ( self::is_child_already_in_menu( $items, $event->get_post() ) ) {
 					continue;
 				}
 				$event->post_parent = $parent_ID;
 
-				$event = wp_setup_nav_menu_item( $event );
+				$event->set_post( wp_setup_nav_menu_item( $event->get_post() ) );
 				$event->db_id = $event->ID;
 
 				self::$added[ $event->ID ] = true; // We'll need this later
@@ -82,8 +82,8 @@ class Ems_Menu {
 
 //				// The menu_order has to be unique, so make up new ones
 //				// The items are already sorted due to the get_pages()
-//				$menu_order ++;
-//				$event->menu_order = $menu_order;
+				$menu_order ++;
+				$event->menu_order = $menu_order;
 
 				$items[] = $event;
 			}

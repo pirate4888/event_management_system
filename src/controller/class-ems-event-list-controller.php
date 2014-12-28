@@ -37,7 +37,7 @@ class Ems_Event_List_Controller {
 			<div style="margin-bottom: 5px;">
 				<div style="width:60%; min-width:300px;float:left;">
 					<a href="<?php echo get_permalink( $event->ID ); ?>"><?php echo $event->post_title; ?></a></div>
-				<div style="width:39%;text-align: right;"><i><?php echo $date_string; ?> </i></div>
+				<div style="text-align: right;"><i><?php echo $date_string; ?> </i></div>
 			</div>
 
 		<?php

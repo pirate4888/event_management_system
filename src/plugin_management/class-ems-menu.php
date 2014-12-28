@@ -52,38 +52,39 @@ class Ems_Menu {
 
 			// Add each child to the menu
 			foreach ( $events as $event ) {
+				$post = $event->get_post();
 				//Set Title for menu
 				$date = $event->get_formatted_date();
 				if ( null !== $date ) {
-					$event->post_title = $event->post_title . "(" . $date . ")";
+					$post->post_title = $post->post_title . "(" . $date . ")";
 				}
 
 				//Check if $child is already an item in the menu
-				if ( self::is_child_already_in_menu( $items, $event ) ) {
+				if ( self::is_child_already_in_menu( $items, $post ) ) {
 					continue;
 				}
-				$event->post_parent = $parent_ID;
+				$post->post_parent = $parent_ID;
 
-				$child = wp_setup_nav_menu_item( $event );
-				$child->db_id = $child->ID;
+				$post        = wp_setup_nav_menu_item( $post );
+				$post->db_id = $post->ID;
 
-				self::$added[ $child->ID ] = true; // We'll need this later
+				self::$added[ $post->ID ] = true; // We'll need this later
 
 				// Set the parent menu item.
 				// When adding items as children of existing menu items, their IDs won't match up
 				// which means that the parent value can't always be used.
-				if ( $child->$parent_field == $item->object_id ) {
-					$child->menu_item_parent = $item->ID; // Children
+				if ( $post->$parent_field == $item->object_id ) {
+					$post->menu_item_parent = $item->ID; // Children
 				} else {
-					$child->menu_item_parent = $child->$parent_field; // Grandchildren, etc.
+					$post->menu_item_parent = $post->$parent_field; // Grandchildren, etc.
 				}
 
 //				// The menu_order has to be unique, so make up new ones
 //				// The items are already sorted due to the get_pages()
 				$menu_order ++;
-				$child->menu_order = $menu_order;
+				$post->menu_order = $menu_order;
 
-				$items[] = $child;
+				$items[] = $post;
 			}
 		}
 

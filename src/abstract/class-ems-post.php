@@ -21,6 +21,7 @@ abstract class Ems_Post extends Fum_Observable implements Fum_Observer, Ems_Post
 	 */
 	public function __get( $var ) {
 		if ( property_exists( $this, $var ) ) {
+			error_log( "var: " . $var );
 			return $this->$var;
 		}
 

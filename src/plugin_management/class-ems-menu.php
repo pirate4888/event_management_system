@@ -79,12 +79,12 @@ class Ems_Menu {
 				} else {
 					$event->menu_item_parent = $event->$parent_field; // Grandchildren, etc.
 				}
-//
+
 //				// The menu_order has to be unique, so make up new ones
 //				// The items are already sorted due to the get_pages()
 				$menu_order ++;
 				$event->menu_order = $menu_order;
-//
+
 				$items[] = $event;
 			}
 		}

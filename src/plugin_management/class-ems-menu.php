@@ -52,13 +52,11 @@ class Ems_Menu {
 
 			// Add each child to the menu
 			foreach ( $events as $event ) {
-//				if ( $event instanceof Ems_Event ) {
-//					//Set Title for menu
-//					$date = $event->get_formatted_date();
-//					if ( null !== $date ) {
-//						$event->post_title = $event->post_title . "(" . $date . ")";
-//					}
-//				}
+				//Set Title for menu
+				$date = $event->get_formatted_date();
+				if ( null !== $date ) {
+					$event->post_title = $event->post_title . "(" . $date . ")";
+				}
 
 				//Check if $child is already an item in the menu
 				if ( self::is_child_already_in_menu( $items, $event->get_post() ) ) {

@@ -8,13 +8,13 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 	function __construct() {
 		parent::__construct(
 // Base ID of your widget
-				'wpb_widget',
+			'wpb_widget',
 
 // Widget name will appear in UI
-				__( 'DHV-Jugend Widget', 'ems_text_domain' ),
+			__( 'DHV-Jugend Widget', 'ems_text_domain' ),
 
 // Widget description
-				array( 'description' => __( 'Widget mit Links zum Dashboard, Registrieren, Login,Abmelden', 'ems_text_domain' ), )
+			array( 'description' => __( 'Widget mit Links zum Dashboard, Registrieren, Login,Abmelden', 'ems_text_domain' ), )
 		);
 	}
 
@@ -24,8 +24,9 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 		$title = apply_filters( 'widget_title', $instance['title'] );
 // before and after widget arguments are defined by themes
 		echo $args['before_widget'];
-		if ( ! empty( $title ) )
+		if ( ! empty( $title ) ) {
 			echo $args['before_title'] . $title . $args['after_title'];
+		}
 
 		?>
 		<ul>
@@ -42,6 +43,11 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 			<?php if ( is_user_logged_in() && ( current_user_can( 'read_event' ) || current_user_can( "read_" . Ems_Conf::EMS_NAME_PREFIX . "event" ) ) ): ?>
 				<li>
 					<a href="<?php echo get_permalink( get_option( Ems_Conf::EMS_NAME_PREFIX . 'event_statistic_page' ) ); ?>">Eventstatistiken</a>
+				</li>
+			<?php endif; ?>
+			<?php if ( is_user_logged_in() && ( current_user_can( 'read_event' ) || current_user_can( "read_" . Ems_Conf::EMS_NAME_PREFIX . "event" ) ) ): ?>
+				<li>
+					<a href="<?php echo get_permalink( 1153 ); ?>">Leitlinien/Protokolle</a>
 				</li>
 			<?php endif; ?>
 			<?php if ( ! is_user_logged_in() || current_user_can( 'manage_options' ) || ( current_user_can( 'read_event' ) || current_user_can( "read_" . Ems_Conf::EMS_NAME_PREFIX . "event" ) ) ): ?>
@@ -64,8 +70,7 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 	public function form( $instance ) {
 		if ( isset( $instance['title'] ) ) {
 			$title = $instance['title'];
-		}
-		else {
+		} else {
 			$title = __( 'New title', 'wpb_widget_domain' );
 		}
 // Widget admin form
@@ -81,6 +86,7 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 		$instance          = array();
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+
 		return $instance;
 	}
 

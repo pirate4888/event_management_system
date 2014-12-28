@@ -52,7 +52,7 @@ class Ems_Event_Statistic_Controller {
 						}
 //						echo $event->post_title . ": " . count( $registrations ) . "<br>";
 					}
-					$dataSet->addPoint( new Point( $start_year, $users ) );
+					$dataSet->addPoint( new Point( $start_year, count( $users ) ) );
 					echo "<h3>Teilnehmer im Jahr " . $start_year . "</h3>";
 					echo count( $users );
 					echo "<h3>Anmeldungen im Jahr " . $start_year . "</h3>";

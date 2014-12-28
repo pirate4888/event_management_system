@@ -65,15 +65,15 @@ class Ems_Menu {
 					continue;
 				}
 				$event->post_parent = $parent_ID;
-//
+
 				$event = wp_setup_nav_menu_item( $event );
-//				$event->db_id = $event->ID;
-//
-//				self::$added[ $event->ID ] = true; // We'll need this later
-//
-//				// Set the parent menu item.
-//				// When adding items as children of existing menu items, their IDs won't match up
-//				// which means that the parent value can't always be used.
+				$event->db_id = $event->ID;
+
+				self::$added[ $event->ID ] = true; // We'll need this later
+
+				// Set the parent menu item.
+				// When adding items as children of existing menu items, their IDs won't match up
+				// which means that the parent value can't always be used.
 //				if ( $event->$parent_field == $item->object_id ) {
 //					$event->menu_item_parent = $item->ID; // Children
 //				} else {

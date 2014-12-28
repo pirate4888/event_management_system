@@ -74,11 +74,11 @@ class Ems_Menu {
 				// Set the parent menu item.
 				// When adding items as children of existing menu items, their IDs won't match up
 				// which means that the parent value can't always be used.
-//				if ( $event->$parent_field == $item->object_id ) {
-//					$event->menu_item_parent = $item->ID; // Children
-//				} else {
-//					$event->menu_item_parent = $event->$parent_field; // Grandchildren, etc.
-//				}
+				if ( $event->$parent_field == $item->object_id ) {
+					$event->menu_item_parent = $item->ID; // Children
+				} else {
+					$event->menu_item_parent = $event->$parent_field; // Grandchildren, etc.
+				}
 //
 //				// The menu_order has to be unique, so make up new ones
 //				// The items are already sorted due to the get_pages()

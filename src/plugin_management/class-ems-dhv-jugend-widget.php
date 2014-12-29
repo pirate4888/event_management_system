@@ -45,11 +45,11 @@ class Ems_Dhv_Jugend_Widget extends WP_Widget {
 					<a href="<?php echo get_permalink( get_option( Ems_Conf::EMS_NAME_PREFIX . 'event_statistic_page' ) ); ?>">Eventstatistiken</a>
 				</li>
 			<?php endif; ?>
-			<?php if ( is_user_logged_in() && ( current_user_can( 'read_event' ) || current_user_can( "read_" . Ems_Conf::EMS_NAME_PREFIX . "event" ) ) ): ?>
-				<li>
-					<a href="<?php echo get_permalink( 1153 ); ?>">Leitlinien/Protokolle</a>
-				</li>
-			<?php endif; ?>
+			<!--			--><?php //if ( is_user_logged_in() && ( current_user_can( 'read_event' ) || current_user_can( "read_" . Ems_Conf::EMS_NAME_PREFIX . "event" ) ) ): ?>
+			<!--				<li>-->
+			<!--					<a href="--><?php //echo get_permalink( 1153 ); ?><!--">Leitlinien/Protokolle</a>-->
+			<!--				</li>-->
+			<!--			--><?php //endif; ?>
 			<?php if ( ! is_user_logged_in() || current_user_can( 'manage_options' ) || ( current_user_can( 'read_event' ) || current_user_can( "read_" . Ems_Conf::EMS_NAME_PREFIX . "event" ) ) ): ?>
 				<?php wp_register(); ?>
 			<?php endif; ?>

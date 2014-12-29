@@ -74,7 +74,11 @@ class Ems_Initialisation {
 	}
 
 	public static function checkAccessOnRestrictedPage( $query ) {
-		error_log( print_r( $query->query, true ) );
+		$ID = get_page_by_title( $query->query->pagename );
+		if ( $ID === 1153 && ! current_user_can( Ems_Event::get_edit_capability() ) ) {
+			wp_redirect( home_url() );
+			exit;
+		}
 	}
 
 	/**

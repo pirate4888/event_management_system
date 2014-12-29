@@ -7,7 +7,7 @@
 class Ems_Event_List_Controller {
 
 	public static function get_event_list() {
-		error_loG( "GET EVENT LIST" );
+		error_log( "GET EVENT LIST" );
 		$allowed_event_time_start = new DateTime();
 		$allowed_event_time_start->setTimestamp( Ems_Date_Helper::get_timestamp( get_option( "date_format" ), get_option( "ems_start_date_period" ) ) );
 		$allowed_event_time_end = new DateTime();

@@ -69,17 +69,8 @@ class Ems_Initialisation {
 		add_action( 'widgets_init', create_function( '', 'return register_widget("Ems_Dhv_Jugend_Widget");' ) );
 		add_action( 'admin_enqueue_scripts', array( 'Ems_Script_Enqueue', 'admin_enqueue_script' ) );
 		add_action( 'wp_enqueue_scripts', array( 'Ems_Script_Enqueue', 'enqueue_script' ) );
-		add_action( 'pre_get_posts', array( 'Ems_Initialisation', 'checkAccessOnRestrictedPage' ) );
-
 	}
 
-	public static function checkAccessOnRestrictedPage( $query ) {
-		$ID = get_page_by_title( $query->query->pagename );
-		if ( $ID === 1153 && ! current_user_can( Ems_Event::get_edit_capability() ) ) {
-			wp_redirect( home_url() );
-			exit;
-		}
-	}
 
 	/**
 	 * Calls the save_post function of the Ems_Post interface if $post_id belongs to a post which implements this interface

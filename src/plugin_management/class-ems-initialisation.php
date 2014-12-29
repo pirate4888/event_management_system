@@ -69,7 +69,12 @@ class Ems_Initialisation {
 		add_action( 'widgets_init', create_function( '', 'return register_widget("Ems_Dhv_Jugend_Widget");' ) );
 		add_action( 'admin_enqueue_scripts', array( 'Ems_Script_Enqueue', 'admin_enqueue_script' ) );
 		add_action( 'wp_enqueue_scripts', array( 'Ems_Script_Enqueue', 'enqueue_script' ) );
+		add_action( 'pre_get_posts', array( 'Ems_Initialisation', 'checkAccessOnRestrictedPage' ) );
 
+	}
+
+	public static function checkAccessOnRestrictedPage( $query ) {
+		error_log( print_r( $query, true ) );
 	}
 
 	/**

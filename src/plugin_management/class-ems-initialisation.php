@@ -74,7 +74,7 @@ class Ems_Initialisation {
 	}
 
 	public static function checkAccessOnRestrictedPage( $query ) {
-		error_log( print_r( $query["query"], true ) );
+		error_log( print_r( $query->query, true ) );
 	}
 
 	/**

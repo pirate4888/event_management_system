@@ -92,7 +92,7 @@ class Ems_Participant_List_Controller {
 				"Handynummer",
 				"Suche Mitfahrgelegenheit",
 				"Biete Mitfahrgelgenheit",
-				'Schüler, Azubi, Student'
+				"Schüler, Azubi, Student"
 			);
 
 

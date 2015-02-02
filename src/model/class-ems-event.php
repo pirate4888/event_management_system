@@ -450,7 +450,6 @@ class Ems_Event extends Ems_Post {
 				}
 			}
 		}
-		error_log( print_r( $data, true ) );
 
 		$event_registration->set_data( $data );
 		Ems_Event_Registration::add_event_registration( $event_registration );

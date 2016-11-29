@@ -120,8 +120,8 @@ class Ems_Event_Registration {
 		$user            = get_userdata( $registration->get_user_id() );
 		$subject         = 'Erfolgreich für "' . $title . '" registriert';
 		$message         =
-				'Liebe/r ' . $user->user_firstname . ",\n" .
-				'schade, dass du nicht auf das Event "' . $title . '" mitwillst.' . "\n" .
+				'Liebe/r ' . $user->user_firstname . ".\n" .
+				'Schade, dass du nicht auf das Event "' . $title . '" mitwillst.' . "\n" .
 				'Vielleicht schaust du nochmal auf www.dhv-jugend.de/events/ nach einem anderen Event.' . "\n" .
 				'Viele Grüße,' . "\n" .
 				'Das DHV-Jugendteam';
